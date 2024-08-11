@@ -2,7 +2,6 @@
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Header } from './componentes/header';
 import { BoasVindas } from './componentes/inicio';
-import { Container } from '@mui/material';
 
 const theme = createTheme({
   palette: {
@@ -59,15 +58,11 @@ const theme = createTheme({
 export default function PaginaPrincipal() {
   return (
     <ThemeProvider theme={theme}>
-      <Container sx={{
-        height: "100px",
-      }}>
-        
-        <Header />
 
-        <BoasVindas />
+      <Header />
 
-      </Container>
+      <BoasVindas />
+
     </ThemeProvider>
   );
 }
