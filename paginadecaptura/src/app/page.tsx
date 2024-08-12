@@ -2,6 +2,9 @@
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Header } from './componentes/header';
 import { BoasVindas } from './componentes/inicio';
+import { Formulario } from './componentes/formulario';
+import { FAQ } from './componentes/faq';
+import { BtnToTop } from './componentes/botaoSubir';
 
 const theme = createTheme({
   palette: {
@@ -62,6 +65,12 @@ export default function PaginaPrincipal() {
       <Header />
 
       <BoasVindas />
+
+      <Formulario />
+
+      <FAQ />
+
+      <BtnToTop />
 
     </ThemeProvider>
   );

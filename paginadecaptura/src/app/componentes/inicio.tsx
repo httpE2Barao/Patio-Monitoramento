@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 export const BoasVindas = () => {
     return (
-        <Container className="flex flex-col m-auto gap-3 sm:gap-5 justify-center items-center max-md:pt-5 xl:flex-row xl:translate-x-[50px]">
+        <Container className="flex flex-col m-auto gap-3 sm:gap-5 justify-center items-center max-md:pt-5 xl:flex-row ">
             <Box className="no-scrollbar" sx={{
                 gap: {
                     lg: "5em",
@@ -37,7 +37,7 @@ export const BoasVindas = () => {
                             xs: "5vw",
                             sm: "1.6rem",
                             md: "2rem",
-                            lg: "2.4rem",
+                            lg: "2rem",
                         }
                     }}>Não vai demorar muito.</Typography>
 
@@ -52,8 +52,8 @@ export const BoasVindas = () => {
                         fontSize: {
                             xs: "10vw",
                             sm: "4rem",
-                            md: "4.5rem",
-                            lg: "4.5rem",
+                            md: "4rem",
+                            lg: "4rem",
                         }
                     }}>Queremos te <br /> conhecer melhor!</Typography>
 
@@ -68,13 +68,16 @@ export const BoasVindas = () => {
                         fontSize: {
                             xs: "5vw",
                             sm: "1.6rem",
-                            md: "2rem",
-                            lg: "2rem",
+                            md: "1.8rem",
+                            lg: "1.8rem",
                         }
                     }}>Atualize seus dados para que possamos estar sempre conectados e entregar o melhor serviço.</Typography>
-                    
+
                 <Box className="flex gap-5 max-xl:justify-center mt-7 lg:mt-10 md:gap-10 ">
                     <Button variant="contained" color="primary"
+                        onClick={() => {
+                            document.getElementById('formulario')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
                         sx={{
                             color: "Black",
                             paddingX: {
@@ -89,24 +92,28 @@ export const BoasVindas = () => {
                             }
                         }}>Atualizar agora!</Button>
 
-                    <Button variant="outlined" color="primary" sx={{
-                        color: "GrayText", borderWidth: '2px', borderColor: 'primary.main',
-                        '&:hover': { color: "black", borderWidth: '2px' },
-                        paddingX: {
-                            sm: "1.3rem",
-                        },
-                        paddingY: "1rem",
-                        fontSize: {
-                            xs: "2.8vw",
-                            sm: "1.2rem",
-                            md: "1rem",
-                            lg: "1rem",
-                        }
-                    }} >Por que fazer isso?</Button>
+                    <Button variant="outlined" color="primary"
+                        onClick={() => {
+                            document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        sx={{
+                            color: "GrayText", borderWidth: '2px', borderColor: 'primary.main',
+                            '&:hover': { color: "black", borderWidth: '2px' },
+                            paddingX: {
+                                sm: "1.3rem",
+                            },
+                            paddingY: "1rem",
+                            fontSize: {
+                                xs: "2.8vw",
+                                sm: "1.2rem",
+                                md: "1rem",
+                                lg: "1rem",
+                            }
+                        }} >Por que fazer isso?</Button>
                 </Box>
             </Box>
 
-            <Image src={"/Agreement-cuate.svg"} className='' width={700} height={700} alt='Duas pessoas se comprimentando em um ambiente profissional.' />
+            <Image src={"/Agreement-cuate.svg"} className='' width={600} height={600} alt='Duas pessoas se comprimentando em um ambiente profissional.' />
 
         </Container>
     )
