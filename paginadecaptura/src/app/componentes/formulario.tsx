@@ -35,7 +35,7 @@ export const Formulario = () => {
                             md: "2.2rem",
                             lg: "2.4rem",
                        },
-                        fontWeight: 400,
+                        fontWeight: 500,
                         textAlign: "center",
                         color: "black",
                         py: "3rem",
