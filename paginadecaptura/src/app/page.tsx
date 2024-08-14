@@ -5,6 +5,7 @@ import { BoasVindas } from './componentes/inicio';
 import { Formulario } from './componentes/formulario';
 import { FAQ } from './componentes/faq';
 import { BtnToTop } from './componentes/botaoSubir';
+import { Footer } from './componentes/footer';
 
 const theme = createTheme({
   palette: {
@@ -69,6 +70,8 @@ export default function PaginaPrincipal() {
       <Formulario />
 
       <FAQ />
+
+      <Footer />
 
       <BtnToTop />
 

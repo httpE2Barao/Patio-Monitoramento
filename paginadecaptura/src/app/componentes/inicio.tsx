@@ -37,7 +37,7 @@ export const BoasVindas = () => {
                             xs: "5vw",
                             sm: "1.6rem",
                             md: "2rem",
-                            lg: "2rem",
+                            lg: "1.8rem",
                         }
                     }}>Não vai demorar muito.</Typography>
 
@@ -53,7 +53,7 @@ export const BoasVindas = () => {
                             xs: "10vw",
                             sm: "4rem",
                             md: "4rem",
-                            lg: "4rem",
+                            lg: "3.5rem",
                         }
                     }}>Queremos te <br /> conhecer melhor!</Typography>
 
@@ -69,7 +69,7 @@ export const BoasVindas = () => {
                             xs: "5vw",
                             sm: "1.6rem",
                             md: "1.8rem",
-                            lg: "1.8rem",
+                            lg: "1.4rem",
                         }
                     }}>Atualize seus dados para que possamos estar sempre conectados e entregar o melhor serviço.</Typography>
 
