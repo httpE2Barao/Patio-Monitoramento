@@ -1,0 +1,7 @@
+{
+    "parentescos": [
+        { "id": "1", "value": "Filho(a)"},
+        { "id": "2", "value": "Pai"},
+        { "id": "3", "value": "Mãe"}
+    ]
+}
