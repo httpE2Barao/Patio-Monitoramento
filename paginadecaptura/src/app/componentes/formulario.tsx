@@ -27,7 +27,7 @@ import { Users } from "../users/users"
 export const Formulario = () => {
     return (
         <section id="formulario">
-            <Container sx={{ backgroundColor: "secondary.main", px: "0", py: "7vw", maxWidth: { lg: "100vw" }, }}>
+            <Container sx={{ backgroundColor: "primary.main", px: "0", py: "7vw", maxWidth: { lg: "100vw" }, }}>
 
                 <Box sx={{ height: "100vh", width: {md: "90%", lg:"90%", xl:"80%"}, margin: "auto", backgroundColor: "white", borderRadius: ".7rem", }}>
 

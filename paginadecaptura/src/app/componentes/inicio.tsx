@@ -74,7 +74,7 @@ export const BoasVindas = () => {
                     }}>Atualize seus dados para que possamos estar sempre conectados e entregar o melhor serviço.</Typography>
 
                 <Box className="flex gap-5 max-xl:justify-center mt-7 lg:mt-10 md:gap-10 ">
-                    <Button variant="contained" color="primary"
+                    <Button variant="contained" color="secondary"
                         onClick={() => {
                             document.getElementById('formulario')?.scrollIntoView({ behavior: 'smooth' });
                         }}
@@ -92,12 +92,12 @@ export const BoasVindas = () => {
                             }
                         }}>Atualizar agora!</Button>
 
-                    <Button variant="outlined" color="primary"
+                    <Button variant="outlined" color="secondary"
                         onClick={() => {
                             document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' });
                         }}
                         sx={{
-                            color: "GrayText", borderWidth: '2px', borderColor: 'primary.main',
+                            color: "GrayText", borderWidth: '2px', borderColor: 'secondary.main',
                             '&:hover': { color: "black", borderWidth: '2px' },
                             paddingX: {
                                 sm: "1.3rem",

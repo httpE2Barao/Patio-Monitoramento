@@ -22,3 +22,7 @@
 .invert-color {
   filter: invert();
 }
+
+.btn-to-top:hover :first-child{
+  filter: invert(1);
+}

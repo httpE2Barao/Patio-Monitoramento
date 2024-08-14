@@ -10,10 +10,10 @@ import { Footer } from './componentes/footer';
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#FBF355",
+      main: "#131946",
     },
     secondary: {
-      main: "#131946",
+      main: "#FBF355",
     },
   },
   typography: {

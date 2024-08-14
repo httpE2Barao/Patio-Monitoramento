@@ -26,7 +26,7 @@ function FaqOption(props: FaqOptionProps) {
     };
 
     return (
-        <Box sx={{ width: "85vw", maxWidth: "1000px", margin: "auto", py: "1rem", px: "2rem", borderRadius: ".7rem", backgroundColor: "#F6F6F6" }}>
+        <Box sx={{ width: "85vw", maxWidth: "1000px", margin: "auto", py: "1rem", px: "2rem", borderRadius: ".7rem", backgroundColor: "#E8E5E5" }}>
             <span className="flex justify-between items-center cursor-pointer" onClick={handleExpandir}>
                 <Typography sx={{ fontSize: {xs: "1.2rem", sm: "1.2rem", md: "1.4rem", lg:"1.5rem"}, pb: ".2rem", fontWeight: 400 }}>
                     {props.pergunta}
@@ -56,7 +56,6 @@ export const FAQ = () => {
                     <FaqOption pergunta={"É seguro fornecer meus dados?"} resposta={"Sim, a segurança dos seus dados é uma prioridade. As informações coletadas serão utilizadas exclusivamente para fins de controle de acesso ao condomínio e serão armazenadas de forma confidencial."} Expandir={Expandir} />
                     <FaqOption pergunta={"E se eu tiver mais de um veículo?"} resposta={"Sim, você poderá informar a quantidade de veículos que possui no formulário de atualização."} Expandir={Expandir} />
                     <FaqOption pergunta={"Quando a atualização dos dados entrará em vigor?"} resposta={"Após a atualização dos dados, a empresa de segurança realizará a devida atualização do sistema e as novas informações estarão disponíveis em breve."} Expandir={Expandir} />
-                    {/* <FaqOption pergunta={"O que acontece se eu mudar de apartamento?"} resposta={"Em caso de mudança de apartamento, será necessário realizar uma nova atualização dos dados informando o novo endereço."} Expandir={Expandir} /> */}
                     <FaqOption pergunta={"E se eu tiver alguma dúvida?"} resposta={'Em caso de dúvidas, entre em contato conosco ao clicar no botão "Contate-nos" no topo da página ou pelo nossos canais de atendimento dispostos no rodapé abaixo.'} Expandir={Expandir} />
                 </Box>
             </Container>
