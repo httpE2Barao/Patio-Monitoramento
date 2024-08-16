@@ -1,49 +1,43 @@
 import { Box, Container, Typography } from "@mui/material"
-import { Users } from "../users/users"
+import { FormTitular } from "../formComponentes/titular"
 
-// type Cliente = {
-//     nome: string,
-//     email: string,
-//     telefone: string,
-
-//     doc: string,
-//     // cpf: string,
-//     // cnh: string,
-//     parente: string,
-// }
-
-// type Residencia = {
-//     Condominio: string,
-//     Apartamento: number,
-//     Complementos?: string,
-// }
-
-// type Veiculo = {
-//     Modelo: string,
-//     Cor: string,
-//     Placa: string,
-// }
+const Titulo = (props: { titulo: string }) => {
+    return (
+        <Typography sx={{
+            fontSize: {
+                sx: "2rem",
+                sm: "2.4rem",
+                md: "2.4rem",
+                lg: "2.4rem",
+                xl: "2.4rem",
+            },
+            fontWeight: 500,
+            textAlign: "center",
+            color: "black",
+            py: "3vw",
+        }}>
+            {props.titulo}
+        </Typography>
+    )
+}
 
 export const Formulario = () => {
     return (
         <section id="formulario">
             <Container sx={{ backgroundColor: "primary.main", px: "0", py: "7vw", maxWidth: { lg: "100vw" }, }}>
 
-                <Box sx={{ height: "100vh", width: {md: "90%", lg:"90%", xl:"80%"}, margin: "auto", backgroundColor: "white", borderRadius: ".7rem", }}>
+                <Box sx={{ width: { md: "90%", lg: "90%", xl: "80%" }, margin: "auto", backgroundColor: "white", borderRadius: ".7rem", }}>
 
-                    <Typography sx={{
-                        fontSize: "2.4rem",
-                        fontWeight: 500,
-                        textAlign: "center",
-                        color: "black",
-                        py: "4vw",
-                    }}>
-                        Formulário cadastral
-                    </Typography>
-                    
-                    <Users />
+                    <Titulo titulo="Titular" />
+
+                    <FormTitular />
+
+                    <Titulo titulo="Residêncial" />
+
+                    <Titulo titulo="Veículo" />
 
                 </Box>
+
             </Container>
         </section>
     )

@@ -28,7 +28,7 @@ function FaqOption(props: FaqOptionProps) {
     return (
         <Box sx={{ width: "85vw", maxWidth: "1000px", margin: "auto", py: "1rem", px: "2rem", borderRadius: ".7rem", backgroundColor: "#E8E5E5" }}>
             <span className="flex justify-between items-center cursor-pointer" onClick={handleExpandir}>
-                <Typography sx={{ fontSize: {xs: "1.2rem", sm: "1.2rem", md: "1.4rem", lg:"1.5rem"}, pb: ".2rem", fontWeight: 400 }}>
+                <Typography sx={{ fontSize: { xs: "1.2rem", sm: "1.2rem", md: "1.4rem", lg: "1.5rem" }, pb: ".2rem", fontWeight: 400 }}>
                     {props.pergunta}
                 </Typography>
                 <Image src={"/down.png"} className={`SetaExpandir self-start ${aberto && "rotate-180"}`} alt="Ver mais" width={50} height={50} />
@@ -46,7 +46,16 @@ export const FAQ = () => {
     return (
         <section id="faq">
             <Container sx={{ pb: "5rem" }}>
-                <Typography sx={{ fontSize: "2.4rem", textAlign: "center", py: "4rem", fontWeight: 500 }}>
+                <Typography sx={{
+                    textAlign: "center", py: "4rem", fontWeight: 500,
+                    fontSize: {
+                        xs: "1.2rem",
+                        sm: "2rem",
+                        md: "2.4rem",
+                        lg: "2.4rem",
+                        xl: "2.4rem",
+                    },
+                }}>
                     Dúvidas frequentes
                 </Typography>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>

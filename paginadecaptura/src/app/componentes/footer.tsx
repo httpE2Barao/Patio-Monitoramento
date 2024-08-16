@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export const Footer = () => {
     return (
-        <Container sx={{ p: "4rem", display: "flex", backgroundColor: "primary.main", color: "white", justifyContent: "space-evenly", flexDirection: {xs:"row", sm:"column", md:"row", lg:"row"}, gap: "2rem", alignItems: "center", maxWidth: { lg: "100vw" } }}>
+        <Container sx={{ p: "4rem", display: "flex", backgroundColor: "primary.main", color: "white", justifyContent: "space-evenly", flexDirection: {xs:"column", sm:"column", md:"row", lg:"row"}, gap: "2rem", alignItems: "center", maxWidth: { lg: "100vw" } }}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: ".7rem", textAlign: {xs:"center", sm:"center", md:"left", lg:"left"} }}>
             <a href="https://www.google.com/maps/search/?api=1&query=Rua%20Dr.%20Fl%C3%A1vio%20Zetola%20372%20-%20S%C3%A3o%20Jos%C3%A9%20dos%20Pinhais%20PR" target="_blank" rel="noopener noreferrer">
                     <p>
