@@ -12,14 +12,14 @@ export const Users = () => {
         resolver: zodResolver(schema),
         defaultValues: {
             tipoDocumento: "RG",
-            residents: []
+            residentes: []
         }
     });
 
     const { control, handleSubmit } = methods;
     const { fields, append } = useFieldArray({
         control,
-        name: "residents"
+        name: "residentes"
     });
 
     const onSubmit = (data: Schema) => {
