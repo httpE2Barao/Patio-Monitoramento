@@ -1,8 +1,9 @@
+import { useState } from "react";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schema, Schema } from "./schema";
-import { FormTitular } from "./titular";
-import { FormResident } from "./residencial";
+import { FormTitular } from "./FormTitular";
+import { FormResident } from "./FormResidencial";
 import { Button, Box } from "@mui/material";
 
 export const Users = () => {
@@ -11,14 +12,14 @@ export const Users = () => {
         resolver: zodResolver(schema),
         defaultValues: {
             tipoDocumento: "RG",
-            residentes: []
+            residents: []
         }
     });
 
     const { control, handleSubmit } = methods;
     const { fields, append } = useFieldArray({
         control,
-        name: "residentes"
+        name: "residents"
     });
 
     const onSubmit = (data: Schema) => {

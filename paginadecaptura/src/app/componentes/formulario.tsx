@@ -1,5 +1,5 @@
 import { Box, Container, Typography } from "@mui/material"
-import { FormTitular } from "../formComponentes/titular"
+import { FormTitular } from "../formComponentes/FormTitular"
 
 const Titulo = (props: { titulo: string }) => {
     return (
