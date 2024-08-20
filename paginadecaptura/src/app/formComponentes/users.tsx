@@ -1,13 +1,13 @@
-import { useState } from "react";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { schema, Schema } from "./schema";
 import { FormTitular } from "./FormTitular";
 import { FormResident } from "./FormResidencial";
 import { Button, Box } from "@mui/material";
+import { schema } from "./schema";
+import {FormSchemaType} from "./schema";
 
 export const Users = () => {
-    const methods = useForm<Schema>({
+    const methods = useForm<FormSchemaType>({
         mode: "all",
         resolver: zodResolver(schema),
         defaultValues: {
@@ -22,7 +22,7 @@ export const Users = () => {
         name: "residentes"
     });
 
-    const onSubmit = (data: Schema) => {
+    const onSubmit = (data: FormSchemaType) => {
         console.log(data);
     };
 
@@ -30,11 +30,12 @@ export const Users = () => {
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <FormTitular />
+
                 {fields.map((field, index) => (
                     <FormResident key={field.id} index={index} />
                 ))}
                 <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-                    <Button variant="contained" onClick={() => append({ nome: "", telefone: "", email: "", tipoDocumento: "RG", documento: "" })}>
+                    <Button variant="contained" onClick={() => append({ nome: "", telefone: "", email: "", tipoDocumento: "RG", documento: "", parentesco: "" })}>
                         Adicionar Residente
                     </Button>
                 </Box>

@@ -1,6 +1,6 @@
 import { RadioGroup, FormControlLabel, Radio, Grid, TextField } from "@mui/material";
 import { useFormContext, Controller } from "react-hook-form";
-import { Schema } from "./schema";
+import { Schema } from "zod";
 
 export const FormTitular = () => {
     const { control, register, formState: { errors } } = useFormContext<Schema>();
