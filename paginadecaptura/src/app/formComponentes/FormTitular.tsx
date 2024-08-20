@@ -1,12 +1,12 @@
-import { RadioGroup, FormControlLabel, Radio, Grid, TextField } from "@mui/material";
+import { Grid, TextField, RadioGroup, FormControlLabel, Radio } from "@mui/material";
 import { useFormContext, Controller } from "react-hook-form";
-import { Schema } from "zod";
+import { Schema } from "./schema";
 
 export const FormTitular = () => {
     const { control, register, formState: { errors } } = useFormContext<Schema>();
 
     return (
-        <Grid container spacing={2} sx={{ mx: "2rem", width: "90%", m: "auto" }}>
+        <Grid container spacing={2} sx={{pb: 2, mx: "2rem", width: "90%", m: "auto" }}>
             <Grid item xs={12}>
                 <RadioGroup sx={{ gap: "1rem", display: "flex", flexDirection: "row" }}>
                     <FormControlLabel value="Cadastrado" control={<Radio />} label="Já possuo cadastro" />

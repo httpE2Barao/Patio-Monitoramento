@@ -1,5 +1,5 @@
-import { Box, Container, Typography } from "@mui/material"
-import { FormTitular } from "../formComponentes/FormTitular"
+import { Box, Container, Typography } from "@mui/material";
+import { Users } from "../formComponentes/users";
 
 const Titulo = (props: { titulo: string }) => {
     return (
@@ -18,27 +18,21 @@ const Titulo = (props: { titulo: string }) => {
         }}>
             {props.titulo}
         </Typography>
-    )
-}
+    );
+};
 
 export const Formulario = () => {
+
     return (
         <section id="formulario">
             <Container sx={{ backgroundColor: "primary.main", px: "0", py: "7vw", maxWidth: { lg: "100vw" }, }}>
-
                 <Box sx={{ width: { md: "90%", lg: "90%", xl: "80%" }, margin: "auto", backgroundColor: "white", borderRadius: ".7rem", }}>
-
-                    <Titulo titulo="Titular" />
-
-                    <FormTitular />
-
-                    <Titulo titulo="Residêncial" />
-
-                    <Titulo titulo="Veículo" />
-
+                    <Titulo titulo="Residentes" />
+                    <Users />
+                    {/* <Titulo titulo="Residêncial" />
+                    <Titulo titulo="Veículo" /> */}
                 </Box>
-
             </Container>
         </section>
-    )
-}
+    );
+};
