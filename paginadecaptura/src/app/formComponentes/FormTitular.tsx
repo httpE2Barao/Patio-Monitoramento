@@ -1,13 +1,14 @@
 import { Grid, TextField, RadioGroup, FormControlLabel, Radio, Typography } from "@mui/material";
 import { useFormContext, Controller } from "react-hook-form";
-import { Schema } from "./schema";
+import { Residente, Schema } from "./schema";
 
+// Componente para título
 export const Titulo = (props: { titulo: string }) => {
     return (
         <Grid item xs={12}>
             <Typography sx={{
                 fontSize: {
-                    sx: "2rem",
+                    xs: "2rem",
                     sm: "2.4rem",
                     md: "2.4rem",
                     lg: "2.4rem",
@@ -24,28 +25,53 @@ export const Titulo = (props: { titulo: string }) => {
     );
 };
 
+// Componente do formulário do titular
 export const FormTitular = () => {
-    const { control, register, formState: { errors } } = useFormContext<Schema>();
+    const { control, register, formState: { errors } } = useFormContext<Residente>();
 
     return (
         <Grid container spacing={2} sx={{ pb: 2, mx: "2rem", width: "90%", m: "auto" }}>
 
-            <Titulo titulo="Titular" />
+            <Titulo titulo="Residencial" />
 
             <Grid item xs={12}>
-                <RadioGroup sx={{ gap: "1rem", display: "flex", flexDirection: "row" }}>
-                    <FormControlLabel value="Cadastrado" control={<Radio />} label="Já possuo cadastro" />
-                    <FormControlLabel value="Novo cadastro" control={<Radio />} label="Sou novo morador" />
-                </RadioGroup>
+                <Controller
+                    name="tipoCadastro"
+                    control={control}
+                    render={({ field }) => (
+                        <RadioGroup {...field} sx={{ gap: "1rem", display: "flex", flexDirection: "row" }}>
+                            <FormControlLabel value="Cadastrado" control={<Radio />} label="Já possuo cadastro" />
+                            <FormControlLabel value="Novo cadastro" control={<Radio />} label="Sou novo morador" />
+                        </RadioGroup>
+                    )}
+                />
             </Grid>
             <Grid item xs={12} md={6}>
-                <TextField {...register("nome")} label="Nome e Sobrenome" fullWidth error={!!errors.nome} helperText={errors.nome?.message} />
+                <TextField
+                    {...register("nome")}
+                    label="Nome e Sobrenome"
+                    fullWidth
+                    error={!!errors.nome}
+                    helperText={errors.nome?.message}
+                />
             </Grid>
             <Grid item xs={12} md={6}>
-                <TextField {...register("telefone")} label="Telefone" fullWidth error={!!errors.telefone} helperText={errors.telefone?.message} />
+                <TextField
+                    {...register("telefone")}
+                    label="Telefone"
+                    fullWidth
+                    error={!!errors.telefone}
+                    helperText={errors.telefone?.message}
+                />
             </Grid>
             <Grid item xs={12}>
-                <TextField {...register("email")} label="Email" fullWidth error={!!errors.email} helperText={errors.email?.message} />
+                <TextField
+                    {...register("email")}
+                    label="Email"
+                    fullWidth
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                />
             </Grid>
             <Grid item xs={12} md={4}>
                 <Controller
@@ -61,14 +87,32 @@ export const FormTitular = () => {
                 />
             </Grid>
             <Grid item xs={12} md={8}>
-                <TextField {...register("documento")} label="Número do Documento" fullWidth error={!!errors.documento} helperText={errors.documento?.message} />
+                <TextField
+                    {...register("documento")}
+                    label="Número do Documento"
+                    fullWidth
+                    error={!!errors.documento}
+                    helperText={errors.documento?.message}
+                />
             </Grid>
 
             <Grid item xs={12} md={6}>
-                <TextField {...register("endereco.condominio")} label="Condominio" fullWidth error={!!errors.endereco?.condominio} helperText={errors.endereco?.condominio?.message} />
+                <TextField
+                    {...register("condominio")}
+                    label="Condomínio"
+                    fullWidth
+                    error={!!errors.condominio}
+                    helperText={errors.condominio?.message}
+                />
             </Grid>
             <Grid item xs={12} md={6}>
-                <TextField {...register("endereco.apto")} label="Apartamento" fullWidth error={!!errors.endereco?.apto} helperText={errors.endereco?.apto?.message} />
+                <TextField
+                    {...register("apto")}
+                    label="Apartamento"
+                    fullWidth
+                    error={!!errors.apto}
+                    helperText={errors.apto?.message}
+                />
             </Grid>
         </Grid>
     );
