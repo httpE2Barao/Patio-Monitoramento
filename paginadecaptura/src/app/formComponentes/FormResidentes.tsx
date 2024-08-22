@@ -15,7 +15,7 @@ export const FormResident = ({ index }: FormResidentProps) => {
     });
 
     return (
-        <Grid container spacing={2} sx={{ py: 2, mx: "2rem", width: "90%", m: "auto", borderTop: "1px solid black" }}>
+        <Grid container spacing={2} sx={{ py: 2, mx: "2rem", width: "90%", m: "auto", borderTop: "1px solid grey" }}>
             <Grid item xs={12} md={6}>
                 <TextField {...register(`residentes.${index}.nome`)} label="Nome e Sobrenome" fullWidth error={!!errors.residentes?.[index]?.nome} helperText={errors.residentes?.[index]?.nome?.message} />
             </Grid>

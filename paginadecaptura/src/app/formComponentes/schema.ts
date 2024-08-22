@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { string, z } from 'zod';
 
 const patterns = {
     email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
@@ -13,8 +13,17 @@ const zodSchema = z.object({
     email: z.string().min(1, { message: 'Insira um email' })
         .refine((text) => patterns.email.test(text), { message: "O email é inválido" }),
     tipoDocumento: z.enum(["RG", "CPF", "CNH"], { message: 'Selecione um tipo de documento válido' }),
-    documento: z.string().min(10, { message: 'Digite somente os números do documento' }),
+    documento: z.string().min(10, { message: 'Exemplo: 123.456.789-00' }),
     parentesco: z.string().optional(),
+    endereco: z.object({
+        condominio: z.string().min(1, { message: 'Digite o nome do condomínio' }),
+        apto: z.string().min(1, { message: 'Digite o número do apartamento' })
+    }),
+    veiculo: z.object({
+        cor: z.string().min(1, { message: 'Digite a cor do carro' }),
+        modelo: z.string().min(1, { message: 'Digite o modelo do carro' }),
+        placa: z.string().min(7, { message: 'Digite a placa do carro' })
+    }),
     residentes: z.array(
         z.object({
             nome: z.string().min(7, { message: 'Digite seu nome completo' }),

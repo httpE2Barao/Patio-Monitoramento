@@ -1,11 +1,12 @@
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormTitular } from "./FormTitular";
-import { FormResident } from "./FormResidencial";
+import { FormResident } from "./FormResidentes";
 import { Button, Box } from "@mui/material";
 import { schema, Schema } from "./schema";
+import { FormVeiculo } from "./FormVeiculo";
 
-export const Users = () => {
+export const Form = () => {
     const methods = useForm<Schema>({
         mode: "all",
         resolver: zodResolver(schema),
@@ -42,6 +43,8 @@ export const Users = () => {
                         Adicionar Residente
                     </Button>
                 </Box>
+
+                <FormVeiculo />
 
                 <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
                     <Button type="submit" variant="contained">
