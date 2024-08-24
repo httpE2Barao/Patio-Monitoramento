@@ -16,9 +16,12 @@ const residenteSchema = z.object({
     tipoDocumento: z.enum(["RG", "CPF", "CNH"], { message: 'Selecione um tipo de documento válido' }),
     documento: z.string().min(10, { message: 'Digite somente os números do documento' }),
     parentesco: z.string().optional(),
+});
+
+const enderecoSchema = z.object({
     condominio: z.string().min(1, { message: 'Digite o nome do condomínio' }),
     apto: z.string().min(1, { message: 'Digite o número do apartamento' }),
-});
+})
 
 const veiculoSchema = z.object({
     cor: z.string().min(1, { message: 'Digite a cor do carro' }),
@@ -26,11 +29,20 @@ const veiculoSchema = z.object({
     placa: z.string().min(7, { message: 'Digite a placa do carro' }),
 });
 
+const titularSchema = z.object({
+    residentes: z.array(residenteSchema),
+    endereco: z.array(enderecoSchema),
+});
+
 export const schema = z.object({
+    endereco: z.array(enderecoSchema),
+    titular: z.array(titularSchema),
     residentes: z.array(residenteSchema),
     veiculos: z.array(veiculoSchema),
 });
 
+export type Endereco = z.infer<typeof enderecoSchema>;
 export type Residente = z.infer<typeof residenteSchema>;
 export type Veiculo = z.infer<typeof veiculoSchema>;
+export type Titular = z.infer<typeof schema>;
 export type Schema = z.infer<typeof schema>;

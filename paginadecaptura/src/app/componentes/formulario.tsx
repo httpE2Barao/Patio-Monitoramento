@@ -1,5 +1,5 @@
 import { Box, Container, Typography } from "@mui/material";
-import { Form } from "../formComponentes/Form";
+import { Form } from "./formComponentes/Form";
 
 export const Formulario = () => {
 

@@ -1,8 +1,7 @@
 import { Grid, TextField, RadioGroup, FormControlLabel, Radio, Typography } from "@mui/material";
 import { useFormContext, Controller } from "react-hook-form";
-import { Residente, Schema } from "./schema";
+import { Residente } from "./schema";
 
-// Componente para título
 export const Titulo = (props: { titulo: string }) => {
     return (
         <Grid item xs={12}>
@@ -25,12 +24,11 @@ export const Titulo = (props: { titulo: string }) => {
     );
 };
 
-// Componente do formulário do titular
 export const FormTitular = () => {
     const { control, register, formState: { errors } } = useFormContext<Residente>();
 
     return (
-        <Grid container spacing={2} sx={{ pb: 2, mx: "2rem", width: "90%", m: "auto" }}>
+        <Grid container spacing={2}>
 
             <Titulo titulo="Residencial" />
 
@@ -93,25 +91,6 @@ export const FormTitular = () => {
                     fullWidth
                     error={!!errors.documento}
                     helperText={errors.documento?.message}
-                />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-                <TextField
-                    {...register("condominio")}
-                    label="Condomínio"
-                    fullWidth
-                    error={!!errors.condominio}
-                    helperText={errors.condominio?.message}
-                />
-            </Grid>
-            <Grid item xs={12} md={6}>
-                <TextField
-                    {...register("apto")}
-                    label="Apartamento"
-                    fullWidth
-                    error={!!errors.apto}
-                    helperText={errors.apto?.message}
                 />
             </Grid>
         </Grid>
