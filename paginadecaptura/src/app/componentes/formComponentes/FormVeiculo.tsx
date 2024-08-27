@@ -3,7 +3,7 @@ import { Grid, TextField, Button } from "@mui/material";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { Schema } from "./schema";
 import { FormNumberProps } from "./FormResidentes";
-import { Titulo } from "./FormTitular";
+import { Titulo } from "./titulo";
 
 export const FormVeiculo: React.FC<FormNumberProps> = ({ index }) => {
     const { control, register, formState: { errors } } = useFormContext<Schema>();

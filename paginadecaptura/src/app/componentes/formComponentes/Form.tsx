@@ -1,36 +1,48 @@
-import React from "react";
-import { Grid, Button, Container } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Grid, Button, Container, Autocomplete, TextField } from "@mui/material";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schema, Schema } from "./schema";
-import { FormResidente } from "./FormResidentes";
 import { FormVeiculo } from "./FormVeiculo";
 import { FormEndereco } from "./FormEndereco";
+import { FormResidentes } from "./FormResidentes";
+import Cliente from "./construtor";
 
 export const Form = () => {
     const methods = useForm<Schema>({
         mode: "all",
         resolver: zodResolver(schema),
         defaultValues: {
-            residentes: [{ nome: '', telefone: '', email: '', tipoDocumento: 'RG', documento: '', parentesco: '' }],
+            residentes: [{ nome: '', telefone: '', email: '', tipoDocumento: 'RG', documento: '' }],
             veiculos: [{ cor: '', modelo: '', placa: '' }],
             endereco: [{ condominio: '', apto: '' }]
         }
     });
 
-    const { handleSubmit, reset, formState: { errors } } = methods;
+    const { handleSubmit, reset } = methods;
 
-    const { fields: residentesFields } = useFieldArray({
+    const { fields: residentesFields, append: appendResidente, remove: removeResidente } = useFieldArray({
         name: "residentes",
         control: methods.control
     });
-    const { fields: veiculosFields } = useFieldArray({
+    const { fields: veiculosFields, append: appendVeiculo, remove: removeVeiculo } = useFieldArray({
         name: "veiculos",
         control: methods.control
     });
 
-    const onSubmit = (data: Schema) => {
-        console.log("Form Data:", data);
+    const [parentescos, setParentescos] = useState<{ id: number, value: string }[]>([]);
+
+    useEffect(() => {
+        fetch("/parentescos.json")
+            .then(res => res.json())
+            .then(data => setParentescos(data))
+            .catch(err => console.error("Erro ao carregar os parentescos:", err));
+    }, []);
+
+    const onSubmit = async (data: Schema) => {
+        // const cliente = new Cliente(data.titular, data.veiculos);
+        // cliente.salvarDados(); // Implemente a lógica para salvar os dados
+        console.log("Dados do cliente:", data);
     };
 
     return (
@@ -44,7 +56,7 @@ export const Form = () => {
 
                         <Grid item xs={12}>
                             {residentesFields.map((item, index) => (
-                                <FormResidente key={item.id} index={index} />
+                                <FormResidentes key={item.id} index={index} />
                             ))}
                         </Grid>
 

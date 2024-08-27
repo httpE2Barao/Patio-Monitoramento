@@ -23,10 +23,6 @@
   filter: invert();
 }
 
-.btn-to-top:hover :first-child{
+.btn-to-top:hover :first-child {
   filter: invert(1);
-}
-
-.primeiro-item {
-  grid-row: 1;
 }

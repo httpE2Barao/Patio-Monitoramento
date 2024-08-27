@@ -2,7 +2,7 @@ import React from "react";
 import { Grid, TextField } from "@mui/material";
 import { useFormContext } from "react-hook-form";
 import { Schema } from "./schema";
-import { Titulo } from "./FormTitular";
+import { Titulo } from "./titulo";
 
 export const FormEndereco: React.FC = () => {
     const { register, formState: { errors } } = useFormContext<Schema>();
