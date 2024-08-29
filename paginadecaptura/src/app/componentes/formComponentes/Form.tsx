@@ -1,5 +1,4 @@
-import React from "react";
-import { NextApiRequest, NextApiResponse } from "next";
+import React, { useEffect } from "react";
 import { Grid, Button, Container } from "@mui/material";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,33 +7,6 @@ import { FormVeiculo } from "./FormVeiculo";
 import { FormEndereco } from "./FormEndereco";
 import { FormResidentes } from "./FormResidentes";
 import { FormFeedback } from "./FormFeedback";
-
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-    const { method, body } = req;
-
-    if (method === 'POST') {
-        const clienteData = JSON.stringify(body);
-
-        fetch('/clientes.json', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: clienteData
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Resposta do servidor:', data);
-            })
-            .catch(error => {
-                console.error('Erro ao enviar dados:', error);
-            });
-
-        res.status(200).json({ message: 'Dados do cliente salvos com sucesso.' });
-    } else {
-        res.status(405).json({ message: 'Método não permitido.' });
-    }
-}
 
 export const Form = () => {
     const methods = useForm<Schema>({
@@ -59,6 +31,7 @@ export const Form = () => {
         control: methods.control
     });
 
+    const filePath = '/api/clientes';
     const onSubmit = async (data: Schema) => {
         const clienteData = {
             residentes: data.residentes,
@@ -67,11 +40,32 @@ export const Form = () => {
             feedback: data.feedback,
         };
 
-        const clienteDataString = JSON.stringify(clienteData);
-
-        console.log("Dados do cliente salvos no arquivo clientes.json.");
+        try {
+            const response = await fetch(filePath, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(clienteData),
+            });
+            useEffect(() => {
+                fetch('/api/clientes')
+                    .then((res) => {
+                        return res.json();
+                    })
+                    .then((data) => {
+                        console.log(data);
+                    });
+            }, []);
+            if (response.ok) {
+                console.log('Dados do cliente enviados com sucesso.');
+            } else {
+                console.error('Erro ao enviar dados do cliente.');
+            }
+        } catch (error) {
+            console.error('Erro na solicitação:', error);
+        }
     };
-
 
     return (
         <Container>
