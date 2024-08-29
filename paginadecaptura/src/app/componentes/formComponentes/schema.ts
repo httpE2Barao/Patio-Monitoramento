@@ -29,13 +29,17 @@ const veiculoSchema = z.object({
     placa: z.string().min(7, { message: 'Digite a placa do carro' }),
 });
 
+const feedbackSchema = z.string().max(500, { message: 'Digite um feedback' });
+
 export const schema = z.object({
     endereco: z.array(enderecoSchema),
     residentes: z.array(residenteSchema),
     veiculos: z.array(veiculoSchema),
+    feedback: z.string(feedbackSchema)
 });
 
 export type Endereco = z.infer<typeof enderecoSchema>;
 export type Residente = z.infer<typeof residenteSchema>;
 export type Veiculo = z.infer<typeof veiculoSchema>;
+export type Feedback = z.infer<typeof feedbackSchema>;
 export type Schema = z.infer<typeof schema>;

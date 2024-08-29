@@ -1,12 +1,40 @@
-import React, { useEffect, useState } from "react";
-import { Grid, Button, Container, Autocomplete, TextField } from "@mui/material";
+import React from "react";
+import { NextApiRequest, NextApiResponse } from "next";
+import { Grid, Button, Container } from "@mui/material";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schema, Schema } from "./schema";
 import { FormVeiculo } from "./FormVeiculo";
 import { FormEndereco } from "./FormEndereco";
 import { FormResidentes } from "./FormResidentes";
-import Cliente from "./construtor";
+import { FormFeedback } from "./FormFeedback";
+
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+    const { method, body } = req;
+
+    if (method === 'POST') {
+        const clienteData = JSON.stringify(body);
+
+        fetch('/clientes.json', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: clienteData
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Resposta do servidor:', data);
+            })
+            .catch(error => {
+                console.error('Erro ao enviar dados:', error);
+            });
+
+        res.status(200).json({ message: 'Dados do cliente salvos com sucesso.' });
+    } else {
+        res.status(405).json({ message: 'Método não permitido.' });
+    }
+}
 
 export const Form = () => {
     const methods = useForm<Schema>({
@@ -15,7 +43,8 @@ export const Form = () => {
         defaultValues: {
             residentes: [{ nome: '', telefone: '', email: '', tipoDocumento: 'RG', documento: '' }],
             veiculos: [{ cor: '', modelo: '', placa: '' }],
-            endereco: [{ condominio: '', apto: '' }]
+            endereco: [{ condominio: '', apto: '' }],
+            feedback: '',
         }
     });
 
@@ -30,20 +59,19 @@ export const Form = () => {
         control: methods.control
     });
 
-    const [parentescos, setParentescos] = useState<{ id: number, value: string }[]>([]);
-
-    useEffect(() => {
-        fetch("/parentescos.json")
-            .then(res => res.json())
-            .then(data => setParentescos(data))
-            .catch(err => console.error("Erro ao carregar os parentescos:", err));
-    }, []);
-
     const onSubmit = async (data: Schema) => {
-        // const cliente = new Cliente(data.titular, data.veiculos);
-        // cliente.salvarDados(); // Implemente a lógica para salvar os dados
-        console.log("Dados do cliente:", data);
+        const clienteData = {
+            residentes: data.residentes,
+            veiculos: data.veiculos,
+            endereco: data.endereco,
+            feedback: data.feedback,
+        };
+
+        const clienteDataString = JSON.stringify(clienteData);
+
+        console.log("Dados do cliente salvos no arquivo clientes.json.");
     };
+
 
     return (
         <Container>
@@ -64,6 +92,10 @@ export const Form = () => {
                             {veiculosFields.map((item, index) => (
                                 <FormVeiculo key={item.id} index={index} />
                             ))}
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <FormFeedback />
                         </Grid>
 
                         <Grid item xs={12} sx={{ mt: 3, justifyContent: "space-around", display: "flex" }}>
