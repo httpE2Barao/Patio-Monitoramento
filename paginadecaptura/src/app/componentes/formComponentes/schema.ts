@@ -29,7 +29,7 @@ const veiculoSchema = z.object({
     placa: z.string().min(7, { message: 'Digite a placa do carro' }),
 });
 
-const feedbackSchema = z.string().max(500, { message: 'Digite um feedback' });
+const feedbackSchema = z.string().max(200, { message: 'Digite um feedback' });
 
 export const schema = z.object({
     endereco: z.array(enderecoSchema),

@@ -53,11 +53,33 @@ class Cliente {
         console.log(this.endereco + " " + this.residentes + " " + this.veiculos + " " + this.feedback);
     }
 
-    // Adicione outros métodos relevantes aqui, se necessário
-    // Por exemplo:
-    // salvarDados() {
-    //     // Lógica para salvar os dados em um arquivo JSON
-    // }
+    async enviarDados(data: Schema) {
+        const filePath = 'http://localhost:4000/clientes';
+        const clienteData = {
+            residentes: data.residentes,
+            veiculos: data.veiculos,
+            endereco: data.endereco,
+            feedback: data.feedback,
+        };
+
+        try {
+            const response = await fetch(filePath, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(clienteData),
+            });
+
+            if (response.ok) {
+                alert('Dados do cliente enviados com sucesso.');
+            } else {
+                alert('Erro ao enviar dados do cliente.');
+            }
+        } catch (error) {
+            console.error('Erro na solicitação:', error);
+        }
+    }
 }
 
 export default Cliente;

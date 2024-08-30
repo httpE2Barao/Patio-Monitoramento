@@ -7,6 +7,7 @@ import { FormVeiculo } from "./FormVeiculo";
 import { FormEndereco } from "./FormEndereco";
 import { FormResidentes } from "./FormResidentes";
 import { FormFeedback } from "./FormFeedback";
+import Cliente from "./construtor";
 
 export const Form = () => {
     const methods = useForm<Schema>({
@@ -31,40 +32,9 @@ export const Form = () => {
         control: methods.control
     });
 
-    const filePath = '/api/clientes';
     const onSubmit = async (data: Schema) => {
-        const clienteData = {
-            residentes: data.residentes,
-            veiculos: data.veiculos,
-            endereco: data.endereco,
-            feedback: data.feedback,
-        };
-
-        try {
-            const response = await fetch(filePath, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(clienteData),
-            });
-            useEffect(() => {
-                fetch('/api/clientes')
-                    .then((res) => {
-                        return res.json();
-                    })
-                    .then((data) => {
-                        console.log(data);
-                    });
-            }, []);
-            if (response.ok) {
-                console.log('Dados do cliente enviados com sucesso.');
-            } else {
-                console.error('Erro ao enviar dados do cliente.');
-            }
-        } catch (error) {
-            console.error('Erro na solicitação:', error);
-        }
+        const cliente = new Cliente(data.endereco, data.residentes, data.veiculos, data.feedback);
+        await cliente.enviarDados(data);
     };
 
     return (

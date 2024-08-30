@@ -25,6 +25,13 @@ export const FormFeedback: React.FC = () => {
                         error={!!errors.feedback}
                         helperText={errors.feedback?.message}
                     />
+                    <input
+                        type="text"
+                        name="feedback"
+                        onChange={(e) => {
+                            console.log('Feedback em tempo real:', e.target.value);
+                        }}
+                    />
                 </Grid>
             </Grid>
         </Grid>
