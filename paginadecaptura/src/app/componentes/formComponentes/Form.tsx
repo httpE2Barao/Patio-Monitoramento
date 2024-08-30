@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Grid, Button, Container } from "@mui/material";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,8 +21,6 @@ export const Form = () => {
         }
     });
 
-    const { handleSubmit, reset } = methods;
-
     const { fields: residentesFields, append: appendResidente, remove: removeResidente } = useFieldArray({
         name: "residentes",
         control: methods.control
@@ -31,6 +29,8 @@ export const Form = () => {
         name: "veiculos",
         control: methods.control
     });
+
+    const { handleSubmit, reset } = methods;
 
     const onSubmit = async (data: Schema) => {
         const cliente = new Cliente(data.endereco, data.residentes, data.veiculos, data.feedback);

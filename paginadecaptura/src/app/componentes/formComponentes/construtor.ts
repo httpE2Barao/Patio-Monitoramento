@@ -77,6 +77,7 @@ class Cliente {
                 alert('Erro ao enviar dados do cliente.');
             }
         } catch (error) {
+            alert('Erro ao enviar dados do cliente.');
             console.error('Erro na solicitação:', error);
         }
     }
