@@ -1,14 +1,19 @@
 import { z } from 'zod';
+import { ZodRawShape } from 'zod';
+
+interface RefinementContext<T extends ZodRawShape> {
+    addIssue: (arg: any) => void;
+    data: z.infer<z.ZodObject<T>>;
+}
 
 const patterns = {
     email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-    cpf: /^\d{3}\.\d{3}\.\d{3}-\d{2}$/,
-    rg: /^\d{2}\.\d{3}\.\d{3}-\d{1}$/,
-    cnh: /^\d{11}$/
+    //     cpf: /^\d{3}\.\d{3}\.\d{3}-\d{2}$/,
+    //     rg: /^\d{2}\.\d{3}\.\d{3}-\d{1}$/,
+    //     cnh: /^\d{11}$/
 };
 
 const residenteSchema = z.object({
-    // tipoCadastro: z.enum(["Cadastrado", "Novo cadastro"], { message: 'Selecione um tipo de cadastro' }),
     nome: z.string().min(7, { message: 'Digite seu nome completo' }),
     telefone: z.string().min(10, { message: 'Digite um telefone válido' }),
     email: z.string().min(1, { message: 'Insira um email' })

@@ -3,7 +3,6 @@ import { Grid, TextField, Button, FormControlLabel, RadioGroup, Radio, Select, M
 import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import { Schema } from "./schema";
 import { Titulo } from "./titulo";
-
 export interface FormNumberProps {
     index: number;
 }
@@ -22,7 +21,7 @@ export const FormResidentes: React.FC<FormNumberProps> = ({ index }) => {
             .then(res => (res.json()))
             .then(data => setParentescos(data))
             .catch(err => console.error("Erro ao carregar os parentescos:", err))
-    })
+    }, []);
 
     return (
         <>
@@ -88,16 +87,22 @@ export const FormResidentes: React.FC<FormNumberProps> = ({ index }) => {
                             label="Documento"
                             fullWidth
                             error={!!errors.residentes?.[index]?.documento}
-                            helperText={errors.residentes?.[index]?.documento?.message}
+                        // helperText={errors.residentes?.[index]?.documento?.message}
                         />
-                        <RadioGroup
-                            {...register(`residentes.${index}.tipoDocumento` as const)}
-                            row
-                        >
-                            <FormControlLabel value="RG" control={<Radio />} label="RG" />
-                            <FormControlLabel value="CPF" control={<Radio />} label="CPF" />
-                            <FormControlLabel value="CNH" control={<Radio />} label="CNH" />
-                        </RadioGroup>
+                        <Controller
+                            name={`residentes.${index}.tipoDocumento`}
+                            control={control}
+                            rules={{ required: 'Selecione um tipo de documento válido' }}
+                            render={({ field }) => (
+                                <RadioGroup {...field} row
+                                // onChange={(event, newValue) => { field.onChange(newValue?.value || ""); }}
+                                >
+                                    <FormControlLabel value="RG" control={<Radio />} label="RG" />
+                                    <FormControlLabel value="CPF" control={<Radio />} label="CPF" />
+                                    <FormControlLabel value="CNH" control={<Radio />} label="CNH" />
+                                </RadioGroup>
+                            )}
+                        />
                         {errors.residentes?.[index]?.tipoDocumento && (
                             <p className="text-xs pt-1 text-red-600 pl-4">{errors.residentes?.[index]?.tipoDocumento?.message}</p>
                         )}
