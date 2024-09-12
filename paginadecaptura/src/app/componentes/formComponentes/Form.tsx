@@ -33,8 +33,10 @@ export const Form = () => {
     const { handleSubmit, reset } = methods;
 
     const onSubmit = async (data: Schema) => {
+        const dataAtual = new Date();
+
         const cliente = new Cliente(data.endereco, data.residentes, data.veiculos, data.feedback);
-        await cliente.enviarDados(data);
+        await cliente.enviarDados(data, dataAtual);
     };
 
     return (

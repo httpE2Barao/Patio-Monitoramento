@@ -6,7 +6,6 @@ class Cliente {
         apto: string;
     }[];
     residentes: {
-        // tipoCadastro: "Cadastrado" | "Novo cadastro";
         nome: string;
         telefone: string;
         email: string;
@@ -27,7 +26,6 @@ class Cliente {
             apto: string;
         }[],
         residentes: {
-            // tipoCadastro: "Cadastrado" | "Novo cadastro";
             nome: string;
             telefone: string;
             email: string;
@@ -53,13 +51,14 @@ class Cliente {
         console.log(this.endereco + " " + this.residentes + " " + this.veiculos + " " + this.feedback);
     }
 
-    async enviarDados(data: Schema) {
+    async enviarDados(data: Schema, dataAtual: Date) {
         const filePath = 'http://localhost:4000/clientes';
         const clienteData = {
             residentes: data.residentes,
             veiculos: data.veiculos,
             endereco: data.endereco,
             feedback: data.feedback,
+            data: dataAtual.toISOString()
         };
 
         try {

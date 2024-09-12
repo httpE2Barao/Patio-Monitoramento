@@ -29,7 +29,7 @@ export const BoasVindas = () => {
                 Height: {
                     sm: "100vh",
                     lg: "100vh",
-                    // xl: "1600px",
+                    xl: "1800px",
                 }
             }}>
                 <Typography variant="h2"
