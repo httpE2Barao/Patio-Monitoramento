@@ -29,7 +29,7 @@ export const BoasVindas = () => {
                 Height: {
                     sm: "100vh",
                     lg: "100vh",
-                    xl: "1800px",
+                    xl: "90vh",
                 }
             }}>
                 <Typography variant="h2"
@@ -82,7 +82,7 @@ export const BoasVindas = () => {
                         onClick={() => {
                             document.getElementById('formulario')?.scrollIntoView({ behavior: 'smooth' });
                         }}
-                        sx={{
+                        sx={{ 
                             color: "#000000ad",
                             '&:hover': { color: "#FBF355" },
                             fontWeight: "600",

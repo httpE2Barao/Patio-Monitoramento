@@ -1,5 +1,11 @@
 import { Schema } from "./schema";
 
+export var retornoForm: boolean | undefined = undefined;
+
+export function resetarRetorno() {
+    retornoForm = undefined;
+}
+
 class Cliente {
     endereco: {
         condominio: string;
@@ -71,11 +77,12 @@ class Cliente {
             });
 
             if (response.ok) {
-                alert('Dados do cliente enviados com sucesso.');
+                retornoForm = true;
             } else {
-                alert('Erro ao enviar dados do cliente.');
+                retornoForm = false;
             }
         } catch (error) {
+            retornoForm = false;
             alert('Erro ao enviar dados do cliente.');
             console.error('Erro na solicitação:', error);
         }

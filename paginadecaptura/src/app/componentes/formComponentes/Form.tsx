@@ -7,7 +7,8 @@ import { FormVeiculo } from "./FormVeiculo";
 import { FormEndereco } from "./FormEndereco";
 import { FormResidentes } from "./FormResidentes";
 import { FormFeedback } from "./FormFeedback";
-import Cliente from "./construtor";
+import Cliente, { resetarRetorno, retornoForm } from "./construtor";
+import { FormRetorno } from "./FormRetorno";
 
 export const Form = () => {
     const methods = useForm<Schema>({
@@ -64,10 +65,17 @@ export const Form = () => {
                             <FormFeedback />
                         </Grid>
 
+                        <Grid item xs={12}>
+                            <FormRetorno />
+                        </Grid>
+
                         <Grid item xs={12} sx={{ mt: 3, justifyContent: "space-around", display: "flex" }}>
                             <Button
                                 variant="outlined"
-                                onClick={() => reset()}
+                                onClick={() => {
+                                    reset();
+                                    resetarRetorno();
+                                }}
                                 sx={{ ml: 2, fontSize: "large" }}>
                                 Resetar
                             </Button>

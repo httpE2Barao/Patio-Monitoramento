@@ -24,6 +24,12 @@
   }
 }
 
+@media screen and (max-width: 1020px) {
+  .conteiner-inicio-img > h2 {
+    margin: 0 5em;
+  }
+}
+
 @media screen and (min-width: 1500px) {
   .conteiner-inicio-img {
     max-width: none;

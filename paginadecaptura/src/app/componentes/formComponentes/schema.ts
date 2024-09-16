@@ -8,9 +8,6 @@ interface RefinementContext<T extends ZodRawShape> {
 
 const patterns = {
     email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-    //     cpf: /^\d{3}\.\d{3}\.\d{3}-\d{2}$/,
-    //     rg: /^\d{2}\.\d{3}\.\d{3}-\d{1}$/,
-    //     cnh: /^\d{11}$/
 };
 
 const residenteSchema = z.object({
