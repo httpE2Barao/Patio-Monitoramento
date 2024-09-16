@@ -14,7 +14,7 @@ export const FormVeiculo: React.FC<FormNumberProps> = ({ index }) => {
 
     return (
         <>
-            <Titulo titulo="Veiculos" />
+            <Titulo titulo="Veículos" />
             {
                 fields.map((field, index) => (
                     <Grid container key={field.id} spacing={2} sx={{ mb: 2 }}>
