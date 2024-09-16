@@ -45,7 +45,6 @@ class Cliente {
             placa: string;
         }[],
         feedback?: string
-
     ) {
         this.endereco = endereco;
         this.residentes = residentes;
@@ -64,7 +63,7 @@ class Cliente {
             veiculos: data.veiculos,
             endereco: data.endereco,
             feedback: data.feedback,
-            data: dataAtual.toISOString()
+            data: dataAtual.toLocaleString()
         };
 
         try {

@@ -16,7 +16,7 @@ const residenteSchema = z.object({
     email: z.string().min(1, { message: 'Insira um email' })
         .refine((text) => patterns.email.test(text), { message: "O email é inválido" }),
     tipoDocumento: z.enum(["RG", "CPF", "CNH"], { message: 'Selecione um tipo de documento válido' }),
-    documento: z.string().min(10, { message: 'Digite somente os números do documento' }),
+    documento: z.string().min(9, { message: 'Digite somente os números do documento' }).max(11, { message: 'Digite somente os números do documento' }),
     parentesco: z.string().min(1, { message: 'Selecione um nível de parentesco' }).optional(),
 });
 
