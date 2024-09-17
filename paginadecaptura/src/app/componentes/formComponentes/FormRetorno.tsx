@@ -6,7 +6,7 @@ export const FormRetorno = () => {
         <Container sx={{ textAlign: 'center', }}>
             {retornoForm == true ? (
                 <Typography sx={{ fontSize: '1.7rem', fontWeight: '500' }}>
-                    Dados enviado com sucesso!
+                    Dados enviados com sucesso!
                 </Typography>
             ) : retornoForm == false ? (
                 <Typography sx={{ fontSize: '1.7rem', fontWeight: '500' }}>
