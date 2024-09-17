@@ -49,7 +49,7 @@ export const FAQ = () => {
                 <Typography sx={{
                     textAlign: "center", py: "4rem", fontWeight: 500,
                     fontSize: {
-                        xs: "1.2rem",
+                        xs: "2rem",
                         sm: "2rem",
                         md: "2.4rem",
                         lg: "2.4rem",

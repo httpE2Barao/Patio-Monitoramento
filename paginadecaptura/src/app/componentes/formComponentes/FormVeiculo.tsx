@@ -52,7 +52,7 @@ export const FormVeiculo: React.FC<FormNumberProps> = ({ index }) => {
                 ))
             }
 
-            <Grid item xs={12} sx={{ my: 2, display: "flex", justifyContent: "space-around" }}>
+            <Grid item xs={12} sx={{ mt: 3, mb: 1, display: "flex", justifyContent: "space-around" }}>
                 <Button
                     onClick={() => append({ modelo: "", cor: "", placa: "" })}
                     variant="contained">

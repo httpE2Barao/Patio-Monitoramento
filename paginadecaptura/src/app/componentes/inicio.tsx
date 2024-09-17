@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 export const BoasVindas = () => {
     return (
-        <Container id="conteiner-inicio" className="flex flex-col m-auto gap-3 sm:gap-5 xl:justify-evenly items-center max-md:pt-5 lg:flex-row ">
+        <Container id="conteiner-inicio" className="flex flex-col m-auto gap-3 sm:gap-5 xl:justify-evenly items-center max-md:pt-5 md:mt-[6vh] lg:mt-0 lg:flex-row ">
 
             <Box className="conteiner-inicio-box" sx={{
                 gap: {
@@ -91,7 +91,7 @@ export const BoasVindas = () => {
                             },
                             paddingY: "1rem",
                             fontSize: {
-                                xs: "2.8vw",
+                                xs: "3.3vw",
                                 sm: "1.2rem",
                                 md: "1rem",
                                 lg: "1rem",
@@ -111,7 +111,7 @@ export const BoasVindas = () => {
                             },
                             paddingY: "1rem",
                             fontSize: {
-                                xs: "2.8vw",
+                                xs: "3.3vw",
                                 sm: "1.2rem",
                                 md: "1rem",
                                 lg: "1rem",

@@ -94,7 +94,7 @@ export const FormResidentes: React.FC<FormNumberProps> = ({ index }) => {
                             control={control}
                             rules={{ required: 'Selecione um tipo de documento válido' }}
                             render={({ field }) => (
-                                <RadioGroup {...field} row
+                                <RadioGroup {...field} row sx={{ justifyContent: "space-around" }}
                                 // onChange={(event, newValue) => { field.onChange(newValue?.value || ""); }}
                                 >
                                     <FormControlLabel value="RG" control={<Radio />} label="RG" />
@@ -109,7 +109,7 @@ export const FormResidentes: React.FC<FormNumberProps> = ({ index }) => {
                     </Grid>
                     {index !== 0 && (
                         <>
-                            < Grid item xs={12} sx={{ mt: 2, display: "flex", justifyContent: "space-around" }}>
+                            < Grid item xs={12} sx={{ display: "flex", justifyContent: "space-around" }}>
                                 <Button
                                     variant="outlined"
                                     onClick={() => remove(index)}
@@ -122,7 +122,7 @@ export const FormResidentes: React.FC<FormNumberProps> = ({ index }) => {
                     )}
                 </Grid >
             ))}
-            <Grid item xs={12} sx={{ mt: 2, display: "flex", justifyContent: "space-around" }}>
+            <Grid item xs={12} sx={{ mt: 3, mb: 1, display: "flex", justifyContent: "space-around" }}>
                 <Button
                     onClick={() => append({ nome: "", telefone: "", email: "", tipoDocumento: "RG", documento: "", parentesco: "" })}
                     variant="contained"

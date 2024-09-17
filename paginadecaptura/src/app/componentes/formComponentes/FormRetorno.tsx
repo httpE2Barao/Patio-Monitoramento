@@ -1,5 +1,5 @@
 import { Container, Typography } from "@mui/material";
-import { retornoForm } from "./construtor";
+import { retornoForm } from "../../construtor";
 
 export const FormRetorno = () => {
     return (

@@ -7,7 +7,7 @@ import { FormVeiculo } from "./FormVeiculo";
 import { FormEndereco } from "./FormEndereco";
 import { FormResidentes } from "./FormResidentes";
 import { FormFeedback } from "./FormFeedback";
-import Cliente, { resetarRetorno, retornoForm } from "./construtor";
+import Cliente, { resetarRetorno, retornoForm } from "../../construtor";
 import { FormRetorno } from "./FormRetorno";
 
 export const Form = () => {
@@ -43,7 +43,7 @@ export const Form = () => {
         <Container>
             <FormProvider {...methods}>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex gap-2 flex-col items-center justify-evenly">
-                    <Grid container spacing={3} sx={{ pb: 4, pr: 1, width: "95%", m: "auto" }}>
+                    <Grid container spacing={1} sx={{ pb: 4, maxWidth: "100%", m: "auto" }}>
                         <Grid item xs={12}>
                             <FormEndereco />
                         </Grid>

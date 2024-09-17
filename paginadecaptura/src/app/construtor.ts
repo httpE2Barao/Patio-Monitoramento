@@ -1,10 +1,15 @@
 import DatabaseConnection from "@/db";
-import { Schema } from "./schema";
+import { sql } from '@vercel/postgres';
+
+import { Schema } from "./componentes/formComponentes/schema";
 
 export var retornoForm: boolean | undefined = undefined;
 
 export function resetarRetorno() {
-    retornoForm = undefined;
+    return () => {
+        retornoForm = undefined
+        console.log(process.env)
+    };
 }
 
 class Cliente {
@@ -59,15 +64,7 @@ class Cliente {
 
     async enviarDados(data: Schema, dataAtual: Date) {
 
-        const dbConnection = new DatabaseConnection("postgres://default:BohVr6L2uWYd@ep-dark-credit-a4jq5um8-pooler.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require");
-
-        if (process.env.clientes_URL) {
-            // A variável está definida, faça algo aqui
-            console.log("clientes_URL está definida:", process.env.clientes_URL);
-        } else {
-            // A variável não está definida
-            console.log("clientes_URL não está definida.");
-        }
+        const dbConnection = new DatabaseConnection(process.env.clientes_URL);
 
         const clienteData = {
             residentes: data.residentes,
