@@ -6,6 +6,7 @@
   --foreground-rgb: f, f, f;
   transition: all 0.3s ease;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 @media screen and (min-width: 1020px) and (max-width: 1350px) {
