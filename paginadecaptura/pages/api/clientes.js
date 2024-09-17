@@ -2,7 +2,7 @@ import { createPool } from "@vercel/postgres";
 
 export default async function handler(req, res) {
     const pool = new createPool({
-        connectionString: process.env.clientes_URL,
+        connectionString: 'postgres://default:BohVr6L2uWYd@ep-dark-credit-a4jq5um8-pooler.us-east-1.aws.neon.tech:5432/verceldb',
         host: 'ep-dark-credit-a4jq5um8-pooler.us-east-1.aws.neon.tech',
     });
 

@@ -1,14 +1,14 @@
 import DatabaseConnection from "@/db";
 import { sql } from '@vercel/postgres';
-
 import { Schema } from "./componentes/formComponentes/schema";
+import handler from "../../pages/api/clientes";
 
 export var retornoForm: boolean | undefined = undefined;
 
 export function resetarRetorno() {
     return () => {
-        retornoForm = undefined
-        console.log(process.env)
+        retornoForm = undefined;
+        console.log(process.env);
     };
 }
 
@@ -64,7 +64,9 @@ class Cliente {
 
     async enviarDados(data: Schema, dataAtual: Date) {
 
-        const dbConnection = new DatabaseConnection(process.env.clientes_URL);
+        handler(data);
+
+        const dbConnection = new DatabaseConnection('postgres://default:BohVr6L2uWYd@ep-dark-credit-a4jq5um8-pooler.us-east-1.aws.neon.tech:5432/verceldb');
 
         const clienteData = {
             residentes: data.residentes,
