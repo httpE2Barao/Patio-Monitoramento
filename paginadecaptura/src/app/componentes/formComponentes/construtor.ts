@@ -1,5 +1,5 @@
+import DatabaseConnection from "@/db";
 import { Schema } from "./schema";
-import { VercelPool } from "@vercel/postgres"
 
 export var retornoForm: boolean | undefined = undefined;
 
@@ -59,9 +59,15 @@ class Cliente {
 
     async enviarDados(data: Schema, dataAtual: Date) {
 
-        const pool = new VercelPool({
-            connectionString: process.env.clientes_URL,
-        });
+        const dbConnection = new DatabaseConnection("postgres://default:BohVr6L2uWYd@ep-dark-credit-a4jq5um8-pooler.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require");
+
+        if (process.env.clientes_URL) {
+            // A variável está definida, faça algo aqui
+            console.log("clientes_URL está definida:", process.env.clientes_URL);
+        } else {
+            // A variável não está definida
+            console.log("clientes_URL não está definida.");
+        }
 
         const clienteData = {
             residentes: data.residentes,
@@ -72,21 +78,19 @@ class Cliente {
         };
 
         try {
-            await pool.query(
-                'INSERT INTO clientes (residentes, veiculos, endereco, feedback, data) VALUES ($1, $2, $3, $4, $5)',
+            await dbConnection.query(
+                "INSERT INTO clientes (residentes, veiculos, endereco, feedback, data) VALUES ($1, $2, $3, $4, $5)",
                 [clienteData.residentes, clienteData.veiculos, clienteData.endereco, clienteData.feedback, clienteData.data]
             );
 
             retornoForm = true;
         } catch (error) {
             retornoForm = false;
-            alert('Erro ao enviar dados do cliente.');
-            console.error('Erro na solicitação:', error);
+            console.error("Erro na solicitação:", error);
         } finally {
-            await pool.end();
+            await dbConnection.end();
         }
     }
-
 }
 
 export default Cliente;
