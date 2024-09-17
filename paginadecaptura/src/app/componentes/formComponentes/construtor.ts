@@ -1,4 +1,5 @@
 import { Schema } from "./schema";
+import { VercelPool } from "@vercel/postgres"
 
 export var retornoForm: boolean | undefined = undefined;
 
@@ -57,35 +58,35 @@ class Cliente {
     }
 
     async enviarDados(data: Schema, dataAtual: Date) {
-        const filePath = 'http://localhost:4000/clientes';
+
+        const pool = new VercelPool({
+            connectionString: process.env.clientes_URL,
+        });
+
         const clienteData = {
             residentes: data.residentes,
             veiculos: data.veiculos,
             endereco: data.endereco,
             feedback: data.feedback,
-            data: dataAtual.toLocaleString()
+            data: dataAtual.toLocaleString(),
         };
 
         try {
-            const response = await fetch(filePath, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(clienteData),
-            });
+            await pool.query(
+                'INSERT INTO clientes (residentes, veiculos, endereco, feedback, data) VALUES ($1, $2, $3, $4, $5)',
+                [clienteData.residentes, clienteData.veiculos, clienteData.endereco, clienteData.feedback, clienteData.data]
+            );
 
-            if (response.ok) {
-                retornoForm = true;
-            } else {
-                retornoForm = false;
-            }
+            retornoForm = true;
         } catch (error) {
             retornoForm = false;
             alert('Erro ao enviar dados do cliente.');
             console.error('Erro na solicitação:', error);
+        } finally {
+            await pool.end();
         }
     }
+
 }
 
 export default Cliente;
