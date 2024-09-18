@@ -1,15 +1,11 @@
-import DatabaseConnection from "@/db";
-import { sql } from '@vercel/postgres';
+import { db } from "@vercel/postgres";
+// import DatabaseConnection from "../../api/db";
 import { Schema } from "./componentes/formComponentes/schema";
-import handler from "../../pages/api/clientes";
 
 export var retornoForm: boolean | undefined = undefined;
 
 export function resetarRetorno() {
-    return () => {
-        retornoForm = undefined;
-        console.log(process.env);
-    };
+    retornoForm = undefined;
 }
 
 class Cliente {
@@ -63,33 +59,35 @@ class Cliente {
     }
 
     async enviarDados(data: Schema, dataAtual: Date) {
-
-        handler(data);
-
-        const dbConnection = new DatabaseConnection('postgres://default:BohVr6L2uWYd@ep-dark-credit-a4jq5um8-pooler.us-east-1.aws.neon.tech:5432/verceldb');
+        const dbConnection = await db.connect();
+        console.log("Conectando ao Banco de dados: " + dbConnection);
 
         const clienteData = {
-            residentes: data.residentes,
-            veiculos: data.veiculos,
-            endereco: data.endereco,
+            residentes: JSON.stringify(data.residentes),
+            veiculos: JSON.stringify(data.veiculos),
+            endereco: JSON.stringify(data.endereco),
             feedback: data.feedback,
             data: dataAtual.toLocaleString(),
         };
 
         try {
-            await dbConnection.query(
-                "INSERT INTO clientes (residentes, veiculos, endereco, feedback, data) VALUES ($1, $2, $3, $4, $5)",
-                [clienteData.residentes, clienteData.veiculos, clienteData.endereco, clienteData.feedback, clienteData.data]
-            );
+            await dbConnection.sql`
+                INSERT INTO clientes (residentes, veiculos, endereco, feedback, data)
+                VALUES (${clienteData.residentes}, ${clienteData.veiculos}, ${clienteData.endereco}, ${clienteData.feedback}, ${clienteData.data})
+            `;
 
             retornoForm = true;
         } catch (error) {
             retornoForm = false;
             console.error("Erro na solicitação:", error);
-        } finally {
-            await dbConnection.end();
+            // return console.status(500).json({ error });
         }
+
+        const clientes = await dbConnection.sql`SELECT * FROM clientes;`;
+        console.log(clientes.rows);
+        // return response.status(200).json({ clientes: clientes.rows });
     }
+
 }
 
 export default Cliente;
