@@ -1,4 +1,4 @@
-import { db } from "@vercel/postgres";
+import { sql } from "@vercel/postgres";
 // import DatabaseConnection from "../../api/db";
 import { Schema } from "./componentes/formComponentes/schema";
 
@@ -59,8 +59,10 @@ class Cliente {
     }
 
     async enviarDados(data: Schema, dataAtual: Date) {
-        const dbConnection = await db.connect();
-        console.log("Conectando ao Banco de dados: " + dbConnection);
+        const dbConnection = await sql.connect();
+        const testDB = await sql`SELECT * from clientes`;
+
+        console.log("Conectando ao Banco de dados: " + dbConnection + " " + testDB);
 
         const clienteData = {
             residentes: JSON.stringify(data.residentes),
