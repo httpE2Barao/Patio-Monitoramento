@@ -61,7 +61,7 @@ class Cliente {
         );
     }
 
-    async enviarDados(data: Schema) {
+    async function (data: Schema) {
         const dadosCliente = new Cliente(data.endereco, data.residentes, data.veiculos, data.feedback);
         enviarDadosAoBanco(dadosCliente);
     }

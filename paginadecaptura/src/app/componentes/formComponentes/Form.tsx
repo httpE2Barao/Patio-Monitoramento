@@ -35,7 +35,6 @@ export const Form = () => {
 
     const onSubmit = async (data: Schema) => {
         const cliente = new Cliente(data.endereco, data.residentes, data.veiculos, data.feedback);
-        await cliente.enviarDados(cliente);
     };
 
     return (

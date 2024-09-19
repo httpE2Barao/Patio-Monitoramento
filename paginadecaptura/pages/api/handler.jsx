@@ -1,10 +1,9 @@
-import Cliente from '@/app/construtor';
+// import Cliente from '@/app/construtor';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function enviarDadosAoBanco(cliente: Cliente) {
-
+export async function enviarDadosAoBanco(cliente) {
     try {
         await prisma.$connect();
 
@@ -24,7 +23,8 @@ export async function enviarDadosAoBanco(cliente: Cliente) {
                 },
                 endereco: {
                     create: {
-                        data: endereco,
+                        condominio: cliente.endereco.condominio,
+                        apto: cliente.endereco.apto,
                     },
                 },
                 feedback: {

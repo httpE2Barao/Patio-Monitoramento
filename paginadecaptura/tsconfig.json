@@ -21,6 +21,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "pages/api/clientes.js", "src/db.js", "pages/api/schema.prisma"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "pages/api/clientes.js", "src/db.js", "pages/api/schema.prisma", "pages/api/handler.jsx"],
   "exclude": ["node_modules"]
 }
