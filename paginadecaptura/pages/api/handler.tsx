@@ -8,7 +8,7 @@ export async function enviarDadosAoBanco(cliente: Cliente) {
     try {
         await prisma.$connect();
 
-        const novoUsuario = await prisma.user.create({
+        const novoUsuario = await prisma.Cliente.create({
             cliente
         });
 
