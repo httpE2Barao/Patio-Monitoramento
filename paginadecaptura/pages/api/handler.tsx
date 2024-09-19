@@ -8,32 +8,8 @@ export async function enviarDadosAoBanco(cliente: Cliente) {
     try {
         await prisma.$connect();
 
-        const { endereco, residentes, veiculos, feedback } = cliente;
-
         const novoUsuario = await prisma.user.create({
-            data: {
-                residentes: {
-                    createMany: {
-                        data: residentes,
-                    },
-                },
-                veiculos: {
-                    createMany: {
-                        data: veiculos || [],
-                    },
-                },
-                endereco: {
-                    create: {
-                        data: endereco,
-                    },
-                },
-                feedback: {
-                    create: {
-                        texto: feedback || '',
-                    },
-                },
-                createdAt: new Date(),
-            },
+            cliente
         });
 
         console.log('Dados enviados com sucesso:', novoUsuario);
