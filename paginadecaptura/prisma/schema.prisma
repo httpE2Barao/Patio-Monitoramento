@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("clientes_URL")
+  directUrl = env("clientes_URL_NON_POOLING")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  endereco  Endereco
+  residentes  Residente[]
+  veiculos  Veiculo[]
+  feedback  String?
+  createdAt DateTime @default(now())
+}
+
+model Endereco {
+  condominio    String
+  apto          String
+}
+
+model Residente {
+  id            Int      @id @default(autoincrement())
+  nome          String
+  telefone      String
+  email         String
+  tipoDocumento String   
+  documento     String
+  parentesco    String? 
+}
+
+model Veiculo {
+  id        Int      @id @default(autoincrement())
+  cor       String
+  modelo    String
+  placa     String
+}

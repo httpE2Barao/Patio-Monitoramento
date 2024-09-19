@@ -1,6 +1,5 @@
-import { sql } from "@vercel/postgres";
-// import DatabaseConnection from "../../api/db";
 import { Schema } from "./componentes/formComponentes/schema";
+import { enviarDadosAoBanco } from "../../pages/api/handler";
 
 export var retornoForm: boolean | undefined = undefined;
 
@@ -54,40 +53,17 @@ class Cliente {
         this.feedback = feedback;
     }
 
-    mostrarDados() {
-        console.log(this.endereco + " " + this.residentes + " " + this.veiculos + " " + this.feedback);
+    mostrarDados = () => {
+        console.log(
+            `Endereço: ${JSON.stringify(this.endereco)}, Residentes: ${JSON.stringify(
+                this.residentes
+            )}, Veículos: ${JSON.stringify(this.veiculos)}, Feedback: ${this.feedback}`
+        );
     }
 
-    async enviarDados(data: Schema, dataAtual: Date) {
-        const dbConnection = await sql.connect();
-        const testDB = await sql`SELECT * from clientes`;
-
-        console.log("Conectando ao Banco de dados: " + dbConnection + " " + testDB);
-
-        const clienteData = {
-            residentes: JSON.stringify(data.residentes),
-            veiculos: JSON.stringify(data.veiculos),
-            endereco: JSON.stringify(data.endereco),
-            feedback: data.feedback,
-            data: dataAtual.toLocaleString(),
-        };
-
-        try {
-            await dbConnection.sql`
-                INSERT INTO clientes (residentes, veiculos, endereco, feedback, data)
-                VALUES (${clienteData.residentes}, ${clienteData.veiculos}, ${clienteData.endereco}, ${clienteData.feedback}, ${clienteData.data})
-            `;
-
-            retornoForm = true;
-        } catch (error) {
-            retornoForm = false;
-            console.error("Erro na solicitação:", error);
-            // return console.status(500).json({ error });
-        }
-
-        const clientes = await dbConnection.sql`SELECT * FROM clientes;`;
-        console.log(clientes.rows);
-        // return response.status(200).json({ clientes: clientes.rows });
+    async enviarDados(data: Schema) {
+        const dadosCliente = new Cliente(data.endereco, data.residentes, data.veiculos, data.feedback);
+        enviarDadosAoBanco(dadosCliente);
     }
 
 }

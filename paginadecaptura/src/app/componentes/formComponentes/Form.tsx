@@ -7,7 +7,7 @@ import { FormVeiculo } from "./FormVeiculo";
 import { FormEndereco } from "./FormEndereco";
 import { FormResidentes } from "./FormResidentes";
 import { FormFeedback } from "./FormFeedback";
-import Cliente, { resetarRetorno, retornoForm } from "../../construtor";
+import Cliente, { resetarRetorno } from "../../construtor";
 import { FormRetorno } from "./FormRetorno";
 
 export const Form = () => {
@@ -34,9 +34,8 @@ export const Form = () => {
     const { handleSubmit, reset } = methods;
 
     const onSubmit = async (data: Schema) => {
-        const dataAtual = new Date();
         const cliente = new Cliente(data.endereco, data.residentes, data.veiculos, data.feedback);
-        await cliente.enviarDados(data, dataAtual);
+        await cliente.enviarDados(cliente);
     };
 
     return (
