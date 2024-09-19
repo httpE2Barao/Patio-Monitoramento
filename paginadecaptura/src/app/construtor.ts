@@ -1,3 +1,4 @@
+
 import { Schema } from "./componentes/formComponentes/schema";
 import { enviarDadosAoBanco } from "../../pages/api/handler";
 
@@ -40,12 +41,12 @@ class Cliente {
             documento: string;
             parentesco?: string;
         }[],
+        feedback: string | '',
         veiculos?: {
             cor: string;
             modelo: string;
             placa: string;
         }[],
-        feedback?: string
     ) {
         this.endereco = endereco;
         this.residentes = residentes;
@@ -61,11 +62,9 @@ class Cliente {
         );
     }
 
-    async function (data: Schema) {
-        const dadosCliente = new Cliente(data.endereco, data.residentes, data.veiculos, data.feedback);
-        enviarDadosAoBanco(dadosCliente);
+    async enviarDados(data: Cliente) {
+        enviarDadosAoBanco(data);
     }
-
 }
 
 export default Cliente;
