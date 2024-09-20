@@ -1,6 +1,6 @@
 import { Box, Container, Typography } from "@mui/material";
-import { useState } from "react";
 import Image from "next/image";
+import { useState } from "react";
 
 type FaqOptionProps = {
     pergunta: string;
@@ -42,7 +42,7 @@ function FaqOption(props: FaqOptionProps) {
     );
 }
 
-export const FAQ = () => {
+const FAQ = () => {
     return (
         <section id="faq">
             <Container sx={{ pb: "5rem" }}>
@@ -71,3 +71,5 @@ export const FAQ = () => {
         </section>
     );
 };
+
+export default FAQ;

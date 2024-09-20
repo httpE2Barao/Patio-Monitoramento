@@ -1,5 +1,4 @@
 
-import { Schema } from "./componentes/formComponentes/schema";
 import { enviarDadosAoBanco } from "../../pages/api/handler";
 
 export var retornoForm: boolean | undefined = undefined;
@@ -41,7 +40,7 @@ class Cliente {
             documento: string;
             parentesco?: string;
         }[],
-        feedback: string | '',
+        feedback?: string,
         veiculos?: {
             cor: string;
             modelo: string;
@@ -62,7 +61,7 @@ class Cliente {
         );
     }
 
-    async enviarDados(data: Cliente) {
+    enviarDados(data: Cliente) {
         enviarDadosAoBanco(data);
     }
 }

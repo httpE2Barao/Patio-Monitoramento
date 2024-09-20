@@ -1,7 +1,7 @@
 import { Box, Container } from "@mui/material";
 import { Form } from "./formComponentes/Form";
 
-export const Formulario = () => {
+const Formulario = () => {
 
     return (
         <section id="formulario">
@@ -13,3 +13,5 @@ export const Formulario = () => {
         </section>
     );
 };
+
+export default Formulario;

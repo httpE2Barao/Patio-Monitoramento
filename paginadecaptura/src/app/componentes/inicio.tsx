@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Image from 'next/image';
 
-export const BoasVindas = () => {
+const BoasVindas = () => {
     return (
         <Container id="conteiner-inicio" className="flex flex-col m-auto gap-3 sm:gap-5 xl:justify-evenly items-center max-md:pt-5 md:mt-[6vh] lg:mt-0 lg:flex-row ">
 
@@ -125,3 +125,5 @@ export const BoasVindas = () => {
         </Container>
     )
 }
+
+export default BoasVindas;

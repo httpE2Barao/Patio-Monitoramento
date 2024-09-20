@@ -1,7 +1,7 @@
 import { Box, Container, Stack } from "@mui/material";
 import Image from "next/image";
 
-export const Footer = () => {
+const Footer = () => {
     return (
         <>
             <Container sx={{ p: "4rem", display: "flex", backgroundColor: "primary.main", color: "white", justifyContent: "space-evenly", flexDirection: { xs: "column", sm: "column", md: "row", lg: "row" }, gap: "2rem", alignItems: "center", maxWidth: { lg: "100vw" } }}>
@@ -40,3 +40,5 @@ export const Footer = () => {
         </>
     );
 };
+
+export default Footer;
