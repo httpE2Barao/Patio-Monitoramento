@@ -1,7 +1,7 @@
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
 const BoasVindas = () => {
@@ -54,7 +54,7 @@ const BoasVindas = () => {
                             xs: "10vw",
                             sm: "4rem",
                             md: "4.2rem",
-                            lg: "4.5rem",
+                            lg: "4.1rem",
                             xl: "4.5rem"
                         }
                     }}>Queremos te <br /> conhecer melhor!</Typography>
