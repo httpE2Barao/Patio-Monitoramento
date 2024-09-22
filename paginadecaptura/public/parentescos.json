@@ -1,0 +1,58 @@
+[
+    {
+        "id": "0",
+        "value": "Conjuge"
+    },
+    {
+        "id": "1",
+        "value": "Filho(a)"
+    },
+    {
+        "id": "2",
+        "value": "Pai"
+    },
+    {
+        "id": "3",
+        "value": "Mãe"
+    },
+    {
+        "id": "4",
+        "value": "Tio(a)"
+    },
+    {
+        "id": "5",
+        "value": "Primo(a)"
+    },
+    {
+        "id": "6",
+        "value": "Avós"
+    },
+    {
+        "id": "7",
+        "value": "Amigo(a)"
+    },
+    {
+        "id": "8",
+        "value": "Locatário(a)"
+    },
+    {
+        "id": "9",
+        "value": "Proprietário(a)"
+    },
+    {
+        "id": "10",
+        "value": "Arrendatário(a)"
+    },
+    {
+        "id": "11",
+        "value": "Funcionário(a)"
+    },
+    {
+        "id": "12",
+        "value": "Diarista"
+    },
+    {
+        "id": "13",
+        "value": "Outro"
+    }
+]

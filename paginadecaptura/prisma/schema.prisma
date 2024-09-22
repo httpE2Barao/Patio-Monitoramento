@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("clientes_URL")
+  directUrl = env("clientes_URL_NON_POOLING")
+}
+
+model Cliente {
+  id         Int          @id @default(autoincrement())
+  endereco   Endereco[]
+  residentes Residentes[]
+  veiculos   Veiculos[]
+  feedback   String?
+  createdAt  DateTime     @default(now())
+}
+
+model Residentes {
+  id            Int      @id @default(autoincrement())
+  nome          String
+  telefone      String
+  email         String
+  tipoDocumento String
+  documento     String
+  parentesco    String?
+  Cliente       Cliente? @relation(fields: [clienteId], references: [id])
+  clienteId     Int?
+}
+
+model Endereco {
+  id         Int      @id @default(autoincrement())
+  condominio String
+  apto       String
+  Cliente    Cliente? @relation(fields: [clienteId], references: [id])
+  clienteId  Int?
+}
+
+model Veiculos {
+  id        Int      @id @default(autoincrement())
+  cor       String
+  modelo    String
+  placa     String
+  Cliente   Cliente? @relation(fields: [clienteId], references: [id])
+  clienteId Int?
+}

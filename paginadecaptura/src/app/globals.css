@@ -4,10 +4,43 @@
 
 :root {
   --foreground-rgb: f, f, f;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
   transition: all 0.3s ease;
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 99vw;
+}
+
+@media screen and (min-width: 1020px) and (max-width: 1350px) {
+  #conteiner-inicio {
+    overflow-x: hidden;
+  }
+
+  .conteiner-inicio-box {
+    padding-left: 2rem;
+    text-align: left;
+    margin-right: -100px;
+  }
+
+  .cont-inicio-titulo {
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 1020px) {
+  .conteiner-inicio-img > h2 {
+    margin: 0 5em;
+  }
+}
+
+@media screen and (min-width: 1500px) {
+  .conteiner-inicio-img {
+    max-width: none;
+    width: 50vw;
+  }
+}
+
+.conteiner-inicio-box > h1{
+  max-width: 90vw;
 }
 
 .SetaExpandir {
@@ -23,10 +56,6 @@
   filter: invert();
 }
 
-.btn-to-top:hover :first-child{
+.btn-to-top:hover :first-child {
   filter: invert(1);
-}
-
-.primeiro-item {
-  grid-row: 1;
 }

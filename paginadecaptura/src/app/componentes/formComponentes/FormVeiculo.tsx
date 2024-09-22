@@ -3,7 +3,7 @@ import { Grid, TextField, Button } from "@mui/material";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { Schema } from "./schema";
 import { FormNumberProps } from "./FormResidentes";
-import { Titulo } from "./FormTitular";
+import { Titulo } from "./titulo";
 
 export const FormVeiculo: React.FC<FormNumberProps> = ({ index }) => {
     const { control, register, formState: { errors } } = useFormContext<Schema>();
@@ -14,7 +14,7 @@ export const FormVeiculo: React.FC<FormNumberProps> = ({ index }) => {
 
     return (
         <>
-            <Titulo titulo="Veiculos" />
+            <Titulo titulo="Veículos" />
             {
                 fields.map((field, index) => (
                     <Grid container key={field.id} spacing={2} sx={{ mb: 2 }}>
@@ -52,7 +52,7 @@ export const FormVeiculo: React.FC<FormNumberProps> = ({ index }) => {
                 ))
             }
 
-            <Grid item xs={12} sx={{ my: 2, display: "flex", justifyContent: "space-around" }}>
+            <Grid item xs={12} sx={{ mt: 3, mb: 1, display: "flex", justifyContent: "space-around" }}>
                 <Button
                     onClick={() => append({ modelo: "", cor: "", placa: "" })}
                     variant="contained">
