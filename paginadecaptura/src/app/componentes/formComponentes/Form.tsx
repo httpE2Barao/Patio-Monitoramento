@@ -1,14 +1,14 @@
-import React from "react";
-import { Grid, Button, Container } from "@mui/material";
-import { useForm, FormProvider, useFieldArray } from "react-hook-form";
+"use client"
 import { zodResolver } from "@hookform/resolvers/zod";
-import { schema, Schema } from "./schema";
-import { FormVeiculo } from "./FormVeiculo";
-import { FormEndereco } from "./FormEndereco";
-import { FormResidentes } from "./FormResidentes";
-import { FormFeedback } from "./FormFeedback";
+import { Button, Container, Grid } from "@mui/material";
+import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import Cliente, { resetarRetorno } from "../../construtor";
+import { FormEndereco } from "./FormEndereco";
+import { FormFeedback } from "./FormFeedback";
+import { FormResidentes } from "./FormResidentes";
 import { FormRetorno } from "./FormRetorno";
+import { FormVeiculo } from "./FormVeiculo";
+import { schema, Schema } from "./schema";
 
 export const Form = () => {
     const methods = useForm<Schema>({

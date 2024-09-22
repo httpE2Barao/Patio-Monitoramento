@@ -1,6 +1,7 @@
+"use client"
+import { Autocomplete, Button, FormControlLabel, Grid, Radio, RadioGroup, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { Grid, TextField, Button, FormControlLabel, RadioGroup, Radio, Autocomplete } from "@mui/material";
-import { useFormContext, useFieldArray, Controller } from "react-hook-form";
+import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { Schema } from "./schema";
 import { Titulo } from "./titulo";
 export interface FormNumberProps {

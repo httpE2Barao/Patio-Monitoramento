@@ -1,7 +1,5 @@
 import Cliente from '@/app/construtor';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from './prisma';
 
 export async function enviarDadosAoBanco(cliente: Cliente) {
     try {
