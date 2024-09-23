@@ -4,12 +4,11 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("clientes_URL")
-  directUrl = env("clientes_URL_NON_POOLING")
+  url       = env("DATABASE_URL")
 }
 
 model Cliente {
-  id         Int          @id @default(autoincrement())
+  id         String          @id @default(cuid())
   endereco   Endereco[]
   residentes Residentes[]
   veiculos   Veiculos[]
@@ -18,7 +17,7 @@ model Cliente {
 }
 
 model Residentes {
-  id            Int      @id @default(autoincrement())
+  id            String      @id @default(cuid())
   nome          String
   telefone      String
   email         String
@@ -26,22 +25,22 @@ model Residentes {
   documento     String
   parentesco    String?
   Cliente       Cliente? @relation(fields: [clienteId], references: [id])
-  clienteId     Int?
+  clienteId     String?
 }
 
 model Endereco {
-  id         Int      @id @default(autoincrement())
+  id         String      @id @default(cuid())
   condominio String
   apto       String
   Cliente    Cliente? @relation(fields: [clienteId], references: [id])
-  clienteId  Int?
+  clienteId  String?
 }
 
 model Veiculos {
-  id        Int      @id @default(autoincrement())
+  id        String      @id @default(cuid())
   cor       String
   modelo    String
   placa     String
   Cliente   Cliente? @relation(fields: [clienteId], references: [id])
-  clienteId Int?
+  clienteId String?
 }

@@ -1,10 +1,32 @@
 "use client"
-import { Root } from "../../pages/page";
+
+import { ThemeProvider } from "@emotion/react";
+import { BtnToTop } from "./componentes/botaoSubir";
+import FAQ from "./componentes/faq";
+import Footer from "./componentes/footer";
+import Formulario from "./componentes/formulario";
+import Header from "./componentes/header";
+import BoasVindas from "./componentes/inicio";
+import { theme } from "./theme";
 
 export default function PaginaPrincipal() {
   return (
     <>
-      <Root />
+      <ThemeProvider theme={theme}>
+
+        <Header />
+
+        <BoasVindas />
+
+        <Formulario />
+
+        <FAQ />
+
+        <Footer />
+
+        <BtnToTop />
+
+      </ThemeProvider>
     </>
   );
 }

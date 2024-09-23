@@ -1,11 +1,12 @@
-
-import { enviarDadosAoBanco } from "../../pages/api/handler";
+import fastify from "fastify";
 
 export var retornoForm: boolean | undefined = undefined;
 
 export function resetarRetorno() {
     retornoForm = undefined;
 }
+
+const app = fastify();
 
 class Cliente {
     endereco: {
@@ -59,10 +60,52 @@ class Cliente {
                 this.residentes
             )}, Veículos: ${JSON.stringify(this.veiculos)}, Feedback: ${this.feedback}`
         );
+        app.get('/clientes', async () => {
+            const clientes = await prisma.cliente.findMany()
+            return clientes
+        })
     }
 
-    enviarDados(data: Cliente) {
-        enviarDadosAoBanco(data);
+    async enviarDadosAoBanco() {
+        try {
+            await prisma.$connect();
+
+            const { endereco, residentes, veiculos, feedback } = this;
+
+            await prisma.cliente.create({
+                data: {
+                    residentes: {
+                        createMany: {
+                            data: residentes,
+                        },
+                    },
+                    veiculos: {
+                        createMany: {
+                            data: veiculos || [],
+                        },
+                    },
+                    endereco: {
+                        create: {
+                            condominio: endereco[0].condominio,
+                            apto: endereco[0].apto,
+                        },
+                    },
+                    feedback: feedback || '',
+                    createdAt: new Date(),
+                },
+            });
+
+            console.log('Dados enviados com sucesso!');
+            alert('Dados enviados com sucesso!');
+            retornoForm = true;
+        } catch (error) {
+            console.error('Erro ao enviar dados ao banco:', error);
+            alert('Erro ao enviar dados ao banco.');
+            retornoForm = false;
+            throw error;
+        } finally {
+            await prisma.$disconnect();
+        }
     }
 }
 

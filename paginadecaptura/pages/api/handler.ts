@@ -26,7 +26,6 @@ export async function enviarDadosAoBanco(cliente: Cliente) {
                     },
                 },
                 feedback: feedback || '',
-                createdAt: new Date(),
             },
         });
 
