@@ -41,7 +41,17 @@ export const Form = () => {
         const { endereco, residentes, veiculos, feedback } = data;
         const novoCliente = new Cliente(endereco, residentes, feedback, veiculos);
         setShouldSubmit(true);
+        setRetornoForm(true);
+        console.log(novoCliente);
 
+        await fetch('http://localhost:3333/clientes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(novoCliente),
+        })
+        
         // useEffect(() => {
         //     if (shouldSubmit && novoCliente) {
         //         async () => {
