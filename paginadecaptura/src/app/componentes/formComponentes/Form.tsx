@@ -1,8 +1,8 @@
-"use client"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Container, Grid } from "@mui/material";
+import { useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import Cliente, { resetarRetorno } from "../../construtor";
+import Cliente from "../../construtor";
 import { FormEndereco } from "./FormEndereco";
 import { FormFeedback } from "./FormFeedback";
 import { FormResidentes } from "./FormResidentes";
@@ -31,12 +31,30 @@ export const Form = () => {
         control: methods.control
     });
 
+    const [retornoForm, setRetornoForm] = useState<boolean|undefined>();    
+
     const { handleSubmit, reset } = methods;
+
+    const [shouldSubmit, setShouldSubmit] = useState(false);
 
     const onSubmit = async (data: Schema) => {
         const { endereco, residentes, veiculos, feedback } = data;
-        const cliente = new Cliente(endereco, residentes, feedback, veiculos);
-        await cliente.enviarDadosAoBanco(cliente);
+        const novoCliente = new Cliente(endereco, residentes, feedback, veiculos);
+        setShouldSubmit(true);
+
+        // useEffect(() => {
+        //     if (shouldSubmit && novoCliente) {
+        //         async () => {
+        //             await app.inject({
+        //                 method: 'POST',
+        //                 url: '/clientes',
+        //                 body: novoCliente,
+        //             });
+        //         }
+        //     //   enviarDadosAoBanco(novoCliente);
+        //       setShouldSubmit(false);
+        //     }
+        // }, [shouldSubmit, novoCliente]);
     };
 
     return (
@@ -65,7 +83,7 @@ export const Form = () => {
                         </Grid>
 
                         <Grid item xs={12}>
-                            <FormRetorno />
+                            <FormRetorno enviado={retornoForm}/>
                         </Grid>
 
                         <Grid item xs={12} sx={{ mt: 3, justifyContent: "space-around", display: "flex" }}>
@@ -73,7 +91,7 @@ export const Form = () => {
                                 variant="outlined"
                                 onClick={() => {
                                     reset();
-                                    resetarRetorno();
+                                    setRetornoForm(undefined);
                                 }}
                                 sx={{ ml: 2, fontSize: "large" }}>
                                 Resetar

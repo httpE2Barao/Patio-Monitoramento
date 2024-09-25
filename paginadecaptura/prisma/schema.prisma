@@ -16,6 +16,14 @@ model Cliente {
   createdAt  DateTime     @default(now())
 }
 
+model Endereco {
+  id         String      @id @default(cuid())
+  condominio String
+  apto       String
+  Cliente    Cliente? @relation(fields: [clienteId], references: [id])
+  clienteId  String?
+}
+
 model Residentes {
   id            String      @id @default(cuid())
   nome          String
@@ -26,14 +34,6 @@ model Residentes {
   parentesco    String?
   Cliente       Cliente? @relation(fields: [clienteId], references: [id])
   clienteId     String?
-}
-
-model Endereco {
-  id         String      @id @default(cuid())
-  condominio String
-  apto       String
-  Cliente    Cliente? @relation(fields: [clienteId], references: [id])
-  clienteId  String?
 }
 
 model Veiculos {
