@@ -22,15 +22,11 @@ export const FormFeedback: React.FC = () => {
                         rows={5}
                         variant="filled"
                         fullWidth
+                        onChange={(e) => {
+                            console.log('Feedback em tempo real:', e.target.value.length);
+                        }}
                         error={!!errors.feedback}
                         helperText={errors.feedback?.message}
-                    />
-                    <input
-                        type="text"
-                        name="feedback"
-                        onChange={(e) => {
-                            console.log('Feedback em tempo real:', e.target.value);
-                        }}
                     />
                 </Grid>
             </Grid>

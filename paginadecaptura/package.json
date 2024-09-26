@@ -13,12 +13,10 @@
   "dependencies": {
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
-    "@fastify/formbody": "^8.0.1",
     "@hookform/resolvers": "^3.9.0",
     "@mui/material": "^5.16.6",
     "@prisma/studio": "^0.502.0",
     "@vercel/postgres": "^0.10.0",
-    "fastify": "^5.0.0",
     "next": "^14.2.12",
     "pg": "^8.13.0",
     "react": "^18",
@@ -28,13 +26,21 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "@eslint/js": "^9.11.1",
+    "@fastify/formbody": "^8.0.1",
     "@prisma/client": "^5.20.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.20",
-    "eslint": "^8",
+    "babel-loader": "^9.2.1",
+    "eslint": "^8.57.1",
     "eslint-config-next": "14.2.5",
+    "eslint-plugin-react": "^7.36.1",
+    "fastify": "^5.0.0",
+    "globals": "^15.9.0",
     "i": "^0.3.7",
     "json-server": "^1.0.0-beta.2",
     "node-polyfill-webpack-plugin": "^4.0.0",
@@ -42,6 +48,13 @@
     "postcss": "^8.4.47",
     "prisma": "^5.20.0",
     "tailwindcss": "^3.4.13",
-    "typescript": "^5"
-  }
+    "typescript": "^5",
+    "typescript-eslint": "^8.7.0",
+    "webpack": "^5.95.0"
+  },
+  "description": "This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).",
+  "main": "cors.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

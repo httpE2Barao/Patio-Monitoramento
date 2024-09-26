@@ -1,7 +1,12 @@
 import Cliente from "@/componentes/classeCliente";
-import fastify from "fastify";
+import fastify, { FastifyBaseLogger, FastifyInstance, FastifyTypeProvider, RawServerDefault } from "fastify";
+import { IncomingMessage, ServerResponse } from "http";
 
 const app = fastify();
+
+app.register(fastifyCors, {
+    origin: '*',
+});
 
 async function enviarDadosAoBanco(cliente: Cliente) {
     const clientData = {
@@ -13,7 +18,7 @@ async function enviarDadosAoBanco(cliente: Cliente) {
                 email: residente.email,
                 tipoDocumento: residente.tipoDocumento,
                 documento: residente.documento,
-                parentesco: residente.parentesco || undefined, 
+                parentesco: residente.parentesco || undefined,
             },
         })),
         veiculos: cliente.veiculos?.map((veiculo) => ({
@@ -45,3 +50,8 @@ async function enviarDadosAoBanco(cliente: Cliente) {
 }
 
 export default enviarDadosAoBanco;
+
+function fastifyCors(instance: FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProvider>, opts: { origin: string; }, done: (err?: Error | undefined) => void): void {
+    throw new Error("Function not implemented.");
+}
+

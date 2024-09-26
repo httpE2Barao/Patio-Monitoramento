@@ -1,45 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --foreground-rgb: f, f, f;
+  --primary-color: f, f, f;
   transition: all 0.3s ease;
   scroll-behavior: smooth;
   overflow-x: hidden;
   width: 99vw;
 }
 
-@media screen and (min-width: 1020px) and (max-width: 1350px) {
-  #conteiner-inicio {
+:root a {
+  color: var(--primary-color);
+}
+
+@media screen and (min-width: 1020px) {
+  #container-start {
     overflow-x: hidden;
   }
 
-  .conteiner-inicio-box {
+  .container-start-box {
     padding-left: 2rem;
     text-align: left;
     margin-right: -100px;
   }
 
-  .cont-inicio-titulo {
+  .container-start-title {
     margin: 0;
   }
-}
 
-@media screen and (max-width: 1020px) {
-  .conteiner-inicio-img > h2 {
-    margin: 0 5em;
+  @media screen and (max-width: 1350px) {
+    .container-start-img > h2 {
+      margin: 0 5em;
+    }
   }
 }
 
 @media screen and (min-width: 1500px) {
-  .conteiner-inicio-img {
+  .container-start-img {
     max-width: none;
     width: 50vw;
   }
 }
 
-.conteiner-inicio-box > h1{
+.container-start-box > h1 {
   max-width: 90vw;
 }
 
-.SetaExpandir {
+.expand-arrow {
   transition: transform 0.3s ease;
   opacity: 0.7;
 }
