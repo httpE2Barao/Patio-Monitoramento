@@ -17,13 +17,11 @@
     "@fastify/formbody": "^8.0.1",
     "@hookform/resolvers": "^3.9.0",
     "@mui/material": "^5.16.6",
-    "@prisma/client": "^5.19.1",
     "@prisma/studio": "^0.502.0",
     "@vercel/postgres": "^0.10.0",
     "fastify": "^5.0.0",
     "next": "^14.2.12",
     "pg": "^8.13.0",
-    "prisma": "^5.19.1",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.52.2",
@@ -31,14 +29,18 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@prisma/client": "^5.20.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
+    "i": "^0.3.7",
     "json-server": "^1.0.0-beta.2",
     "node-polyfill-webpack-plugin": "^4.0.0",
+    "npm": "^10.8.3",
     "postcss": "^8",
+    "prisma": "^5.20.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

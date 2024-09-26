@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Container, Grid } from "@mui/material";
 import { useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import Cliente from "../../construtor";
+import Cliente from "../../classeCliente";
 import { FormEndereco } from "./FormEndereco";
 import { FormFeedback } from "./FormFeedback";
 import { FormResidentes } from "./FormResidentes";
@@ -44,14 +44,14 @@ export const Form = () => {
         setRetornoForm(true);
         console.log(novoCliente);
 
-        await fetch('http://localhost:3333/clientes', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(novoCliente),
-        })
-        
+        // await fetch('http://localhost:3333/clientes', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify(novoCliente),
+        // })
+
         // useEffect(() => {
         //     if (shouldSubmit && novoCliente) {
         //         async () => {
