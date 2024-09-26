@@ -1,11 +1,11 @@
 "use client"
 import { ThemeProvider } from "@emotion/react";
-import { BtnToTop } from "./componentes/botaoSubir";
-import FAQ from "./componentes/faq";
-import Footer from "./componentes/footer";
-import Formulario from "./componentes/formulario";
-import Header from "./componentes/header";
-import BoasVindas from "./componentes/inicio";
+import { BtnToTop } from "../componentes/botaoSubir";
+import FAQ from "../componentes/faq";
+import Footer from "../componentes/footer";
+import Formulario from "../componentes/formulario";
+import Header from "../componentes/header";
+import BoasVindas from "../componentes/inicio";
 import { theme } from "./theme";
 
 export default function PaginaPrincipal() {

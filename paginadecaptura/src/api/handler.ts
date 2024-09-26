@@ -1,26 +1,30 @@
-import Cliente from "@/app/classeCliente";
-import app from "./server.js";
+import Cliente from "@/componentes/classeCliente";
+import fastify from "fastify";
+
+const app = fastify();
 
 async function enviarDadosAoBanco(cliente: Cliente) {
-    const clientData: {
-        endereco: { create: { condominio: string; apto: string } };
-        residentes: { create: { nome: string; telefone: string; email: string; tipoDocumento: "RG" | "CPF" | "CNH"; documento: string; parentesco?: string } }[];
-        veiculos?: { create: { cor: string; modelo: string; placa: string } }[];
-        feedback?: string;
-    } = {
-        residentes: [],
-        endereco: {
+    const clientData = {
+        endereco: { create: { condominio: cliente.endereco[0].condominio, apto: cliente.endereco[0].apto } },
+        residentes: cliente.residentes.map((residente) => ({
             create: {
-                condominio: '',
-                apto: ''
-            }
-        }
+                nome: residente.nome,
+                telefone: residente.telefone,
+                email: residente.email,
+                tipoDocumento: residente.tipoDocumento,
+                documento: residente.documento,
+                parentesco: residente.parentesco || undefined, 
+            },
+        })),
+        veiculos: cliente.veiculos?.map((veiculo) => ({
+            create: {
+                cor: veiculo.cor,
+                modelo: veiculo.modelo,
+                placa: veiculo.placa,
+            },
+        })),
+        feedback: cliente.feedback || undefined,
     };
-
-    clientData.endereco = { create: { condominio: cliente.endereco[0].condominio, apto: cliente.endereco[0].apto } };
-    clientData.residentes = cliente.residentes.map((residente) => ({ create: { nome: residente.nome, telefone: residente.telefone, email: residente.email, tipoDocumento: residente.tipoDocumento, documento: residente.documento, parentesco: residente.parentesco } }));
-    clientData.veiculos = cliente.veiculos?.map((veiculo) => ({ create: { cor: veiculo.cor, modelo: veiculo.modelo, placa: veiculo.placa } }));
-    clientData.feedback = cliente.feedback;
 
     try {
         const response = await app.inject({
@@ -36,7 +40,7 @@ async function enviarDadosAoBanco(cliente: Cliente) {
         console.log(response);
     } catch (error) {
         console.error(error);
-        throw error; 
+        throw error;
     }
 }
 

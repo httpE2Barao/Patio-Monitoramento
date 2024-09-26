@@ -1,14 +1,15 @@
+"use client"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Container, Grid } from "@mui/material";
 import { useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import Cliente from "../../classeCliente";
+import { schema, Schema } from "../../api/schema-zod";
+import Cliente from "../classeCliente";
 import { FormEndereco } from "./FormEndereco";
 import { FormFeedback } from "./FormFeedback";
 import { FormResidentes } from "./FormResidentes";
 import { FormRetorno } from "./FormRetorno";
 import { FormVeiculo } from "./FormVeiculo";
-import { schema, Schema } from "./schema";
 
 export const Form = () => {
     const methods = useForm<Schema>({

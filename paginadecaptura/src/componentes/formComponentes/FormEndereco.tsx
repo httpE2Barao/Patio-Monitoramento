@@ -1,7 +1,7 @@
-import React from "react";
 import { Grid, TextField } from "@mui/material";
+import React from "react";
 import { useFormContext } from "react-hook-form";
-import { Schema } from "./schema";
+import { Schema } from "../../api/schema-zod";
 import { Titulo } from "./titulo";
 
 export const FormEndereco: React.FC = () => {
