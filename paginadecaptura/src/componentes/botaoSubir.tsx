@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Button } from "@mui/material";
 import Image from "next/image";
 
 export const BtnToTop = () => {

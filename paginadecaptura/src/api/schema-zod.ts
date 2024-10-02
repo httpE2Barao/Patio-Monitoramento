@@ -1,9 +1,4 @@
-import { z, ZodRawShape } from 'zod';
-
-interface RefinementContext<T extends ZodRawShape> {
-    addIssue: (arg: any) => void;
-    data: z.infer<z.ZodObject<T>>;
-}
+import { z } from 'zod';
 
 const patterns = {
     email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
@@ -33,7 +28,7 @@ const veiculoSchema = z.object({
 const feedbackSchema = z.string().max(200, { message: 'Digite um feedback' });
 
 export const schema = z.object({
-    endereco: z.array(enderecoSchema),
+    endereco: z.object({enderecoSchema}),
     residentes: z.array(residenteSchema),
     veiculos: z.array(veiculoSchema),
     feedback: z.string(feedbackSchema)

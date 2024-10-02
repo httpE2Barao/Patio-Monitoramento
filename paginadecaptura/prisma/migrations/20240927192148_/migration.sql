@@ -8,6 +8,16 @@ CREATE TABLE "Cliente" (
 );
 
 -- CreateTable
+CREATE TABLE "Endereco" (
+    "id" TEXT NOT NULL,
+    "condominio" TEXT NOT NULL,
+    "apto" TEXT NOT NULL,
+    "clienteId" TEXT,
+
+    CONSTRAINT "Endereco_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Residentes" (
     "id" TEXT NOT NULL,
     "nome" TEXT NOT NULL,
@@ -22,16 +32,6 @@ CREATE TABLE "Residentes" (
 );
 
 -- CreateTable
-CREATE TABLE "Endereco" (
-    "id" TEXT NOT NULL,
-    "condominio" TEXT NOT NULL,
-    "apto" TEXT NOT NULL,
-    "clienteId" TEXT,
-
-    CONSTRAINT "Endereco_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Veiculos" (
     "id" TEXT NOT NULL,
     "cor" TEXT NOT NULL,
@@ -43,10 +43,10 @@ CREATE TABLE "Veiculos" (
 );
 
 -- AddForeignKey
-ALTER TABLE "Residentes" ADD CONSTRAINT "Residentes_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "Cliente"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Endereco" ADD CONSTRAINT "Endereco_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "Cliente"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Endereco" ADD CONSTRAINT "Endereco_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "Cliente"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Residentes" ADD CONSTRAINT "Residentes_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "Cliente"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Veiculos" ADD CONSTRAINT "Veiculos_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "Cliente"("id") ON DELETE SET NULL ON UPDATE CASCADE;

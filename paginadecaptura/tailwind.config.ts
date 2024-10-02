@@ -13,6 +13,9 @@ export default {
       },
     },
   },
+  "compilerOptions": {
+    "esModuleInterop": true
+  },
   plugins: [],
   module: {
     rules: [
@@ -27,8 +30,6 @@ export default {
               postcssOptions: {
                 plugins: [
                   require('tailwindcss'),
-                  require('autoprefixer'),   
-
                 ],
               },
             },
@@ -37,6 +38,5 @@ export default {
       },
     ],
   },
-
 }
 

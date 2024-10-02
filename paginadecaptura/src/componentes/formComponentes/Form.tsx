@@ -23,11 +23,11 @@ export const Form = () => {
         }
     });
 
-    const { fields: residentesFields, append: appendResidente, remove: removeResidente } = useFieldArray({
+    const { fields: residentesFields } = useFieldArray({
         name: "residentes",
         control: methods.control
     });
-    const { fields: veiculosFields, append: appendVeiculo, remove: removeVeiculo } = useFieldArray({
+    const { fields: veiculosFields } = useFieldArray({
         name: "veiculos",
         control: methods.control
     });
@@ -36,36 +36,19 @@ export const Form = () => {
 
     const { handleSubmit, reset } = methods;
 
-    const [shouldSubmit, setShouldSubmit] = useState(false);
+    // const [shouldSubmit, setShouldSubmit] = useState(false);
 
     const onSubmit = async (data: Schema) => {
         const { endereco, residentes, veiculos, feedback } = data;
-        const novoCliente = new Cliente(endereco, residentes, feedback, veiculos);
-        setShouldSubmit(true);
-        setRetornoForm(true);
-        console.log(novoCliente);
-
-        // await fetch('http://localhost:3333/clientes', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify(novoCliente),
-        // })
-
-        // useEffect(() => {
-        //     if (shouldSubmit && novoCliente) {
-        //         async () => {
-        //             await app.inject({
-        //                 method: 'POST',
-        //                 url: '/clientes',
-        //                 body: novoCliente,
-        //             });
-        //         }
-        //     //   enviarDadosAoBanco(novoCliente);
-        //       setShouldSubmit(false);
-        //     }
-        // }, [shouldSubmit, novoCliente]);
+        const novoCliente = new Cliente(endereco[0], residentes, veiculos, feedback);
+        // setShouldSubmit(true);
+        await novoCliente.enviarCliente().then(() => {
+            setRetornoForm(true);
+            console.log(novoCliente);
+        }).catch(() => {
+            setRetornoForm(false);
+        });
+    console.log(novoCliente);
     };
 
     return (

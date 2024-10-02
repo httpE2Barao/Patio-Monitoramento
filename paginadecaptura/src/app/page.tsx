@@ -1,5 +1,5 @@
 "use client"
-import { ThemeProvider } from "@emotion/react";
+import { ThemeProvider } from "@mui/material";
 import { BtnToTop } from "../componentes/botaoSubir";
 import FAQ from "../componentes/faq";
 import Footer from "../componentes/footer";
