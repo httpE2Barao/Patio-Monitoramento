@@ -10,7 +10,6 @@ import { theme } from "./theme";
 
 export default function PaginaPrincipal() {
   return (
-    <>
       <ThemeProvider theme={theme}>
 
         <Header />
@@ -26,6 +25,5 @@ export default function PaginaPrincipal() {
         <BtnToTop />
 
       </ThemeProvider>
-    </>
   );
 }

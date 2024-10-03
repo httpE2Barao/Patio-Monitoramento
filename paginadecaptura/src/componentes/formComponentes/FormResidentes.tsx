@@ -10,10 +10,10 @@ export interface FormNumberProps {
 }
 
 export const FormResidentes: React.FC<FormNumberProps> = ({ index }) => {
-    const { register, control, formState: { errors } } = useFormContext<Schema>();
+    const { control, register, formState: { errors } } = useFormContext<Schema>();
     const { append, fields, remove } = useFieldArray({
-        control,
-        name: "residentes"
+      control,
+      name: "residentes"
     });
 
     const [parentescos, setParentescos] = useState<{ id: number, value: string }[]>([]);

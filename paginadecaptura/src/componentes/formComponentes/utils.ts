@@ -1,4 +1,4 @@
-import { UseFieldArrayAppend, FieldValues, FieldArrayPath } from "react-hook-form";
+import { FieldArrayPath, FieldValues, UseFieldArrayAppend } from "react-hook-form";
 
 type ItemType<T> = T extends { residentes: (infer U)[] } ? U :
                    T extends { veiculos: (infer U)[] } ? U :
