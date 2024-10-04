@@ -14,7 +14,8 @@ export default {
     },
   },
   "compilerOptions": {
-    "esModuleInterop": true
+    // "esModuleInterop": true,
+    "jsx": "react"
   },
   plugins: [],
   module: {
@@ -30,6 +31,7 @@ export default {
               postcssOptions: {
                 plugins: [
                   require('tailwindcss'),
+                  require('autoprefixer'),
                 ],
               },
             },

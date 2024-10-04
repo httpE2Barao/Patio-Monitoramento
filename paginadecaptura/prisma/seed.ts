@@ -9,22 +9,33 @@ async function enviarCliente(dadosCliente: Cliente) {
                     condominio: "Wolf",
                     apto: "33"
                 },
-            },
+            }, 
             residentes: {
-                create: {
-                    nome: "Elias Barão",
-                    telefone: "41998046755",
-                    email: "e2barao@hotmail.com",
-                    tipoDocumento: "RG",
-                    documento: "137257890",
-                    parentesco: ""
-                }
+                createMany: {
+                    data: [{
+                        nome: "Elias Barão",
+                        telefone: "41998046755",
+                        email: "e2barao@hotmail.com",
+                        tipoDocumento: "RG",
+                        documento: "137257890",
+                        parentesco: ""
+                    },{
+                        nome: "Thiago Barão",
+                        telefone: "41998046755",
+                        email: "e2barao@hotmail.com",
+                        tipoDocumento: "RG",
+                        documento: "137257890",
+                        parentesco: "Conjuge"
+                    }]
+                },
             },
             veiculos: {
-                create: {
+                createMany: {
+                    data: [{
                     cor: "",
                     modelo: "",
                     placa: ""
+                    }]
                 }
             },
             feedback: "alguma coisa"

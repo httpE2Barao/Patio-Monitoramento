@@ -1,7 +1,8 @@
 import { schema } from "@/api/schema-zod";
+import app from "@/api/server";
 
 class Cliente {
-  endereco: { condominio: string; apto: string };
+  endereco: { condominio: string; apto: string }[];
   residentes: {
     nome: string;
     telefone: string;
@@ -14,7 +15,7 @@ class Cliente {
   feedback?: string;
 
   constructor(
-    endereco: { condominio: string; apto: string },
+    endereco: { condominio: string; apto: string }[],
     residentes: {
       nome: string;
       telefone: string;
@@ -45,22 +46,21 @@ class Cliente {
     const resultado = schema.parseAsync(dadosDoCliente);
     console.log(resultado);
     
+    try {
+      const response = await app.inject({
+        url: 'http://localhost:3333/clientes',
+        body: resultado,
+      });
 
-    // try {
-    //   const response = await app.inject({
-    //     url: 'http://localhost:3333/clientes',
-    //     body: resultado,
-    //   });
+      if (response.statusCode !== 201) {
+        throw new Error(`Failed to create client: ${response.body}`);
+      }
 
-    //   if (response.statusCode !== 201) {
-    //     throw new Error(`Failed to create client: ${response.body}`);
-    //   }
-
-    //   console.log(response);
-    // } catch (error) {
-    //   console.error(error);
-    //   throw error;
-    // }
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 }
 

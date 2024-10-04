@@ -40,7 +40,7 @@ export const Form = () => {
 
     const onSubmit = async (data: Schema) => {
         const { endereco, residentes, veiculos, feedback } = data;
-        const novoCliente = new Cliente(endereco[0], residentes, veiculos, feedback);
+        const novoCliente = new Cliente(endereco, residentes, veiculos, feedback);
         // setShouldSubmit(true);
         await novoCliente.enviarCliente().then(() => {
             setRetornoForm(true);
