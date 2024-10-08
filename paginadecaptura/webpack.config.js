@@ -1,4 +1,7 @@
-const webpack = require("webpack");
+const path = require('path');
+const webpack = require('webpack');
+const NodeExternals = require('webpack-node-externals');
+const dns = require('dns');
 
 module.exports = function override(config, env) {
     config.resolve.fallback = {
@@ -6,26 +9,22 @@ module.exports = function override(config, env) {
         fs: require.resolve("graceful-fs"),
         buffer: require.resolve("buffer"),
         stream: require.resolve("stream-browserify"),
+        crypto: require.resolve("node:crypto"),
+        assert: require.resolve("assert"),
+        dns: require.resolve("node:dns/promises"),
     };
-    config.plugins.push(
-        new webpack.ProvidePlugin({
-            process: "process/browser",
-            Buffer: ["buffer", "Buffer"],
-        }),
-        new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
-            const mod = resource.request.replace(/^node:/, "");
-            switch (mod) {
-                case "buffer":
-                    resource.request = "buffer";
-                    break;
-                case "stream":
-                    resource.request = "readable-stream";
-                    break;
-                default:
-                    throw new Error(`Not found ${mod}`);
+    config.resolve.module = {
+        rules: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'node-loader'
+                }
             }
-        }),
-    );
+        ]
+    }
+    config.externals = [NodeExternals()],
     config.ignoreWarnings = [/Failed to parse source map/];
 
     return config;

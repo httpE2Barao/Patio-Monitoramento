@@ -15,27 +15,27 @@ app.get('/clientes', async (request, reply) => {
     }
 });
 
-app.post('/clientes', async (request, reply) => {
-    console.log(request.body);
+// app.post('/clientes', async (request, reply) => {
+//     console.log(request.body);
 
-    const { endereco, residentes, veiculos, feedback } = request.body as never;
+//     const { endereco, residentes, veiculos, feedback } = request.body as never;
 
-    await prisma.cliente.create({
-        data: {
-            endereco: {
-                create: endereco
-            },
-            residentes: {
-                create: residentes
-            },
-            veiculos: {
-                create: veiculos
-            },
-            feedback: feedback
-        }
-    });
-    return reply.status(201).send('Cliente data saved successfully!');
-});
+//     await prisma.cliente.create({
+//         data: {
+//             endereco: {
+//                 create: endereco
+//             },
+//             residentes: {
+//                 create: residentes
+//             },
+//             veiculos: {
+//                 create: veiculos
+//             },
+//             feedback: feedback
+//         }
+//     });
+//     return reply.status(201).send('Cliente data saved successfully!');
+// });
 
 app.listen({
     host: '0.0.0.0',
