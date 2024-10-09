@@ -46,8 +46,7 @@ async function enviarCliente(dadosCliente: Cliente) {
         console.log(verClientes);
         await prisma.$disconnect()
     })
-        .catch(async (e) => {
-            console.error(e)
+        .catch(async () => {
             await prisma.$disconnect()
             process.exit(1)
         })
