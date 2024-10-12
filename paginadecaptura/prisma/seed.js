@@ -1,7 +1,8 @@
-import Cliente from "@/componentes/classeCliente";
-import { prisma } from "../lib/prisma";
+import { PrismaClient } from "@prisma/client/extension";
 
-async function enviarCliente(dadosCliente: Cliente) {
+const prisma = new PrismaClient();
+
+async function enviarCliente() {
     const cliente = await prisma.cliente.create({
         data: {
             endereco: {
@@ -9,7 +10,7 @@ async function enviarCliente(dadosCliente: Cliente) {
                     condominio: "Wolf",
                     apto: "33"
                 },
-            }, 
+            },
             residentes: {
                 createMany: {
                     data: [{
@@ -19,7 +20,7 @@ async function enviarCliente(dadosCliente: Cliente) {
                         tipoDocumento: "RG",
                         documento: "137257890",
                         parentesco: ""
-                    },{
+                    }, {
                         nome: "Thiago Barão",
                         telefone: "41998046755",
                         email: "e2barao@hotmail.com",
@@ -32,9 +33,9 @@ async function enviarCliente(dadosCliente: Cliente) {
             veiculos: {
                 createMany: {
                     data: [{
-                    cor: "",
-                    modelo: "",
-                    placa: ""
+                        cor: "vermelha",
+                        modelo: "montana",
+                        placa: "atx2313"
                     }]
                 }
             },

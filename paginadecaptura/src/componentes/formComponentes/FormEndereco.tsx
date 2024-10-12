@@ -13,20 +13,20 @@ export const FormEndereco: React.FC = () => {
             <Grid container key={0} spacing={2}>
                 <Grid item xs={12} md={6}>
                     <TextField
-                        {...register(`endereco.0.condominio` as const)}
+                        {...register(`endereco.condominio` as const)}
                         label="Condomínio"
                         fullWidth
-                        error={!!errors.endereco?.[0]?.condominio}
-                        helperText={errors.endereco?.[0]?.condominio?.message}
+                        error={!!errors.endereco?.condominio}
+                        helperText={errors.endereco?.condominio?.message}
                     />
                 </Grid>
                 <Grid item xs={12} md={6}>
                     <TextField
-                        {...register(`endereco.0.apto` as const)}
+                        {...register(`endereco.apto` as const)}
                         label="Apartamento"
                         fullWidth
-                        error={!!errors.endereco?.[0]?.apto}
-                        helperText={errors.endereco?.[0]?.apto?.message}
+                        error={!!errors.endereco?.apto}
+                        helperText={errors.endereco?.apto?.message}
                     />
                 </Grid>
             </Grid>

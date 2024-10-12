@@ -1,7 +1,7 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Container, Grid } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { schema, Schema } from "../../api/schema-zod";
 import Cliente from "../classeCliente";
@@ -18,7 +18,7 @@ export const Form = () => {
         defaultValues: {
             residentes: [{ nome: '', telefone: '', email: '', tipoDocumento: 'RG', documento: '' }],
             veiculos: [{ cor: '', modelo: '', placa: '' }],
-            endereco: [{ condominio: '', apto: '' }],
+            endereco: { condominio: '', apto: '' },
             feedback: '',
         }
     });
@@ -35,26 +35,30 @@ export const Form = () => {
     const [retornoForm, setRetornoForm] = useState<boolean|undefined>();    
 
     const { handleSubmit, reset } = methods;
-
-    // const [shouldSubmit, setShouldSubmit] = useState(false);
-
+    
+    useEffect(() => {
+      const botaoEnviar = document.querySelector('#enviar-form');
+      if (botaoEnviar) {
+        botaoEnviar.addEventListener('click', () => onSubmit(methods.getValues()));
+      }
+    });                                                       
+             
     const onSubmit = async (data: Schema) => {
         const { endereco, residentes, veiculos, feedback } = data;
         const novoCliente = new Cliente(endereco, residentes, veiculos, feedback);
-        // setShouldSubmit(true);
-        await novoCliente.enviarCliente().then(() => {
+        await novoCliente.enviarCliente()
+        .then(() => {
             setRetornoForm(true);
-            console.log(novoCliente);
+            console.log(JSON.stringify(novoCliente));
         }).catch(() => {
             setRetornoForm(false);
         });
-    console.log(novoCliente);
     };
 
     return (
         <Container>
             <FormProvider {...methods}>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex gap-2 flex-col items-center justify-evenly">
+                <form className="flex gap-2 flex-col items-center justify-evenly">
                     <Grid container spacing={1} sx={{ pb: 4, maxWidth: "100%", m: "auto" }}>
                         <Grid item xs={12}>
                             <FormEndereco />
@@ -90,7 +94,7 @@ export const Form = () => {
                                 sx={{ ml: 2, fontSize: "large" }}>
                                 Resetar
                             </Button>
-                            <Button type="submit" variant="contained" sx={{ fontSize: "large" }}>
+                            <Button id="enviar-form" variant="contained" sx={{ fontSize: "large" }}>
                                 Enviar
                             </Button>
                         </Grid>

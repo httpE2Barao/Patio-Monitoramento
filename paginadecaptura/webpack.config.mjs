@@ -16,13 +16,19 @@ module.exports = function override(config, env) {
     config.resolve.module = {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.m?js$/,
+                resolve: {
+                    fullySpecified: true,
+                },
                 exclude: /node_modules/,
                 use: {
                     loader: 'node-loader'
                 }
             }
-        ]
+        ],
+    }
+    config.resolve.alias = {
+        '@api': path.resolve(__dirname, 'src/api'),
     }
     config.externals = [NodeExternals()],
     config.ignoreWarnings = [/Failed to parse source map/];

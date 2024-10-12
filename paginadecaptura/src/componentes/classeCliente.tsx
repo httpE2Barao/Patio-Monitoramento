@@ -1,8 +1,8 @@
-import { schema } from "@/api/schema-zod";
-import app from "@/api/server";
+import { prisma } from "../../lib/prisma";
+import { schema } from "../api/schema-zod";
 
 class Cliente {
-  endereco: { condominio: string; apto: string }[];
+  endereco: { condominio: string; apto: string };
   residentes: {
     nome: string;
     telefone: string;
@@ -15,7 +15,7 @@ class Cliente {
   feedback?: string;
 
   constructor(
-    endereco: { condominio: string; apto: string }[],
+    endereco: { condominio: string; apto: string },
     residentes: {
       nome: string;
       telefone: string;
@@ -33,34 +33,40 @@ class Cliente {
     this.feedback = feedback;
   }
 
+  async receberDados() {
+    const dados = await prisma.cliente.findMany();
+    console.log(dados);
+  }
+
   async enviarCliente() {
-    
+
     const dadosDoCliente = {
       endereco: this.endereco,
       residentes: this.residentes,
       veiculos: this.veiculos,
       feedback: this.feedback,
     };
-    
-    // Validando os dados
-    const resultado = schema.parseAsync(dadosDoCliente);
-    console.log(resultado);
-    
+
     try {
-      const response = await app.inject({
-        url: 'http://localhost:3333/clientes',
-        body: resultado,
+      // Validando os dados
+      const resultado = await schema.parseAsync(dadosDoCliente);
+      console.log(resultado);
+      
+      const novoCliente = await prisma.cliente.create({
+        data: { 
+          endereco: { create: resultado.endereco },
+          residentes: { createMany: { data: resultado.residentes } },
+          veiculos: { createMany: { data: resultado.veiculos } },
+          feedback: resultado.feedback,
+        },
       });
 
-      if (response.statusCode !== 201) {
-        throw new Error(`Failed to create client: ${response.body}`);
-      }
-
-      console.log(response);
+      console.log('Cliente criado com sucesso:', novoCliente);
+      return true;
     } catch (error) {
-      console.error(error);
-      throw error;
-    }
+      console.error('Erro ao criar cliente:', error);
+      return false;
+    } 
   }
 }
 

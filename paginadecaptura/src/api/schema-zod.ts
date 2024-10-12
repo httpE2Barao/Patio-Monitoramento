@@ -12,27 +12,27 @@ const residenteSchema = z.object({
     tipoDocumento: z.enum(["RG", "CPF", "CNH"], { message: 'Selecione um tipo de documento válido' }),
     documento: z.string().min(9, { message: 'Digite somente os números do documento' }).max(11, { message: 'Digite somente os números do documento' }),
     parentesco: z.string().min(1, { message: 'Selecione um nível de parentesco' }).optional(),
-});
+}); 
 
 const enderecoSchema = z.object({
-    condominio: z.string().min(1, { message: 'Digite o nome do condomínio' }),
-    apto: z.string().min(1, { message: 'Digite o número do apartamento' }),
+    condominio: z.string().min(3, { message: 'Digite o nome do condomínio' }),
+    apto: z.string().min(1, { message: 'Digite o numero e o bloco do apartamento' }),
 });
 
 const veiculoSchema = z.object({
-    cor: z.string().min(1, { message: 'Digite a cor do carro' }),
-    modelo: z.string().min(1, { message: 'Digite o modelo do carro' }),
+    cor: z.string().min(3, { message: 'Digite a cor do carro' }),
+    modelo: z.string().min(3, { message: 'Digite o modelo do carro' }),
     placa: z.string().min(7, { message: 'Digite a placa do carro' }),
 });
 
-const feedbackSchema = z.string().max(200, { message: 'Digite um feedback' });
+const feedbackSchema = z.string().max(200, { message: 'Digite um feedback' }).optional();
 
 export const schema = z.object({
-    endereco: z.array(enderecoSchema),
+    endereco: enderecoSchema,
     residentes: z.array(residenteSchema),
     veiculos: z.array(veiculoSchema),
-    feedback: z.string(feedbackSchema)
-  });
+    feedback: z.string(feedbackSchema),
+});
 
 export type Endereco = z.infer<typeof enderecoSchema>;
 export type Residente = z.infer<typeof residenteSchema>;
