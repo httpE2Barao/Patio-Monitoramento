@@ -6,8 +6,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "start": "next start",
-    "postinstall": "prisma generate"
+    "start": "next start && node src/api/server.js",
+    "lint": "next lint",
+    "eject": "react-scripts eject"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"Commonjs\"} prisma/seed.js"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
