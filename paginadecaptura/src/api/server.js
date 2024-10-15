@@ -11,7 +11,7 @@ const app = fastify({
 });
 
 app.register(fastifyCors, {
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://www.patiomonitoramento.com/'],
 });
 
 app.get('/clientes', async () => {

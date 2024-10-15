@@ -55,18 +55,18 @@ export const Form = () => {
         }
     };
 
-    // const deletarTodos = async () => {
-    //     try {
-    //         const response = await fetch('http://localhost:3333/clientes', { method: 'DELETE' });
-    //         if (!response.ok) {
-    //             throw new Error('Erro ao deletar clientes');
-    //         }
-    //         const data = await response.json();
-    //         console.log('Clientes deletados com sucesso:', data);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }
+    const deletarTodos = async () => {
+        try {
+            const response = await fetch('http://localhost:3333/clientes', { method: 'DELETE' });
+            if (!response.ok) {
+                throw new Error('Erro ao deletar clientes');
+            }
+            const data = await response.json();
+            console.log('Clientes deletados com sucesso:', data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     return (
         <Container>
@@ -100,7 +100,7 @@ export const Form = () => {
                                 onClick={() => {
                                     reset();
                                     setRetornoForm(undefined);
-                                    // deletarTodos();
+                                    deletarTodos();
                                 }}
                                 sx={{ ml: 2, fontSize: "large" }}>
                                 Resetar
