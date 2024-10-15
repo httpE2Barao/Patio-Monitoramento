@@ -7,7 +7,7 @@
     "dev": "prisma generate && next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "server": "prisma migrate deploy && node src/api/server.js",
+    "server": "node src/api/server.js",
     "lint": "next lint",
     "eject": "react-scripts eject"
   },
@@ -23,6 +23,7 @@
     "babel": "^5.8.38",
     "buffer": "^6.0.3",
     "fastify": "^5.0.0",
+    "fastify-cors": "^3.0.3",
     "graceful-fs": "^4.2.11",
     "init": "^0.1.2",
     "latest": "^0.2.0",

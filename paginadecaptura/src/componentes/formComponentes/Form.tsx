@@ -1,7 +1,7 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Container, Grid } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { schema, Schema } from "../../api/schema-zod";
 import Cliente from "../classeCliente";
@@ -16,9 +16,9 @@ export const Form = () => {
         mode: "all",
         resolver: zodResolver(schema),
         defaultValues: {
+            endereco: { condominio: '', apto: '' },
             residentes: [{ nome: '', telefone: '', email: '', tipoDocumento: 'RG', documento: '' }],
             veiculos: [{ cor: '', modelo: '', placa: '' }],
-            endereco: { condominio: '', apto: '' },
             feedback: '',
         }
     });
@@ -34,26 +34,31 @@ export const Form = () => {
 
     const [retornoForm, setRetornoForm] = useState<boolean|undefined>();    
 
-    const { handleSubmit, reset } = methods;
-    
-    useEffect(() => {
-      const botaoEnviar = document.querySelector('#enviar-form');
-      if (botaoEnviar) {
-        botaoEnviar.addEventListener('click', () => onSubmit(methods.getValues()));
-      }
-    });                                                       
+    const { handleSubmit, reset } = methods;                                                 
              
     const onSubmit = async (data: Schema) => {
-        const { endereco, residentes, veiculos, feedback } = data;
-        const novoCliente = new Cliente(endereco, residentes, veiculos, feedback);
-        await novoCliente.enviarCliente()
-        .then(() => {
+        const novoCliente = new Cliente(data);
+        try {
+            await novoCliente.enviarCliente();
             setRetornoForm(true);
-            console.log(JSON.stringify(novoCliente));
-        }).catch(() => {
+        } catch (error) {
+            console.error(error);
             setRetornoForm(false);
-        });
+        }
     };
+
+    const deletarTodos = async () => {
+        try {
+            const response = await fetch('http://localhost:3333/clientes', { method: 'DELETE' });
+            if (!response.ok) {
+              throw new Error('Erro ao deletar clientes');
+            }
+            const data = await response.json();
+            console.log('Clientes deletados com sucesso:', data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     return (
         <Container>
@@ -90,11 +95,12 @@ export const Form = () => {
                                 onClick={() => {
                                     reset();
                                     setRetornoForm(undefined);
+                                    deletarTodos();
                                 }}
                                 sx={{ ml: 2, fontSize: "large" }}>
                                 Resetar
                             </Button>
-                            <Button id="enviar-form" variant="contained" sx={{ fontSize: "large" }}>
+                            <Button onClick={handleSubmit(onSubmit)} variant="contained" sx={{ fontSize: "large" }}>
                                 Enviar
                             </Button>
                         </Grid>

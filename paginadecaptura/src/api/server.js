@@ -1,9 +1,15 @@
+import { PrismaClient } from '@prisma/client';
 import fastify from 'fastify';
-import { prisma } from "../../lib/prisma";
+import fastifyCors from 'fastify-cors';
 
+const prisma = new PrismaClient();
 const app = fastify();
 
-app.get('/clientes', async (request, reply) => {
+app.register(fastifyCors, {
+    origin: 'http://localhost:3000',
+});
+
+app.get('/clientes', async () => {
     try {
         const clientes = await prisma.cliente.findMany();
         console.log(clientes);
@@ -14,25 +20,41 @@ app.get('/clientes', async (request, reply) => {
 });
 
 app.post('/clientes', async (request, reply) => {
-    console.log(request.body);
-
     const { endereco, residentes, veiculos, feedback } = request.body;
 
-    await prisma.cliente.create({
-        data: {
-            endereco: {
-                create: endereco
+    if (!endereco || !residentes || !veiculos || !feedback) {
+        return reply.status(400).send({ error: 'Dados incompletos' });
+    }
+
+    try {
+        const novoCliente = await prisma.cliente.create({
+            data: {
+                endereco: {
+                    create: endereco
+                },
+                residentes: {
+                    create: residentes
+                },
+                veiculos: {
+                    create: veiculos
+                },
+                feedback: feedback,
             },
-            residentes: {
-                create: residentes
-            },
-            veiculos: {
-                create: veiculos
-            },
-            feedback: feedback
-        }
-    });
-    return reply.status(201).send('Cliente data saved successfully!');
+        });
+    } catch (error) {
+        console.error('Erro ao criar cliente:', error);
+        return reply.status(500).send({ error: 'Erro ao criar cliente' });
+    }
+});
+
+app.delete('/clientes', async (request, reply) => {
+    try {
+        const clientesDeletados = await prisma.cliente.deleteMany();
+        return reply.status(200).send({ message: `Foram deletados ${clientesDeletados.count} clientes` });
+    } catch (error) {
+        console.error('Erro ao deletar clientes:', error);
+        return reply.status(500).send({ message: 'Erro interno do servidor' });
+    }
 });
 
 app.listen({

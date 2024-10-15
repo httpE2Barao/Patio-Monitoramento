@@ -1,72 +1,60 @@
-import { prisma } from "../../lib/prisma";
-import { schema } from "../api/schema-zod";
+interface VeiculoData {
+  cor: string;
+  modelo: string;
+  placa: string;
+}
+
+interface ResidenteData {
+  nome?: string;
+  telefone: string;
+  email: string;
+  tipoDocumento: string;
+  documento: string;
+  parentesco?: string;
+}
+
+interface ClienteData {
+  endereco: { condominio: string; apto: string };
+  residentes: ResidenteData | ResidenteData[];
+  veiculos?: VeiculoData | VeiculoData[];
+  feedback?: string;
+}
 
 class Cliente {
-  endereco: { condominio: string; apto: string };
-  residentes: {
-    nome: string;
-    telefone: string;
-    email: string;
-    tipoDocumento: "RG" | "CPF" | "CNH";
-    documento: string;
-    parentesco?: string;
-  }[];
-  veiculos?: { cor: string; modelo: string; placa: string }[];
-  feedback?: string;
-
-  constructor(
-    endereco: { condominio: string; apto: string },
-    residentes: {
-      nome: string;
-      telefone: string;
-      email: string;
-      tipoDocumento: "RG" | "CPF" | "CNH";
-      documento: string;
-      parentesco?: string;
-    }[],
-    veiculos?: { cor: string; modelo: string; placa: string }[],
-    feedback?: string
-  ) {
-    this.endereco = endereco;
-    this.residentes = residentes;
-    this.veiculos = veiculos;
-    this.feedback = feedback;
-  }
-
-  async receberDados() {
-    const dados = await prisma.cliente.findMany();
-    console.log(dados);
-  }
+  constructor(private data: ClienteData) {}
 
   async enviarCliente() {
 
-    const dadosDoCliente = {
-      endereco: this.endereco,
-      residentes: this.residentes,
-      veiculos: this.veiculos,
-      feedback: this.feedback,
+    const formatarResidentes = (residentes: ResidenteData | ResidenteData[]) => {
+      return Array.isArray(residentes) ? residentes : [residentes];
+    };
+    const formatarVeiculos = (veiculos: VeiculoData | VeiculoData[] | undefined): VeiculoData[] => {
+      return Array.isArray(veiculos) ? veiculos : veiculos ? [veiculos] : [];
+    };
+
+    const cliente = {
+      endereco: this.data.endereco,
+      residentes: formatarResidentes(this.data.residentes),
+      veiculos: formatarVeiculos(this.data.veiculos),
+      feedback: this.data.feedback,
     };
 
     try {
-      // Validando os dados
-      const resultado = await schema.parseAsync(dadosDoCliente);
-      console.log(resultado);
-      
-      const novoCliente = await prisma.cliente.create({
-        data: { 
-          endereco: { create: resultado.endereco },
-          residentes: { createMany: { data: resultado.residentes } },
-          veiculos: { createMany: { data: resultado.veiculos } },
-          feedback: resultado.feedback,
-        },
+      const response = await fetch('http://localhost:3333/clientes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cliente),
       });
-
-      console.log('Cliente criado com sucesso:', novoCliente);
-      return true;
+  
+      if (!response.ok) {
+        throw new Error(`Error creating client: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      console.log('Cliente criado com sucesso:', data); 
     } catch (error) {
-      console.error('Erro ao criar cliente:', error);
-      return false;
-    } 
+      console.error('Error creating client:', error); 
+    }
   }
 }
 
