@@ -4,15 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "prisma generate && next dev",
+    "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "server": "node src/api/server.js",
-    "lint": "next lint",
-    "eject": "react-scripts eject"
-  },
-  "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"Commonjs\"} prisma/seed.js"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
