@@ -4,11 +4,7 @@ import fastifyCors from 'fastify-cors';
 
 const prisma = new PrismaClient();
 
-const app = fastify({
-    __internal: {
-        useUds: true,
-    },
-});
+const app = fastify();
 
 app.register(fastifyCors, {
     origin: ['http://localhost:3000', 'https://www.patiomonitoramento.com/'],
