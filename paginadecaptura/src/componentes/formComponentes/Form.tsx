@@ -1,6 +1,7 @@
 "use client"
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Container, Grid } from "@mui/material";
+import { Button, CircularProgress, Container, Grid } from "@mui/material";
 import { useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { schema, Schema } from "../../api/schema-zod";
@@ -27,38 +28,45 @@ export const Form = () => {
         name: "residentes",
         control: methods.control
     });
+
     const { fields: veiculosFields } = useFieldArray({
         name: "veiculos",
         control: methods.control
     });
 
-    const [retornoForm, setRetornoForm] = useState<boolean|undefined>();    
+    const [retornoForm, setRetornoForm] = useState<boolean|undefined>();
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const { handleSubmit, reset } = methods;                                                 
-             
+    const { handleSubmit, reset } = methods;
+
     const onSubmit = async (data: Schema) => {
+        setLoading(true);
         const novoCliente = new Cliente(data);
+        console.log(novoCliente);
         try {
             await novoCliente.enviarCliente();
             setRetornoForm(true);
         } catch (error) {
             console.error(error);
             setRetornoForm(false);
+        } finally {
+            setLoading(false);
+            reset();
         }
     };
 
-    const deletarTodos = async () => {
-        try {
-            const response = await fetch('http://localhost:3333/clientes', { method: 'DELETE' });
-            if (!response.ok) {
-              throw new Error('Erro ao deletar clientes');
-            }
-            const data = await response.json();
-            console.log('Clientes deletados com sucesso:', data);
-        } catch (error) {
-            console.error(error);
-        }
-    }
+    // const deletarTodos = async () => {
+    //     try {
+    //         const response = await fetch('http://localhost:3333/clientes', { method: 'DELETE' });
+    //         if (!response.ok) {
+    //             throw new Error('Erro ao deletar clientes');
+    //         }
+    //         const data = await response.json();
+    //         console.log('Clientes deletados com sucesso:', data);
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // }
 
     return (
         <Container>
@@ -68,34 +76,31 @@ export const Form = () => {
                         <Grid item xs={12}>
                             <FormEndereco />
                         </Grid>
-
                         <Grid item xs={12}>
                             {residentesFields.map((item, index) => (
                                 <FormResidentes key={item.id} index={index} />
                             ))}
                         </Grid>
-
                         <Grid item xs={12}>
                             {veiculosFields.map((item, index) => (
                                 <FormVeiculo key={item.id} index={index} />
                             ))}
                         </Grid>
-
                         <Grid item xs={12}>
                             <FormFeedback />
                         </Grid>
-
                         <Grid item xs={12}>
-                            <FormRetorno enviado={retornoForm}/>
+                            <span className="flex justify-center items-center mt-2">
+                                {loading ? <CircularProgress /> : <FormRetorno enviado={retornoForm} />}
+                            </span>
                         </Grid>
-
                         <Grid item xs={12} sx={{ mt: 3, justifyContent: "space-around", display: "flex" }}>
                             <Button
                                 variant="outlined"
                                 onClick={() => {
                                     reset();
                                     setRetornoForm(undefined);
-                                    deletarTodos();
+                                    // deletarTodos();
                                 }}
                                 sx={{ ml: 2, fontSize: "large" }}>
                                 Resetar

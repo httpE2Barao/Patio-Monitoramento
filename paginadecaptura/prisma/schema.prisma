@@ -1,48 +1,46 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Cliente {
-  id         String          @id @default(cuid())
-  endereco   Endereco[]      
-  residentes Residentes[]
-  veiculos   Veiculos[]
-  feedback   String?
-  createdAt  DateTime     @default(now())
+  id         String      @id @default(cuid())
+  feedback   String
+  endereco   Endereco[]
+  residentes Residente[]
+  veiculos   Veiculo[]
+  createdAt  DateTime    @default(now())
 }
 
 model Endereco {
-  id         String      @id @default(cuid())
+  id         String   @id @default(cuid())
   condominio String
   apto       String
-  Cliente Cliente[]
+  clienteId  String?
+  cliente    Cliente? @relation(fields: [clienteId], references: [id])
 }
 
-model Residentes {
-  id            String      @id @default(cuid())
+model Residente {
+  id            String   @id @default(cuid())
   nome          String
   telefone      String
   email         String
   tipoDocumento String
   documento     String
   parentesco    String?
-  Cliente Cliente[]
+  clienteId     String?
+  cliente       Cliente? @relation(fields: [clienteId], references: [id])
 }
 
-model Veiculos {
-  id        String      @id @default(cuid())
+model Veiculo {
+  id        String   @id @default(cuid())
   cor       String
   modelo    String
   placa     String
-  Cliente Cliente[]
+  clienteId String?
+  cliente   Cliente? @relation(fields: [clienteId], references: [id])
 }

@@ -1,3 +1,4 @@
+
 interface VeiculoData {
   cor: string;
   modelo: string;
@@ -5,7 +6,7 @@ interface VeiculoData {
 }
 
 interface ResidenteData {
-  nome?: string;
+  nome: string;
   telefone: string;
   email: string;
   tipoDocumento: string;
@@ -34,9 +35,9 @@ class Cliente {
 
     const cliente = {
       endereco: this.data.endereco,
-      residentes: formatarResidentes(this.data.residentes),
-      veiculos: formatarVeiculos(this.data.veiculos),
-      feedback: this.data.feedback,
+      residentes: this.data.residentes,
+      veiculos: this.data.veiculos,
+      feedback: this.data.feedback || '',
     };
 
     try {
@@ -53,7 +54,7 @@ class Cliente {
       const data = await response.json();
       console.log('Cliente criado com sucesso:', data); 
     } catch (error) {
-      console.error('Error creating client:', error); 
+      console.error('Error sending client:', error); 
     }
   }
 }

@@ -7,8 +7,8 @@ async function enviarCliente() {
         data: {
             endereco: {
                 create: {
-                    condominio: "Wolf",
-                    apto: "33"
+                    condominio: "",
+                    apto: ""
                 },
             },
             residentes: {
