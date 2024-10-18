@@ -55,19 +55,6 @@ export const Form = () => {
         }
     };
 
-    const deletarTodos = async () => {
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/clientes` , { method: 'DELETE' });
-            if (!response.ok) {
-                throw new Error('Erro ao deletar clientes');
-            }
-            const data = await response.json();
-            console.log('Clientes deletados com sucesso:', data);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
     return (
         <Container>
             <FormProvider {...methods}>
@@ -100,7 +87,6 @@ export const Form = () => {
                                 onClick={() => {
                                     reset();
                                     setRetornoForm(undefined);
-                                    deletarTodos();
                                 }}
                                 sx={{ ml: 2, fontSize: "large" }}>
                                 Resetar
