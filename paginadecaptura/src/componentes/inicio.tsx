@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 const BoasVindas = () => {
     return (
-        <Container id="conteiner-inicio" className="flex flex-col m-auto gap-3 sm:gap-5 xl:justify-evenly items-center max-md:pt-5 md:mt-[6vh] lg:mt-0 lg:flex-row ">
+        <Container id="conteiner-inicio" className="flex flex-col m-auto gap-3 sm:gap-5 xl:justify-evenly items-center max-md:pt-5 md:mt-[6vh] lg:mt-0 xl:flex-row overflow-hidden">
 
             <Box className="conteiner-inicio-box" sx={{
                 gap: {
@@ -17,13 +17,13 @@ const BoasVindas = () => {
                     xs: "center",
                     sm: "center",
                     md: "center",
-                    lg: "left",
+                    lg: "center",
                     xl: "left",
                 },
                 maxWidth: {
                     xs: "70em",
                     sm: "70em",
-                    lg: "80vw",
+                    // lg: "80vw",
                     xl: "2000px",
                 },
                 Height: {
@@ -77,7 +77,7 @@ const BoasVindas = () => {
                         }
                     }}>Atualize seus dados para que possamos estar sempre conectados e entregar o melhor serviço.</Typography>
 
-                <Box className="flex gap-5 max-lg:justify-center mt-7 lg:mt-10 md:gap-10 ">
+                <Box className="flex gap-5 max-xl:justify-center mt-7 lg:mt-10 md:gap-10 ">
                     <Button variant="contained" color="secondary"
                         onClick={() => {
                             document.getElementById('formulario')?.scrollIntoView({ behavior: 'smooth' });

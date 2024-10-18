@@ -1,7 +1,7 @@
 import { Grid, TextField } from "@mui/material";
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { Schema } from "../../api/schema-zod";
+import { Schema } from "../../app/schema-zod";
 import { Titulo } from "./titulo";
 
 export const FormEndereco: React.FC = () => {
@@ -23,7 +23,7 @@ export const FormEndereco: React.FC = () => {
                 <Grid item xs={12} md={6}>
                     <TextField
                         {...register(`endereco.apto` as const)}
-                        label="Apartamento"
+                        label="Apartamento e Bloco"
                         fullWidth
                         error={!!errors.endereco?.apto}
                         helperText={errors.endereco?.apto?.message}

@@ -1,7 +1,7 @@
 import { Box, Grid, TextField } from "@mui/material";
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { Schema } from "../../api/schema-zod";
+import { Schema } from "../../app/schema-zod";
 import { Titulo } from "./titulo";
 
 export const FormFeedback: React.FC = () => {
@@ -19,7 +19,7 @@ export const FormFeedback: React.FC = () => {
                         {...register(`feedback`)}
                         placeholder="Queremos ouvir você! Deixe-nos saber o que pensa – seja um elogio, sugestão ou desafio que enfrentou. Digite suas palavras neste campo e faça parte da nossa jornada de melhorias!"
                         multiline
-                        rows={5}
+                        rows={6}
                         variant="filled"
                         fullWidth
                         onChange={(e) => {

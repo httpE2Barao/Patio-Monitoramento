@@ -1,7 +1,7 @@
 import { Button, Grid, TextField } from "@mui/material";
 import React from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Schema } from "../../api/schema-zod";
+import { Schema } from "../../app/schema-zod";
 import { FormNumberProps } from "./FormResidentes";
 import { Titulo } from "./titulo";
 

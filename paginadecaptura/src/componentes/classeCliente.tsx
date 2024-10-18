@@ -1,11 +1,11 @@
 
-interface VeiculoData {
+export interface VeiculoData {
   cor: string;
   modelo: string;
   placa: string;
 }
 
-interface ResidenteData {
+export interface ResidenteData {
   nome: string;
   telefone: string;
   email: string;
@@ -14,7 +14,7 @@ interface ResidenteData {
   parentesco?: string;
 }
 
-interface ClienteData {
+export interface ClienteData {
   endereco: { condominio: string; apto: string };
   residentes: ResidenteData | ResidenteData[];
   veiculos?: VeiculoData | VeiculoData[];
@@ -41,7 +41,7 @@ class Cliente {
     };
 
     try {
-      const response = await fetch('http://localhost:3333/clientes', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/clientes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cliente),

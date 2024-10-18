@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, CircularProgress, Container, Grid } from "@mui/material";
 import { useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import { schema, Schema } from "../../api/schema-zod";
+import { schema, Schema } from "../../app/schema-zod";
 import Cliente from "../classeCliente";
 import { FormEndereco } from "./FormEndereco";
 import { FormFeedback } from "./FormFeedback";
@@ -57,7 +57,7 @@ export const Form = () => {
 
     const deletarTodos = async () => {
         try {
-            const response = await fetch('http://localhost:3333/clientes', { method: 'DELETE' });
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/clientes` , { method: 'DELETE' });
             if (!response.ok) {
                 throw new Error('Erro ao deletar clientes');
             }
