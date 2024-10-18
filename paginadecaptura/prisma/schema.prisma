@@ -21,7 +21,7 @@ model Endereco {
   condominio String
   apto       String
   clienteId  String?
-  cliente    Cliente? @relation(fields: [clienteId], references: [id])
+  cliente    Cliente? @relation(fields: [clienteId], references: [id], onDelete: Cascade)
 }
 
 model Residente {
@@ -33,7 +33,7 @@ model Residente {
   documento     String
   parentesco    String?
   clienteId     String?
-  cliente       Cliente? @relation(fields: [clienteId], references: [id])
+  cliente       Cliente? @relation(fields: [clienteId], references: [id], onDelete: Cascade)
 }
 
 model Veiculo {
@@ -42,5 +42,5 @@ model Veiculo {
   modelo    String
   placa     String
   clienteId String?
-  cliente   Cliente? @relation(fields: [clienteId], references: [id])
+  cliente   Cliente? @relation(fields: [clienteId], references: [id], onDelete: Cascade)
 }
