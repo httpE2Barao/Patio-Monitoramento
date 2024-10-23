@@ -10,22 +10,6 @@ app.register(fastifyCors, {
   origin: ['http://127.0.0.1:3000', 'https://www.patiomonitoramento.com', 'https://app-grupo-patio-web.onrender.com'],
 });
 
-// app.get('/api/clientes', async (request, reply) => {
-//   try {
-//     const clientes = await prisma.cliente.findMany({
-//       include: {
-//         endereco: true,
-//         residentes: true,
-//         veiculos: true,
-//       },
-//     });
-//     reply.send({ clientes, status: 200 });
-//   } catch (error: any) {
-//     console.error('Erro ao buscar clientes:', error.message);
-//     reply.send({ error: 'Erro ao buscar clientes', status: 500 });
-//   }
-// });
-
 app.post('/api/clientes', async (request, reply) => {
   const { endereco, residentes, veiculos, feedback } = request.body as ClienteData;
   console.log('Dados recebidos:', request.body);
