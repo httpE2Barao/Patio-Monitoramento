@@ -41,8 +41,16 @@ const residenteSchema = z.object({
     documento: z.string()
         .min(9, { message: 'Digite somente os números do documento' })
         .max(11, { message: 'Digite somente os números do documento' })
-        .refine((doc) => isValidCPF(doc), { message: 'CPF inválido' }),
+        .transform((doc) => doc.replace(/[\s.-]/g, '')),
     parentesco: z.string().min(1, { message: 'Selecione um nível de parentesco' }).optional(),
+}).superRefine((values, ctx) => {
+    if (values.tipoDocumento === "CPF" && !isValidCPF(values.documento)) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "CPF inválido",
+            path: ["documento"],
+        });
+    }
 });
 
 // Esquema de validação para endereço

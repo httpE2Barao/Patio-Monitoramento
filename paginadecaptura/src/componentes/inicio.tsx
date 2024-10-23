@@ -17,7 +17,7 @@ const BoasVindas = () => {
                     xs: "center",
                     sm: "center",
                     md: "center",
-                    lg: "center",
+                    lg: "left",
                     xl: "left",
                 },
                 maxWidth: {
