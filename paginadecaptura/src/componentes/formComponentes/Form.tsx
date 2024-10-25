@@ -2,8 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, CircularProgress, Container, Grid } from "@mui/material";
-import { useState } from "react";
-import { FormProvider, useFieldArray, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { schema, Schema } from "../../app/schema-zod";
 import Cliente from "../classeCliente";
 import { FormEndereco } from "./FormEndereco";
@@ -18,7 +18,7 @@ export const Form = () => {
         resolver: zodResolver(schema),
         defaultValues: {
             endereco: { condominio: '', apto: '' },
-            residentes: [{ nome: '', telefone: '', email: '', tipoDocumento: 'RG', documento: '' }],
+            residentes: [{ nome: '', telefone: '', email: '', tipoDocumento: 'CPF', documento: '' }],
             veiculos: [{ cor: '', modelo: '', placa: '' }],
             feedback: '',
         }
@@ -34,10 +34,23 @@ export const Form = () => {
         control: methods.control
     });
 
-    const [retornoForm, setRetornoForm] = useState<boolean|undefined>();
+    const [retornoForm, setRetornoForm] = useState<boolean | undefined>();
     const [loading, setLoading] = useState<boolean>(false);
 
-    const { handleSubmit, reset } = methods;
+    const { handleSubmit, reset, trigger, control } = methods;
+
+    // Observar a mudança no campo tipoDocumento
+    const tipoDocumento = useWatch({
+        name: "residentes",
+        control,
+    });
+
+    // Revalidar o campo documento sempre que tipoDocumento mudar
+    useEffect(() => {
+        if (tipoDocumento) {
+            trigger("residentes");
+        }
+    }, [tipoDocumento, trigger]);
 
     const onSubmit = async (data: Schema) => {
         setLoading(true);
