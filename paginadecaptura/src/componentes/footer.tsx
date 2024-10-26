@@ -36,7 +36,7 @@ const Footer = () => {
                 </Stack>
             </Container>
             <p className="bg-black py-1 text-white text-center font-extralight text-xs justify-end cursor-default">
-                Site desenvolvido com NextJS por <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/e2barao/">Elias Barão.</a></p>
+                Site desenvolvido com Next.js por <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/e2barao/">Elias Barão.</a></p>
         </>
     );
 };
