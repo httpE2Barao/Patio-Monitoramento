@@ -1,10 +1,8 @@
 import dynamic from 'next/dynamic';
 
-// Carregar o componente client-side dinamicamente
-const PaginaPrincipal = dynamic(() => import('./page'), {
-  ssr: false, // Desativar renderização do lado do servidor para este componente
-});
+// Carregar o componente com renderização do lado do servidor
+const PaginaPrincipal = dynamic(() => import('./page'));
 
-export default async function PaginaServidor() {
-  return <PaginaPrincipal />;
+export default function PaginaServidor() {
+    return <PaginaPrincipal />;
 }
