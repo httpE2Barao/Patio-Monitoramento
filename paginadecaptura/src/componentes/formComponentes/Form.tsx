@@ -37,7 +37,7 @@ export const Form = () => {
     const [retornoForm, setRetornoForm] = useState<boolean | undefined>();
     const [loading, setLoading] = useState<boolean>(false);
 
-    const { handleSubmit, reset, trigger, control } = methods;
+    const { handleSubmit, reset, trigger, control, getValues, formState } = methods;
 
     const tipoDocumento = useWatch({
         name: "residentes",
@@ -45,10 +45,13 @@ export const Form = () => {
     });
 
     useEffect(() => {
-        if (tipoDocumento) {
+        if (
+            tipoDocumento &&
+            formState.touchedFields.residentes?.some((residente) => residente.tipoDocumento)
+        ) {
             trigger("residentes");
         }
-    }, [tipoDocumento, trigger]);
+    }, [tipoDocumento, trigger, formState.touchedFields.residentes]);
 
     const onSubmit = async (data: Schema) => {
         setLoading(true);

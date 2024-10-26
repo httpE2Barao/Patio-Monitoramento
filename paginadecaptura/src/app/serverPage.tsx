@@ -6,8 +6,5 @@ const PaginaPrincipal = dynamic(() => import('./page'), {
 });
 
 export default async function PaginaServidor() {
-  // Você pode fazer requisições server-side aqui, por exemplo:
-  // const data = await fetchSomeData();
-
   return <PaginaPrincipal />;
 }
