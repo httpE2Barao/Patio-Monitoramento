@@ -39,13 +39,11 @@ export const Form = () => {
 
     const { handleSubmit, reset, trigger, control } = methods;
 
-    // Observar a mudança no campo tipoDocumento
     const tipoDocumento = useWatch({
         name: "residentes",
         control,
     });
 
-    // Revalidar o campo documento sempre que tipoDocumento mudar
     useEffect(() => {
         if (tipoDocumento) {
             trigger("residentes");
