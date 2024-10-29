@@ -6,8 +6,18 @@ import fastifyCors from 'fastify-cors';
 const prisma = new PrismaClient();
 const app = fastify();
 
+const allowedOrigins: string[] = process.env.SERVER_CORS
+  ? process.env.SERVER_CORS.split(',').map((origin) => origin.trim())
+  : ['http://localhost:3000'];
+
 app.register(fastifyCors, {
-  origin: ['http://127.0.0.1:3000', 'https://www.patiomonitoramento.com', 'https://app-grupo-patio-web.onrender.com'],
+  origin: (origin: string | undefined, cb: (err: Error | null, allow?: boolean) => void) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Origem não permitida pelo CORS'));
+    }
+  },
 });
 
 app.post('/api/clientes', async (request, reply) => {
