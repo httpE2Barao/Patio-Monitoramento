@@ -8,7 +8,7 @@ const app = fastify();
 
 const allowedOrigins: string[] = process.env.SERVER_CORS
   ? process.env.SERVER_CORS.split(',').map((origin) => origin.trim())
-  : ['http://localhost:3000'];
+  : ['http://www.patiomonitoramento.com'];
 
 app.register(fastifyCors, {
   origin: (origin: string | undefined, cb: (err: Error | null, allow?: boolean) => void) => {
