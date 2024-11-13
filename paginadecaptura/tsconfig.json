@@ -30,7 +30,7 @@
     ".next/types/**/*.ts",
     "src/componentes/formComponentes/utils.js",
     "tailwind.config.mts",
-    "src/app/api/clientes.ts",
+    "src/app/api/clientes/route.ts",
     "lib/prisma.js"
   ],
   "exclude": ["node_modules"]

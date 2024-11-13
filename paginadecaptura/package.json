@@ -4,10 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"next dev\"",
-    "build": "prisma generate && prisma migrate deploy && tsc && next build",
-    "start": "concurrently \"next start\" \"npm run server\"",
-    "server": "node dist/src/app/api/clientes.js",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "next lint",
     "eject": "react-scripts eject"
   },

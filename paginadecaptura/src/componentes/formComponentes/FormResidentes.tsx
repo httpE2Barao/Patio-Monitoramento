@@ -2,7 +2,7 @@
 import { Autocomplete, Button, FormControlLabel, Grid, Radio, RadioGroup, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
-import { Schema } from "../../app/schema-zod";
+import { Schema } from "../../app/api/schema-zod";
 import { Titulo } from "./titulo";
 
 export interface FormNumberProps {
