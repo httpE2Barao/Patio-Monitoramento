@@ -36,7 +36,7 @@ class Cliente {
         headers: {
           'Content-Type': 'application/json',
         },
-        cache: 'no-store', // Evita cacheamento para sempre obter dados atualizados
+        cache: 'no-store', 
       });
 
       if (!response.ok) {
