@@ -8,7 +8,7 @@ const BoasVindas = () => {
     return (
         <Container id="conteiner-inicio" className="flex flex-col m-auto gap-3 sm:gap-5 xl:justify-evenly items-center max-md:pt-5 md:mt-[6vh] lg:mt-0 xl:flex-row overflow-hidden">
 
-            <Box className="conteiner-inicio-box" sx={{
+            <Box className="conteiner-inicio-box lg:pb-5" sx={{
                 gap: {
                     lg: "-5em",
                     xl: "7em",
@@ -120,8 +120,14 @@ const BoasVindas = () => {
                 </Box>
             </Box>
 
-            <Image src={"/Agreement-cuate.svg"} className="conteiner-inicio-img -z-10" width={600} height={600} alt='Duas pessoas se comprimentando em um ambiente profissional.' />
-
+            <Image
+                src="/Agreement-cuate.svg" 
+                alt="Duas pessoas se cumprimentando em um ambiente profissional."
+                width={600} 
+                height={600} 
+                quality={75} // Qualidade da imagem (valor entre 1 e 100)
+                priority // Carregar como prioridade (útil para imagens acima da dobra)
+            />
         </Container>
     )
 }
