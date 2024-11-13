@@ -121,12 +121,12 @@ const BoasVindas = () => {
             </Box>
 
             <Image
-                src="/Agreement-cuate.svg" 
+                src="/banner-otimizado.jpg" 
                 alt="Duas pessoas se cumprimentando em um ambiente profissional."
                 width={600} 
                 height={600} 
-                quality={75} // Qualidade da imagem (valor entre 1 e 100)
-                priority // Carregar como prioridade (útil para imagens acima da dobra)
+                quality={50} 
+                priority 
             />
         </Container>
     )
