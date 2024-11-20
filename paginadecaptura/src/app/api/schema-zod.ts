@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Padrões de validação
-const patterns = {
+export const patterns = {
     email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
 };
 
@@ -31,19 +31,22 @@ const isValidCPF = (cpf: string): boolean => {
     return true;
 };
 
-// Esquema de validação para residente
-const residenteSchema = z.object({
+// Esquema base de validação para residente
+export const residenteBaseSchema = z.object({
     nome: z.string().min(7, { message: 'Digite seu nome completo' }),
     telefone: z.string().min(10, { message: 'Digite um telefone válido' }),
     email: z.string().min(1, { message: 'Insira um email' })
         .refine((text) => patterns.email.test(text), { message: "O email é inválido" }),
     tipoDocumento: z.enum(["RG", "CPF", "CNH"], { message: 'Selecione um tipo de documento válido' }),
     documento: z.string()
-        .min(9, { message: 'Digite somente os números do documento' })
-        .max(11, { message: 'Digite somente os números do documento' })
-        .transform((doc) => doc.replace(/[\s.-]/g, '')),
+        .transform((doc) => doc.replace(/[\s.-]/g, ''))
+        .refine((doc) => doc.length >= 9 && doc.length <= 11, { message: 'Documento é inválido' })
+        .refine((doc) => isValidCPF(doc), { message: 'CPF inválido' }),
     parentesco: z.string().min(1, { message: 'Selecione um nível de parentesco' }).optional(),
-}).superRefine((values, ctx) => {
+});
+
+// Esquema final de residente com validação adicional de CPF
+export const residenteSchema = residenteBaseSchema.superRefine((values, ctx) => {
     if (values.tipoDocumento === "CPF" && !isValidCPF(values.documento)) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -54,20 +57,20 @@ const residenteSchema = z.object({
 });
 
 // Esquema de validação para endereço
-const enderecoSchema = z.object({
+export const enderecoSchema = z.object({
     condominio: z.string().min(3, { message: 'Digite o nome do condomínio' }),
-    apto: z.string().min(1, { message: 'Digite o numero e o bloco do apartamento' }),
+    apto: z.string().min(1, { message: 'Digite o número e o bloco do apartamento' }),
 });
 
 // Esquema de validação para veículo
-const veiculoSchema = z.object({
+export const veiculoSchema = z.object({
     cor: z.string().min(3, { message: 'Digite a cor do carro' }),
     modelo: z.string().min(3, { message: 'Digite o modelo do carro' }),
     placa: z.string().min(7, { message: 'Digite a placa do carro' }),
 });
 
 // Esquema de validação para feedback
-const feedbackSchema = z.string().max(100, { message: 'Digite um feedback' }).optional();
+export const feedbackSchema = z.string().max(100, { message: 'Digite um feedback' }).optional();
 
 // Esquema geral de validação
 export const schema = z.object({
