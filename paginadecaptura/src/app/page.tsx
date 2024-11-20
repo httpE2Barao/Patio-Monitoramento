@@ -15,7 +15,7 @@ const PaginaPrincipal: React.FC = () => {
     <ThemeProvider theme={theme}>
       <Router>
         <Routes>
-          <Route path="/" element={<Navigate to="/auth" replace />} />
+          <Route path="/" element={<Navigate to="/formulario" replace />} />
           <Route path="/auth" element={<LoginSignupPage />} />
           <Route path="/formulario" element={
             <>
