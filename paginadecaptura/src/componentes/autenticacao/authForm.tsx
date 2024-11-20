@@ -1,4 +1,3 @@
-"use client"
 import { residenteBaseSchema } from 'app/api/schema-zod';
 import React, { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -78,7 +77,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     };
 
     return (
-        <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleFormSubmit} className="flex flex-col gap-4 px-10 min-lg:h-[50vh]">
+            <h2 className='text-2xl font-medium'>{isSignup ? 'Cadastro' : 'Login'}</h2>
             {error && <div className="text-red-500">{error}</div>}
             <input
                 type="text"

@@ -1,6 +1,7 @@
 import { residenteBaseSchema } from 'app/api/schema-zod';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { AuthForm } from './authForm';
@@ -17,21 +18,6 @@ const LoginSignupPage: React.FC = () => {
     setIsSignup(!isSignup);
     setError('');
   };
-
-  // Validação do CPF enquanto o usuário está digitando
-  useEffect(() => {
-    if (cpf) {
-      try {
-        const cpfValidationSchema = residenteBaseSchema.shape.documento;
-        cpfValidationSchema.parse(cpf);
-        setError(''); // Limpa o erro se o CPF for válido
-      } catch (err) {
-        if (err instanceof z.ZodError) {
-          setError(err.errors[0]?.message || 'Erro de validação');
-        }
-      }
-    }
-  }, [cpf]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,16 +54,22 @@ const LoginSignupPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen">
-      <div
-        className="hidden md:flex md:w-1/2 bg-cover bg-center"
-        style={{ backgroundImage: 'url(/public/banner-login-2.png)' }}
-      ></div>
-      <div className="flex flex-col justify-center md:w-1/2 p-6">
-        <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold mb-2">Dashboard do Cliente</h2>
-          <p className="text-gray-600">
-            Atualize seus dados para que possamos estar sempre conectados e entregar o melhor serviço.
+    <div className="flex flex-col-reverse lg:flex-row h-screen">
+      <div className="w-full lg:w-1/2 relative lg:my-auto max-w-[1300px] order-1 lg:order-none">
+        <Image
+          src="/banner-login-1.png"
+          alt="Banner Login"
+          layout="responsive"
+          width={1300}
+          height={800}
+          objectFit="cover"
+          className="rounded-b-2xl lg:rounded-r-2xl lg:rounded-b-none object-left-top"
+        />
+      </div>
+      <div className="flex flex-col px-9 gap-10 lg:justify-center lg:w-1/2 p-6 m-auto max-w-[60em]">
+        <div className="mb-4 text-center">
+          <p className="text-gray-600 text-3xl">
+            Mantenha seus dados atualizados para que possamos sempre oferecer o melhor serviço e mantê-lo informado.
           </p>
         </div>
         <AuthForm
@@ -92,7 +84,7 @@ const LoginSignupPage: React.FC = () => {
           setError={setError}
           handleSubmit={handleSubmit}
         />
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center xl:mt-4">
           <button
             onClick={handleToggleForm}
             className="text-blue-500 underline hover:text-blue-700 transition-colors duration-300"

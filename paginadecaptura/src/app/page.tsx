@@ -1,13 +1,13 @@
-"use client";
+"use client"
 import { ThemeProvider } from "@mui/material";
-import LoginSignupPage from "componentes/autenticacao/loginSignup";
-import { BtnToTop } from "componentes/botaoSubir";
+import LoginSignupPage from "componentes/autenticacao/page";
+import FAQ from "componentes/faq";
+import Footer from "componentes/footer";
+import Formulario from "componentes/formulario";
+import Header from "componentes/header";
+import BoasVindas from "componentes/inicio";
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import FAQ from "../componentes/faq";
-import Footer from "../componentes/footer";
-import Formulario from "../componentes/formulario";
-import Header from "../componentes/header";
-import BoasVindas from "../componentes/inicio";
+import { BtnToTop } from "../componentes/botaoSubir";
 import { theme } from "./theme";
 
 const PaginaPrincipal: React.FC = () => {
@@ -15,9 +15,8 @@ const PaginaPrincipal: React.FC = () => {
     <ThemeProvider theme={theme}>
       <Router>
         <Routes>
-          <Route path="/" element={<Navigate to="/formulario" replace />} />
-          <Route path="/auth" element={<LoginSignupPage />} />
-          <Route path="/formulario" element={
+          <Route path="/" element={<LoginSignupPage />} />
+          <Route path="/form" element={
             <>
               <Header />
               <BoasVindas />
@@ -27,6 +26,7 @@ const PaginaPrincipal: React.FC = () => {
               <BtnToTop />
             </>
           } />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </ThemeProvider>
