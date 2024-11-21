@@ -1,4 +1,3 @@
-import { residenteBaseSchema } from 'app/api/schema-zod';
 import axios from 'axios';
 import Image from 'next/image';
 import React, { useState } from 'react';
@@ -24,8 +23,9 @@ const LoginSignupPage: React.FC = () => {
     setError('');
 
     try {
-      // Utilizando o esquema base para validar o CPF
-      residenteBaseSchema.parse({ documento: cpf });
+      // Utilizando apenas a validação do CPF
+      const cpfValidationSchema = z.string().regex(/^\d{11}$/, "CPF inválido");
+      cpfValidationSchema.parse(cpf);
 
       if (isSignup && password !== confirmPassword) {
         setError('As senhas não coincidem.');
@@ -69,7 +69,7 @@ const LoginSignupPage: React.FC = () => {
       <div className="flex flex-col px-9 gap-10 md:justify-center md:w-1/2 p-6 m-auto max-w-[60em]">
         <div className="mb-4 text-center order-3 md:order-none">
           <p className="text-gray-600 text-lg md:text-xl xl:text-2xl">
-            Mantenha seus dados atualizados para que possamos sempre oferecer o melhor serviço e mantê-lo informado.
+            Mantenha seus dados atualizados para que possamos sempre oferecer o melhor serviço e te manter sempre informado.
           </p>
         </div>
         <AuthForm

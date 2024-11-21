@@ -13,24 +13,22 @@ import { theme } from "./theme";
 const PaginaPrincipal: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
-      {typeof window !== 'undefined' && (
-        <Router>
-          <Routes>
-            <Route path="/auth" element={<LoginSignupPage />} />
-            <Route path="/form" element={
-              <>
-                <Header />
-                <BoasVindas />
-                <Formulario />
-                <FAQ />
-                <Footer />
-                <BtnToTop />
-              </>
-            } />
-            <Route path="*" element={<Navigate to="/auth" replace />} />
-          </Routes>
-        </Router>
-      )}
+      <Router>
+        <Routes>
+          <Route path="/auth" element={<LoginSignupPage />} />
+          <Route path="/form" element={
+            <>
+              <Header />
+              <BoasVindas />
+              <Formulario />
+              <FAQ />
+              <Footer />
+              <BtnToTop />
+            </>
+          } />
+          <Route path="/*" element={<Navigate to="/auth" replace />} />
+        </Routes>
+      </Router>
     </ThemeProvider>
   );
 };

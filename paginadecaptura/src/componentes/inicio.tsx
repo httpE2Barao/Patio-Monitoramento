@@ -57,7 +57,7 @@ const BoasVindas = () => {
                             lg: "4.1rem",
                             xl: "4.5rem"
                         }
-                    }}>Atualize todos<br />os seus dados!</Typography>
+                    }}>Mantenha seus<br />dados atualizados!</Typography>
 
                 <Typography variant="h2"
                     sx={{

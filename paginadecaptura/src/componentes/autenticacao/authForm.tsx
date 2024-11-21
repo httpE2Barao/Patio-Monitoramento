@@ -1,6 +1,4 @@
-import { residenteBaseSchema } from 'app/api/schema-zod';
 import React, { useEffect, useState } from 'react';
-import { z } from 'zod';
 
 interface AuthFormProps {
     isSignup: boolean;
@@ -15,6 +13,51 @@ interface AuthFormProps {
     handleSubmit: (e: React.FormEvent) => void;
 }
 
+// Função para verificar se o CPF é válido
+const isValidCPF = (cpf: string): boolean => {
+    cpf = cpf.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
+        // Verifica se tem 11 dígitos e se não é uma sequência repetida
+        return false;
+    }
+
+    let sum = 0;
+    let remainder;
+
+    // Validação do primeiro dígito verificador
+    for (let i = 1; i <= 9; i++) {
+        sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    }
+    remainder = (sum * 10) % 11;
+
+    if (remainder === 10 || remainder === 11) {
+        remainder = 0;
+    }
+
+    if (remainder !== parseInt(cpf.substring(9, 10))) {
+        return false;
+    }
+
+    // Validação do segundo dígito verificador
+    sum = 0;
+    for (let i = 1; i <= 10; i++) {
+        sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+    }
+    remainder = (sum * 10) % 11;
+
+    if (remainder === 10 || remainder === 11) {
+        remainder = 0;
+    }
+
+    if (remainder !== parseInt(cpf.substring(10, 11))) {
+        return false;
+    }
+
+    return true;
+};
+
+// Função para avaliar a força da senha
 const evaluatePasswordStrength = (password: string): string => {
     const strongPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\[\]{}|;:,.<>?]).{10,}$/;
     const mediumPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -45,13 +88,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     // Validação do CPF enquanto o usuário está digitando
     useEffect(() => {
         if (cpf) {
-            try {
-                residenteBaseSchema.parse({ documento: cpf });
+            if (isValidCPF(cpf)) {
                 setError(''); // Limpa o erro se o CPF for válido
-            } catch (err) {
-                if (err instanceof z.ZodError) {
-                    setError(err.errors[0]?.message || 'Erro de validação');
-                }
+            } else {
+                setError('CPF inválido.');
             }
         }
     }, [cpf, setError]);

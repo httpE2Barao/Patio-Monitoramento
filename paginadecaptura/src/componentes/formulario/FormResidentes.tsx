@@ -29,7 +29,7 @@ export const FormResidentes: React.FC<FormNumberProps> = ({ index }) => {
         <>
             <Titulo titulo="Residentes" />
             {fields.map((field, index) => (
-                <Grid container spacing={2} key={field.id} className={`${index != 0 ? 'mt-10' : ''}`}>
+                <Grid container spacing={2} key={field.id} className={`${index > 0 ? '' : ''}`}>
                     <Grid item xs={12} md={6}>
                         <TextField
                             {...register(`residentes.${index}.nome` as const)}
