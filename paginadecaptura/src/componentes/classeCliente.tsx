@@ -26,7 +26,6 @@ export interface ClienteData {
 }
 
 class Cliente {
-
   constructor(private data: ClienteData) {}
 
   private async obterClientes(): Promise<ClienteData[]> {

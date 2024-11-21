@@ -1,4 +1,4 @@
-import Image from "next/image"
+import Image from "next/image";
 
 const Header = () => {
     return (
@@ -16,4 +16,3 @@ const Header = () => {
 }
 
 export default Header;
-

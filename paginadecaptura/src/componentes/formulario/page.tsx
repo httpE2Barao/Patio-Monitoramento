@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, CircularProgress, Container, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
-import { schema, Schema } from "../../app/api/schema-zod";
+import { schema, Schema } from "../../pages/api/schema-zod";
 import Cliente from "../classeCliente";
 import { FormEndereco } from "./FormEndereco";
 import { FormFeedback } from "./FormFeedback";
@@ -11,7 +11,26 @@ import { FormResidentes } from "./FormResidentes";
 import { FormRetorno } from "./FormRetorno";
 import { FormVeiculo } from "./FormVeiculo";
 
-export const Form = () => {
+type FormProps = {
+  moradorDados: {
+    mor_cond_id: string;
+    mor_cond_nome: string;
+    mor_apto: string;
+    mor_bloco: string;
+    mor_nome: string;
+    mor_parentesco: string;
+    mor_cpf: string;
+    mor_celular01: string;
+    mor_email: string;
+    mor_responsavel: string;
+    mor_obs: string;
+    mor_senhaapp: string;
+  };
+  setMoradorDados: React.Dispatch<React.SetStateAction<any>>;
+  handleSubmit: (e: any) => void;
+};
+
+export const Form: React.FC<FormProps> = ({ moradorDados, setMoradorDados, handleSubmit }) => {
   const methods = useForm<Schema>({
     mode: "all",
     resolver: zodResolver(schema),
@@ -36,7 +55,7 @@ export const Form = () => {
   const [retornoForm, setRetornoForm] = useState<boolean | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const { handleSubmit, reset, trigger, control, formState } = methods;
+  const { reset, trigger, control, formState } = methods;
 
   const tipoDocumento = useWatch({
     name: "residentes",
@@ -70,7 +89,7 @@ export const Form = () => {
   return (
     <Container>
       <FormProvider {...methods}>
-        <form className="flex gap-2 flex-col items-center justify-evenly">
+        <form className="flex gap-2 flex-col items-center justify-evenly" onSubmit={handleSubmit}>
           <Grid container spacing={1} sx={{ pb: 4, maxWidth: "100%", m: "auto" }}>
             <Grid item xs={12}>
               <FormEndereco />
@@ -103,7 +122,7 @@ export const Form = () => {
                 sx={{ ml: 2, fontSize: "large" }}>
                 Resetar
               </Button>
-              <Button onClick={handleSubmit(onSubmit)} variant="contained" sx={{ fontSize: "large" }}>
+              <Button type="submit" variant="contained" sx={{ fontSize: "large" }}>
                 Enviar
               </Button>
             </Grid>

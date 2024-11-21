@@ -106,14 +106,45 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         }
     }, [password]);
 
-    const handleFormSubmit = (e: React.FormEvent) => {
+    const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+      
+        // Perform front-end validations here
         if (isSignup && passwordStrength === 'weak') {
-            setError('A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma minúscula e um número.');
-            return;
+          setError('A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma minúscula e um número.');
+          return;
         }
-        handleSubmit(e);
-    };
+        if (isSignup && password !== confirmPassword) {
+          setError('As senhas não coincidem.');
+          return;
+        }
+      
+        try {
+          const response = await fetch('/api/auth', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              cpf,
+              password,
+              isSignup,
+            }),
+          });
+      
+          const data = await response.json();
+      
+          if (!response.ok) {
+            setError(data.error || 'Erro ao autenticar.');
+          } else {
+            // Authentication successful, redirect to '/form'
+            window.location.href = '/form';
+          }
+        } catch (error) {
+          setError('Erro ao comunicar com o servidor.');
+          console.error(error);
+        }
+      };      
 
     return (
         <form onSubmit={handleFormSubmit} className="flex flex-col gap-4 px-10 min-lg:h-[50vh]">
