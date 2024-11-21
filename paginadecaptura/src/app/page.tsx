@@ -89,7 +89,11 @@ const PaginaPrincipal: React.FC = () => {
     }
   };
 
-  return (
+  if (typeof window === 'undefined') {
+    return null; 
+  }
+  
+  return (  
     <ThemeProvider theme={theme}>
       <Router>
         <Routes>
