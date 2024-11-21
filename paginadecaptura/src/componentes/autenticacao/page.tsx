@@ -25,8 +25,7 @@ const LoginSignupPage: React.FC = () => {
 
     try {
       // Utilizando o esquema base para validar o CPF
-      const cpfValidationSchema = residenteBaseSchema.shape.documento;
-      cpfValidationSchema.parse(cpf);
+      residenteBaseSchema.parse({ documento: cpf });
 
       if (isSignup && password !== confirmPassword) {
         setError('As senhas não coincidem.');
