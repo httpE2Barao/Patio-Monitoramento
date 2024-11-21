@@ -64,6 +64,7 @@ const LoginSignupPage: React.FC = () => {
           height={800}
           objectFit="cover"
           className="rounded-b-2xl md:rounded-r-2xl md:rounded-b-none object-left-top"
+          priority
         />
       </div>
       <div className="flex flex-col px-9 gap-10 md:justify-center md:w-1/2 p-6 m-auto max-w-[60em]">

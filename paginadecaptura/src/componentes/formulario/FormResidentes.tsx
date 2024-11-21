@@ -89,22 +89,20 @@ export const FormResidentes: React.FC<FormNumberProps> = ({ index }) => {
                             label="Documento"
                             fullWidth
                             error={!!errors.residentes?.[index]?.documento}
-                        // helperText={errors.residentes?.[index]?.documento?.message}
+                            helperText={errors.residentes?.[index]?.documento?.message}
                         />
-                        <Controller
-                            name={`residentes.${index}.tipoDocumento`}
-                            control={control}
-                            rules={{ required: 'Selecione um tipo de documento válido' }}
-                            render={({ field }) => (
-                                <RadioGroup {...field} row sx={{ justifyContent: "space-around" }}
-                                // onChange={(event, newValue) => { field.onChange(newValue?.value || ""); }}
-                                >
-                                    <FormControlLabel value="RG" control={<Radio />} label="RG" />
-                                    <FormControlLabel value="CPF" control={<Radio />} label="CPF" />
-                                    <FormControlLabel value="CNH" control={<Radio />} label="CNH" />
-                                </RadioGroup>
-                            )}
-                        />
+                    <Controller
+                        name={`residentes.${index}.tipoDocumento`}
+                        control={control}
+                        rules={{ required: 'Selecione um tipo de documento válido' }}
+                        render={({ field }) => (
+                            <RadioGroup {...field} row sx={{ justifyContent: "space-around" }}>
+                                <FormControlLabel value="RG" control={<Radio />} label="RG" />
+                                <FormControlLabel value="CPF" control={<Radio />} label="CPF" />
+                                <FormControlLabel value="CNH" control={<Radio />} label="CNH" />
+                            </RadioGroup>
+                        )}
+                    />
                         {errors.residentes?.[index]?.tipoDocumento && (
                             <p className="text-xs pt-1 text-red-600 pl-4">{errors.residentes?.[index]?.tipoDocumento?.message}</p>
                         )}

@@ -57,7 +57,7 @@ const BoasVindas = () => {
                             lg: "4.1rem",
                             xl: "4.5rem"
                         }
-                    }}>Queremos te <br /> conhecer melhor!</Typography>
+                    }}>Atualize todos<br />os seus dados!</Typography>
 
                 <Typography variant="h2"
                     sx={{

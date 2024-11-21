@@ -7,6 +7,7 @@ export const patterns = {
 
 // Função de validação de CPF
 const isValidCPF = (cpf: string): boolean => {
+    if (!/^[0-9]{11}$/.test(cpf)) return false;
     cpf = cpf.replace(/[\s.-]/g, '');
     if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
 
@@ -38,23 +39,32 @@ export const residenteBaseSchema = z.object({
     email: z.string().min(1, { message: 'Insira um email' })
         .refine((text) => patterns.email.test(text), { message: "O email é inválido" }),
     tipoDocumento: z.enum(["RG", "CPF", "CNH"], { message: 'Selecione um tipo de documento válido' }),
-    documento: z.string()
-        .transform((doc) => doc.replace(/[\s.-]/g, ''))
-        .refine((doc) => doc.length >= 9 && doc.length <= 11, { message: 'Documento é inválido' })
-        .refine((doc) => isValidCPF(doc), { message: 'CPF inválido' }),
-    parentesco: z.string().min(1, { message: 'Selecione um nível de parentesco' }).optional(),
-});
+    documento: z.string(),
+    parentesco: z.string().optional(),
+}).superRefine((values, ctx) => {
+    const documentoLimpo = values.documento.replace(/[\s.-]/g, '');
 
-// Esquema final de residente com validação adicional de CPF
-export const residenteSchema = residenteBaseSchema.superRefine((values, ctx) => {
-    if (values.tipoDocumento === "CPF" && !isValidCPF(values.documento)) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "CPF inválido",
-            path: ["documento"],
-        });
+    if (values.tipoDocumento === "CPF") {
+        if (!isValidCPF(documentoLimpo)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "CPF inválido",
+                path: ["documento"],
+            });
+        }
+    } else if (values.tipoDocumento === "RG" || values.tipoDocumento === "CNH") {
+        if (documentoLimpo.length < 9 || documentoLimpo.length > 11) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Documento inválido, deve ter no mínimo 9 caracteres",
+                path: ["documento"],
+            });
+        }
     }
 });
+
+// Esquema final de residente
+export const residenteSchema = residenteBaseSchema;
 
 // Esquema de validação para endereço
 export const enderecoSchema = z.object({
