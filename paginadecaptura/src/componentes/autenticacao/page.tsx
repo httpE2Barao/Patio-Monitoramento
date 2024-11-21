@@ -54,8 +54,8 @@ const LoginSignupPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col-reverse lg:flex-row h-screen">
-      <div className="w-full lg:w-1/2 relative lg:my-auto max-w-[1300px] order-1 lg:order-none">
+    <div className="flex flex-col-reverse md:flex-row md:h-screen relative">
+      <div className="w-full md:w-1/2 md:relative md:my-auto max-w-[1300px] order-2 md:order-none">
         <Image
           src="/banner-login-1.png"
           alt="Banner Login"
@@ -63,12 +63,12 @@ const LoginSignupPage: React.FC = () => {
           width={1300}
           height={800}
           objectFit="cover"
-          className="rounded-b-2xl lg:rounded-r-2xl lg:rounded-b-none object-left-top"
+          className="rounded-b-2xl md:rounded-r-2xl md:rounded-b-none object-left-top"
         />
       </div>
-      <div className="flex flex-col px-9 gap-10 lg:justify-center lg:w-1/2 p-6 m-auto max-w-[60em]">
-        <div className="mb-4 text-center">
-          <p className="text-gray-600 text-3xl">
+      <div className="flex flex-col px-9 gap-10 md:justify-center md:w-1/2 p-6 m-auto max-w-[60em]">
+        <div className="mb-4 text-center order-3 md:order-none">
+          <p className="text-gray-600 text-lg md:text-xl xl:text-2xl">
             Mantenha seus dados atualizados para que possamos sempre oferecer o melhor serviço e mantê-lo informado.
           </p>
         </div>
