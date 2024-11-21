@@ -17,7 +17,7 @@ const PaginaPrincipal: React.FC = () => {
         <Router>
           <Routes>
             <Route path="/auth" element={<LoginSignupPage />} />
-            <Route path="/" element={
+            <Route path="/form" element={
               <>
                 <Header />
                 <BoasVindas />
