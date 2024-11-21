@@ -85,14 +85,14 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                 value={cpf}
                 onChange={(e) => setCpf(e.target.value)}
                 placeholder="CPF"
-                className="p-2 border rounded"
+                className="p-2 border border-blue-500 rounded"
             />
             <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Senha"
-                className="p-2 border rounded"
+                className="p-2 border border-blue-500 rounded"
             />
             {isSignup && (
                 <div className="text-sm text-gray-600">
@@ -113,7 +113,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirme sua senha"
-                    className="p-2 border rounded"
+                    className="p-2 border border-blue-500 rounded"
                 />
             )}
             <button
