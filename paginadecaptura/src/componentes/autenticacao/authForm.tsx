@@ -46,8 +46,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     useEffect(() => {
         if (cpf) {
             try {
-                const cpfValidationSchema = residenteBaseSchema.shape.documento;
-                cpfValidationSchema.parse(cpf);
+                residenteBaseSchema.parse({ documento: cpf });
                 setError(''); // Limpa o erro se o CPF for válido
             } catch (err) {
                 if (err instanceof z.ZodError) {
@@ -70,7 +69,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     const handleFormSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (isSignup && passwordStrength === 'weak') {
-            setError('A senha deve ter pelo menos 8 caracteres, uma letras maiúscula e uma minúscula e um número.');
+            setError('A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma minúscula e um número.');
             return;
         }
         handleSubmit(e);
