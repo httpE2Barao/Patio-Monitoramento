@@ -112,7 +112,7 @@ const PaginaPrincipal: React.FC = () => {
               <BtnToTop />
             </>
           } />
-          <Route path="/*" element={<Navigate to="/auth" replace />} />
+          <Route path="/*" element={<Navigate to="/form" replace />} />
         </Routes>
       </Router>
     </ThemeProvider>

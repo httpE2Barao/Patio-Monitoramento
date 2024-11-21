@@ -1,4 +1,10 @@
+import {
+    Button,
+    TextField
+} from "@mui/material";
+import { CondominioSelect } from "componentes/formulario/FormEndSelect";
 import React, { useEffect, useState } from 'react';
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 interface AuthFormProps {
     isSignup: boolean;
@@ -10,22 +16,19 @@ interface AuthFormProps {
     setConfirmPassword: (confirmPassword: string) => void;
     error: string;
     setError: (error: string) => void;
-    handleSubmit: (e: React.FormEvent) => void;
+    handleSubmit: SubmitHandler<FieldValues>;
 }
 
-// Função para verificar se o CPF é válido
 const isValidCPF = (cpf: string): boolean => {
-    cpf = cpf.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+    cpf = cpf.replace(/\D/g, '');
 
     if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
-        // Verifica se tem 11 dígitos e se não é uma sequência repetida
         return false;
     }
 
     let sum = 0;
     let remainder;
 
-    // Validação do primeiro dígito verificador
     for (let i = 1; i <= 9; i++) {
         sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
     }
@@ -39,7 +42,6 @@ const isValidCPF = (cpf: string): boolean => {
         return false;
     }
 
-    // Validação do segundo dígito verificador
     sum = 0;
     for (let i = 1; i <= 10; i++) {
         sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
@@ -57,20 +59,6 @@ const isValidCPF = (cpf: string): boolean => {
     return true;
 };
 
-// Função para avaliar a força da senha
-const evaluatePasswordStrength = (password: string): string => {
-    const strongPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\[\]{}|;:,.<>?]).{10,}$/;
-    const mediumPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-
-    if (strongPasswordPattern.test(password)) {
-        return 'strong';
-    } else if (mediumPasswordPattern.test(password)) {
-        return 'medium';
-    } else {
-        return 'weak';
-    }
-};
-
 export const AuthForm: React.FC<AuthFormProps> = ({
     isSignup,
     cpf,
@@ -81,117 +69,101 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     setConfirmPassword,
     error,
     setError,
-    handleSubmit,
+    handleSubmit: handleParentSubmit,
 }) => {
+    const { control, handleSubmit: handleFormSubmit, register } = useForm();
     const [passwordStrength, setPasswordStrength] = useState<string>('');
+    const [condominios, setCondominios] = useState<{ codigoCondominio: string; nomeCondominio: string }[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
 
-    // Validação do CPF enquanto o usuário está digitando
+    const [cpfError, setCpfError] = useState<string>('');
+
     useEffect(() => {
         if (cpf) {
             if (isValidCPF(cpf)) {
-                setError(''); // Limpa o erro se o CPF for válido
+                setCpfError('');
+                setError('');
             } else {
-                setError('CPF inválido.');
+                setCpfError('CPF inválido.');
+                setError(''); // Não afeta outros campos
             }
         }
     }, [cpf, setError]);
 
-    // Avaliação da força da senha enquanto o usuário está digitando
     useEffect(() => {
         if (password) {
-            const strength = evaluatePasswordStrength(password);
-            setPasswordStrength(strength);
+            setPasswordStrength(password);
         } else {
             setPasswordStrength('');
         }
     }, [password]);
 
-    const handleFormSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-      
-        // Perform front-end validations here
-        if (isSignup && passwordStrength === 'weak') {
-          setError('A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma minúscula e um número.');
-          return;
-        }
-        if (isSignup && password !== confirmPassword) {
-          setError('As senhas não coincidem.');
-          return;
-        }
-      
-        try {
-          const response = await fetch('/api/auth', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              cpf,
-              password,
-              isSignup,
-            }),
-          });
-      
-          const data = await response.json();
-      
-          if (!response.ok) {
-            setError(data.error || 'Erro ao autenticar.');
-          } else {
-            // Authentication successful, redirect to '/form'
-            window.location.href = '/form';
-          }
-        } catch (error) {
-          setError('Erro ao comunicar com o servidor.');
-          console.error(error);
-        }
-      };      
+    useEffect(() => {
+        const fetchCondominios = async () => {
+            try {
+                const response = await fetch("/api/condominios");
+                if (!response.ok) {
+                    throw new Error(
+                        `Erro ao obter condomínios: ${response.status} ${response.statusText}`
+                    );
+                }
+                const data = await response.json();
+                setCondominios(data.condominios);
+            } catch (error) {
+                console.error("Erro ao obter condomínios:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCondominios();
+    }, []);
 
     return (
-        <form onSubmit={handleFormSubmit} className="flex flex-col gap-4 px-10 min-lg:h-[50vh]">
+        <form onSubmit={(e) => { e.preventDefault(); handleParentSubmit(e); }} className="flex flex-col gap-4 px-10 min-lg:h-[50vh]">
             <h2 className='text-2xl font-medium'>{isSignup ? 'Cadastro' : 'Login'}</h2>
-            {error && <div className="text-red-500">{error}</div>}
-            <input
-                type="text"
+            <CondominioSelect 
+                control={control} 
+                error={''}
+                loading={loading} 
+                condominios={condominios} 
+            />
+            <TextField
                 value={cpf}
                 onChange={(e) => setCpf(e.target.value)}
                 placeholder="CPF"
                 className="p-2 border border-blue-500 rounded"
+                label="CPF"
+                fullWidth
+                error={!!cpfError}
+                helperText={cpfError}
             />
-            <input
+            <TextField
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Senha"
                 className="p-2 border border-blue-500 rounded"
+                label="Senha"
+                fullWidth
             />
             {isSignup && (
-                <div className="text-sm text-gray-600">
-                    Força da senha: <span className={
-                        passwordStrength === 'strong' ? 'text-green-600' :
-                        passwordStrength === 'medium' ? 'text-yellow-600' :
-                        'text-red-600'
-                    }>
-                        {passwordStrength === 'strong' ? 'Forte' :
-                        passwordStrength === 'medium' ? 'Média' :
-                        'Fraca'}
-                    </span>
-                </div>
-            )}
-            {isSignup && (
-                <input
+                <TextField
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirme sua senha"
                     className="p-2 border border-blue-500 rounded"
+                    label="Confirme sua senha"
+                    fullWidth
                 />
             )}
-            <button
+            <Button
                 type="submit"
-                className="bg-blue-500 text-white py-2 rounded hover:bg-blue-700 transition-colors duration-300"
+                variant="contained"
+                color="primary"
             >
                 {isSignup ? 'Cadastrar' : 'Entrar'}
-            </button>
+            </Button>
         </form>
     );
 };

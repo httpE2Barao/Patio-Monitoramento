@@ -1,15 +1,11 @@
 import {
-    FormControl,
-    FormHelperText,
-    Grid,
-    InputLabel,
-    MenuItem,
-    Select,
-    TextField,
+  Grid,
+  TextField
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { Schema } from "../../pages/api/schema-zod";
+import { CondominioSelect } from "./FormEndSelect";
 import { Titulo } from "./titulo";
 
 export const FormEndereco: React.FC = () => {
@@ -51,46 +47,18 @@ export const FormEndereco: React.FC = () => {
       <Titulo titulo="Endereço" />
       <Grid container key={0} spacing={2}>
         <Grid item xs={12} md={6}>
-          <FormControl fullWidth error={!!errors.endereco?.condominio}>
-            <InputLabel id="condominio-label">Condomínio</InputLabel>
-            <Controller
-              name="endereco.condominio"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  labelId="condominio-label"
-                  label="Condomínio"
-                  disabled={loading || condominios.length === 0}
-                >
-                  {condominios.map((condominio) => (
-                    <MenuItem
-                      key={condominio.codigoCondominio}
-                      value={condominio.codigoCondominio}
-                    >
-                      {condominio.nomeCondominio}
-                    </MenuItem>
-                  ))}
-                  {!loading && condominios.length === 0 && (
-                    <MenuItem disabled>Nenhum condomínio disponível</MenuItem>
-                  )}
-                </Select>
-              )}
-            />
-            {errors.endereco?.condominio?.message && (
-              <FormHelperText>
-                {errors.endereco?.condominio?.message}
-              </FormHelperText>
-            )}
-            {error && (
-              <FormHelperText error>{error}</FormHelperText>
-            )}
-          </FormControl>
+          <CondominioSelect 
+            control={control} 
+            error={''}
+            loading={loading} 
+            condominios={condominios} 
+          />
         </Grid>
         <Grid item xs={12} md={6}>
           <TextField
             {...register(`endereco.apto` as const)}
             label="Apartamento e Bloco"
+            placeholder="Exemplo: 55 B1"
             fullWidth
             error={!!errors.endereco?.apto}
             helperText={errors.endereco?.apto?.message}

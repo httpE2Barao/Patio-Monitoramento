@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const cookieHeader = req.headers.cookie || '';
+    const cookieHeader = req.headers.cookie!;
     const cookies = parse(cookieHeader);
     const cpf = cookies.cpf;
     const moradorId = cookies.morador_id;

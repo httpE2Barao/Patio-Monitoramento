@@ -18,8 +18,7 @@ const LoginSignupPage: React.FC = () => {
     setError('');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setError('');
 
     try {

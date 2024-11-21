@@ -69,7 +69,7 @@ export const residenteSchema = residenteBaseSchema;
 // Esquema de validação para endereço
 export const enderecoSchema = z.object({
     condominio: z.string().nonempty('Selecione um condomínio'),
-    apto: z.string().min(1, { message: 'Digite o número e o bloco do apartamento' }),
+    apto: z.string().min(1, { message: 'Digite o apartamento e o bloco em seguida' }),
 });
 
 // Esquema de validação para veículo
