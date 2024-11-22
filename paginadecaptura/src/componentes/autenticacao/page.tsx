@@ -65,10 +65,10 @@ const LoginSignupPage: React.FC = () => {
           priority
         />
       </div>
-      <div className="flex flex-col px-9 gap-10 md:justify-center md:w-1/2 p-6 m-auto max-w-[60em]">
+      <div className="flex flex-col px-7 gap-5 2xl:gap-20 md:justify-center md:w-1/2 p-6 m-auto max-w-[60em]">
         <div className="mb-4 text-center order-3 md:order-none">
-          <p className="text-gray-600 text-lg md:text-xl xl:text-2xl">
-            Mantenha seus dados atualizados para que possamos sempre oferecer o melhor serviço e te manter sempre informado.
+          <p className="text-gray-600 text-lg px-7 md:text-xl xl:text-2xl">
+            Mantenha seus dados atualizados para que possamos oferecer o melhor serviço e te manter sempre informado.
           </p>
         </div>
         <AuthForm

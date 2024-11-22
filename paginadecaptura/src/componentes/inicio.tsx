@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 const BoasVindas = () => {
     return (
-        <Container id="conteiner-inicio" className="flex flex-col m-auto gap-3 sm:gap-5 xl:justify-evenly items-center max-md:pt-5 md:mt-[6vh] lg:mt-0 xl:flex-row overflow-hidden">
+        <Container id="conteiner-inicio" className="flex flex-col m-auto gap-3 sm:gap-5 xl:justify-evenly items-center max-md:pt-5 md:mt-[6vh] lg:mt-0 xl:flex-row">
 
             <Box className="conteiner-inicio-box lg:pb-5" sx={{
                 gap: {
@@ -24,7 +24,7 @@ const BoasVindas = () => {
                     xs: "70em",
                     sm: "70em",
                     // lg: "80vw",
-                    xl: "2000px",
+                    xl: "1000px",
                 },
                 Height: {
                     sm: "100vh",
@@ -48,13 +48,14 @@ const BoasVindas = () => {
                         width: {
                             xs: "600px",
                             lg: "600px",
+                            xl: "700px",
                         },
                         fontWeight: "bold",
                         fontSize: {
                             xs: "10vw",
                             sm: "4rem",
                             md: "4.2rem",
-                            lg: "4.1rem",
+                            lg: "4rem",
                             xl: "4.5rem"
                         }
                     }}>Mantenha seus<br />dados atualizados!</Typography>

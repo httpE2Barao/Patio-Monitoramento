@@ -1,7 +1,6 @@
 import { ClienteData } from 'componentes/classeCliente';
-import { parse } from 'cookie';
+import { SerializeOptions, parse, serialize } from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
-
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
@@ -78,14 +77,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const cpf = cookies.cpf;
     const moradorId = cookies.morador_id;
 
-    if (!cpf || !moradorId) {
-      return res.status(401).json({ error: 'Usuário não autenticado.' });
-    }
-
     const body = req.body;
     const data = typeof body === 'string' ? JSON.parse(body) : body;
 
-    const { endereco, residentes, veiculos, feedback, acao } = data as ClienteData & { acao: string };
+    const { endereco, residentes, veiculos, feedback, acao, senha } = data as ClienteData & { acao: string; senha: string };
 
     const residentesPayload = residentes.map((residente) => ({
       nome: residente.nome,
@@ -139,7 +134,24 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       return res.status(response.status).json({ error: responseData.erro || 'Erro ao processar a solicitação.' });
     }
 
-    return res.status(200).json({ success: true, data: responseData });
+    // Armazenar informações no cookie
+    const cookieOptions: SerializeOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    };
+
+    res.setHeader('Set-Cookie', [
+      serialize('cpf', cpf || data.residentes[0].documento, cookieOptions),
+      serialize('morador_id', responseData.morador_id, cookieOptions),
+      serialize('condominio', endereco.condominio, cookieOptions),
+      serialize('senha', senha, cookieOptions),
+    ]);
+
+    // Redirecionar para a página /form
+    res.writeHead(302, { Location: '/form' });
+    res.end();
   } catch (error) {
     console.error('Erro ao enviar cliente:', error);
     return res.status(500).json({ error: 'Erro ao enviar cliente.' });

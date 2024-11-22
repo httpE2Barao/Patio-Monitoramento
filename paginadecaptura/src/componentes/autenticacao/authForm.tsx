@@ -1,6 +1,7 @@
 import {
     Button,
-    TextField
+    TextField,
+    Typography
 } from "@mui/material";
 import { CondominioSelect } from "componentes/formulario/FormEndSelect";
 import React, { useEffect, useState } from 'react';
@@ -59,6 +60,19 @@ const isValidCPF = (cpf: string): boolean => {
     return true;
 };
 
+const evaluatePasswordStrength = (password: string): string => {
+    const strongPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\[\]{}|;:,.<>?]).{10,}$/;
+    const mediumPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+    if (strongPasswordPattern.test(password)) {
+        return 'strong';
+    } else if (mediumPasswordPattern.test(password)) {
+        return 'medium';
+    } else {
+        return 'weak';
+    }
+};
+
 export const AuthForm: React.FC<AuthFormProps> = ({
     isSignup,
     cpf,
@@ -76,27 +90,38 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     const [condominios, setCondominios] = useState<{ codigoCondominio: string; nomeCondominio: string }[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
+    // Estados de erro individuais para cada campo
     const [cpfError, setCpfError] = useState<string>('');
+    const [passwordError, setPasswordError] = useState<string>('');
+    const [confirmPasswordError, setConfirmPasswordError] = useState<string>('');
 
     useEffect(() => {
         if (cpf) {
             if (isValidCPF(cpf)) {
                 setCpfError('');
-                setError('');
             } else {
                 setCpfError('CPF inválido.');
-                setError(''); // Não afeta outros campos
             }
         }
-    }, [cpf, setError]);
+    }, [cpf]);
 
     useEffect(() => {
         if (password) {
-            setPasswordStrength(password);
-        } else {
-            setPasswordStrength('');
+            const strength = evaluatePasswordStrength(password);
+            setPasswordStrength(strength);
+            setPasswordError(''); // Limpa o erro de senha ao digitar
         }
     }, [password]);
+
+    useEffect(() => {
+        if (isSignup && confirmPassword) {
+            if (confirmPassword !== password) {
+                setConfirmPasswordError('As senhas não correspondem.');
+            } else {
+                setConfirmPasswordError('');
+            }
+        }
+    }, [confirmPassword, password, isSignup]);
 
     useEffect(() => {
         const fetchCondominios = async () => {
@@ -118,8 +143,16 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         fetchCondominios();
     }, []);
 
+    const onSubmit = (data: FieldValues) => {
+        if (isSignup && password !== confirmPassword) {
+            setConfirmPasswordError('As senhas não correspondem.');
+            return;
+        }
+        handleParentSubmit(data);
+    };
+
     return (
-        <form onSubmit={(e) => { e.preventDefault(); handleParentSubmit(e); }} className="flex flex-col gap-4 px-10 min-lg:h-[50vh]">
+        <form onSubmit={handleFormSubmit(onSubmit)} className="flex flex-col gap-4 px-10 min-lg:h-[50vh]">
             <h2 className='text-2xl font-medium'>{isSignup ? 'Cadastro' : 'Login'}</h2>
             <CondominioSelect 
                 control={control} 
@@ -145,17 +178,34 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                 className="p-2 border border-blue-500 rounded"
                 label="Senha"
                 fullWidth
+                error={!!passwordError}
+                helperText={passwordError}
             />
             {isSignup && (
-                <TextField
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirme sua senha"
-                    className="p-2 border border-blue-500 rounded"
-                    label="Confirme sua senha"
-                    fullWidth
-                />
+                <>
+                    <Typography variant="body2" className="text-sm text-gray-600">
+                        Força da senha: <span className={
+                            passwordStrength === 'strong' ? 'text-green-600' :
+                            passwordStrength === 'medium' ? 'text-yellow-600' :
+                            'text-red-600'
+                        }>
+                            {passwordStrength === 'strong' ? 'Forte' :
+                            passwordStrength === 'medium' ? 'Média' :
+                            'Fraca'}
+                        </span>
+                    </Typography>
+                    <TextField
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Confirme sua senha"
+                        className="p-2 border border-blue-500 rounded"
+                        label="Confirme sua senha"
+                        fullWidth
+                        error={!!confirmPasswordError}
+                        helperText={confirmPasswordError}
+                    />
+                </>
             )}
             <Button
                 type="submit"
