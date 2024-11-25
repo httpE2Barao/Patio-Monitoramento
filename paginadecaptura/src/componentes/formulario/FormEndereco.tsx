@@ -65,7 +65,7 @@ export const FormEndereco: React.FC = () => {
             helperText={errors.endereco?.apto?.message}
           />
           {!errors.endereco?.apto && (
-            <FormHelperText>Se existir bloco, digite-o em seguida do apartamento.</FormHelperText>
+            <FormHelperText>Digite o bloco em seguida do apartamento se existir.</FormHelperText>
           )}
         </Grid>
       </Grid>
