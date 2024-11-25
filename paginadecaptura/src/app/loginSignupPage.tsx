@@ -1,56 +1,59 @@
 import axios from 'axios';
+import { AuthForm } from 'componentes/autenticacao/authForm';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { AuthForm } from './authForm';
 
 const LoginSignupPage: React.FC = () => {  
   const navigate = useNavigate();
   const [isSignup, setIsSignup] = useState<boolean>(false);
-  const [cpf, setCpf] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleToggleForm = () => {
     setIsSignup(!isSignup);
     setError('');
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (data: any) => {
     setError('');
-
+    setLoading(true);
+  
+    const { cpf, password } = data;
+  
     try {
-      // Utilizando apenas a validação do CPF
-      const cpfValidationSchema = z.string().regex(/^\d{11}$/, "CPF inválido");
-      cpfValidationSchema.parse(cpf);
-
-      if (isSignup && password !== confirmPassword) {
-        setError('As senhas não coincidem.');
-        return;
-      }
-
+      let response;
+  
       if (isSignup) {
-        await axios.post('/api/clientes/signup', { cpf, password });
+        response = await axios.post(process.env.API_URL_CRIAR_SENHA!, {
+          cpf,
+          senha: password,
+        });
+      } else {
+        response = await axios.post(process.env.API_URL_LOGIN!, { cpf, password });
+      }
+  
+      if (response.data.resposta === "Senha criada com sucesso" || response.data.exists) {
         navigate('/dashboard');
       } else {
-        const response = await axios.get(`/api/clientes/login?cpf=${cpf}&password=${password}`);
-        if (response.data.exists) {
-          navigate('/dashboard');
-        } else {
-          setError('Credenciais inválidas ou usuário não encontrado.');
-        }
+        setError(response.data.resposta || 'Credenciais inválidas ou usuário não encontrado.');
       }
-    } catch (err) {
+  
+    } catch (err: any) {
       if (err instanceof z.ZodError) {
         setError(err.errors[0]?.message || 'Erro de validação');
+      } else if (axios.isAxiosError(err)) {
+        console.error('Erro na requisição:', err.response?.data);
+        setError(err.response?.data?.error || 'Ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.');
       } else {
-        setError('Ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.');
+        setError('Erro desconhecido. Tente novamente mais tarde.');
       }
+    } finally {
+      setLoading(false);
     }
   };
-
+  
   return (
     <div className="flex flex-col-reverse md:flex-row md:h-screen relative">
       <div className="w-full md:w-1/2 md:relative md:my-auto max-w-[1300px] order-2 md:order-none">
@@ -60,7 +63,6 @@ const LoginSignupPage: React.FC = () => {
           layout="responsive"
           width={1300}
           height={800}
-          objectFit="cover"
           className="rounded-b-2xl md:rounded-r-2xl md:rounded-b-none object-left-top"
           priority
         />
@@ -73,15 +75,10 @@ const LoginSignupPage: React.FC = () => {
         </div>
         <AuthForm
           isSignup={isSignup}
-          cpf={cpf}
-          setCpf={setCpf}
-          password={password}
-          setPassword={setPassword}
-          confirmPassword={confirmPassword}
-          setConfirmPassword={setConfirmPassword}
           error={error}
           setError={setError}
           handleSubmit={handleSubmit}
+          loading={loading}
         />
         <div className="flex justify-center xl:mt-4">
           <button

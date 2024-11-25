@@ -1,4 +1,3 @@
-"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, CircularProgress, Container, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -89,7 +88,7 @@ export const Form: React.FC<FormProps> = ({ moradorDados, setMoradorDados, handl
   return (
     <Container>
       <FormProvider {...methods}>
-        <form className="flex gap-2 flex-col items-center justify-evenly" onSubmit={handleSubmit}>
+        <form className="flex gap-2 flex-col items-center justify-evenly" onSubmit={methods.handleSubmit(onSubmit)}>
           <Grid container spacing={1} sx={{ pb: 4, maxWidth: "100%", m: "auto" }}>
             <Grid item xs={12}>
               <FormEndereco />

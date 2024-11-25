@@ -1,219 +1,191 @@
-import {
-    Button,
-    TextField,
-    Typography
-} from "@mui/material";
+import { Button, CircularProgress, TextField, Typography } from "@mui/material";
 import { CondominioSelect } from "componentes/formulario/FormEndSelect";
-import React, { useEffect, useState } from 'react';
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { FieldValues, useForm } from "react-hook-form";
 
 interface AuthFormProps {
     isSignup: boolean;
-    cpf: string;
-    setCpf: (cpf: string) => void;
-    password: string;
-    setPassword: (password: string) => void;
-    confirmPassword: string;
-    setConfirmPassword: (confirmPassword: string) => void;
     error: string;
     setError: (error: string) => void;
-    handleSubmit: SubmitHandler<FieldValues>;
-}
-
-const isValidCPF = (cpf: string): boolean => {
+    handleSubmit: (data: FieldValues) => Promise<void>;
+    loading: boolean;
+  }
+  
+  const isValidCPF = (cpf: string): boolean => {
     cpf = cpf.replace(/\D/g, '');
-
+  
     if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
-        return false;
+      return false;
     }
-
+  
     let sum = 0;
     let remainder;
-
+  
     for (let i = 1; i <= 9; i++) {
-        sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+      sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
     }
     remainder = (sum * 10) % 11;
-
+  
     if (remainder === 10 || remainder === 11) {
-        remainder = 0;
+      remainder = 0;
     }
-
+  
     if (remainder !== parseInt(cpf.substring(9, 10))) {
-        return false;
+      return false;
     }
-
+  
     sum = 0;
     for (let i = 1; i <= 10; i++) {
-        sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+      sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
     }
     remainder = (sum * 10) % 11;
-
+  
     if (remainder === 10 || remainder === 11) {
-        remainder = 0;
+      remainder = 0;
     }
-
+  
     if (remainder !== parseInt(cpf.substring(10, 11))) {
-        return false;
+      return false;
     }
-
+  
     return true;
-};
-
-const evaluatePasswordStrength = (password: string): string => {
+  };
+  
+  const evaluatePasswordStrength = (password: string): string => {
     const strongPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\[\]{}|;:,.<>?]).{10,}$/;
     const mediumPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-
+  
     if (strongPasswordPattern.test(password)) {
-        return 'strong';
+      return 'strong';
     } else if (mediumPasswordPattern.test(password)) {
-        return 'medium';
+      return 'medium';
     } else {
-        return 'weak';
+      return 'weak';
     }
-};
-
-export const AuthForm: React.FC<AuthFormProps> = ({
+  };
+  
+  export const AuthForm: React.FC<AuthFormProps> = ({
     isSignup,
-    cpf,
-    setCpf,
-    password,
-    setPassword,
-    confirmPassword,
-    setConfirmPassword,
     error,
     setError,
     handleSubmit: handleParentSubmit,
-}) => {
-    const { control, handleSubmit: handleFormSubmit, register } = useForm();
+    loading,
+  }) => {
+    const {
+      control,
+      handleSubmit: handleFormSubmit,
+      register,
+      getValues,
+      formState: { errors }
+    } = useForm<FieldValues>({
+      mode: 'onChange',
+    });
+  
     const [passwordStrength, setPasswordStrength] = useState<string>('');
     const [condominios, setCondominios] = useState<{ codigoCondominio: string; nomeCondominio: string }[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-
-    // Estados de erro individuais para cada campo
-    const [cpfError, setCpfError] = useState<string>('');
-    const [passwordError, setPasswordError] = useState<string>('');
-    const [confirmPasswordError, setConfirmPasswordError] = useState<string>('');
-
+  
     useEffect(() => {
-        if (cpf) {
-            if (isValidCPF(cpf)) {
-                setCpfError('');
-            } else {
-                setCpfError('CPF inválido.');
-            }
+      const fetchCondominios = async () => {
+        try {
+          const response = await fetch("/api/condominios");
+          if (!response.ok) {
+            throw new Error(
+              `Erro ao obter condomínios: ${response.status} ${response.statusText}`
+            );
+          }
+          const data = await response.json();
+          setCondominios(data.condominios);
+        } catch (error) {
+          console.error("Erro ao obter condomínios:", error);
         }
-    }, [cpf]);
-
-    useEffect(() => {
-        if (password) {
-            const strength = evaluatePasswordStrength(password);
-            setPasswordStrength(strength);
-            setPasswordError(''); // Limpa o erro de senha ao digitar
-        }
-    }, [password]);
-
-    useEffect(() => {
-        if (isSignup && confirmPassword) {
-            if (confirmPassword !== password) {
-                setConfirmPasswordError('As senhas não correspondem.');
-            } else {
-                setConfirmPasswordError('');
-            }
-        }
-    }, [confirmPassword, password, isSignup]);
-
-    useEffect(() => {
-        const fetchCondominios = async () => {
-            try {
-                const response = await fetch("/api/condominios");
-                if (!response.ok) {
-                    throw new Error(
-                        `Erro ao obter condomínios: ${response.status} ${response.statusText}`
-                    );
-                }
-                const data = await response.json();
-                setCondominios(data.condominios);
-            } catch (error) {
-                console.error("Erro ao obter condomínios:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchCondominios();
+      };
+      fetchCondominios();
     }, []);
-
+  
     const onSubmit = (data: FieldValues) => {
-        if (isSignup && password !== confirmPassword) {
-            setConfirmPasswordError('As senhas não correspondem.');
-            return;
-        }
-        handleParentSubmit(data);
+      if (isSignup && data.password !== data.confirmPassword) {
+        setError('As senhas não correspondem.');
+        return;
+      }
+      handleParentSubmit(data);
     };
-
+  
     return (
-        <form onSubmit={handleFormSubmit(onSubmit)} className="flex flex-col gap-4 px-10 min-lg:h-[50vh]">
-            <h2 className='text-2xl font-medium'>{isSignup ? 'Cadastro' : 'Login'}</h2>
-            <CondominioSelect 
-                control={control} 
-                error={''}
-                loading={loading} 
-                condominios={condominios} 
-            />
+      <form onSubmit={handleFormSubmit(onSubmit)} className="flex flex-col gap-4 px-10 min-lg:h-[50vh]">
+        <h2 className='text-2xl font-medium'>{isSignup ? 'Cadastro' : 'Login'}</h2>
+        {error && (
+          <Typography variant="body2" color="error">
+            {error}
+          </Typography>
+        )}
+        <CondominioSelect 
+          control={control} 
+          error={errors.condominio?.message ? String(errors.condominio.message) : undefined}
+          loading={loading} 
+          condominios={condominios} 
+        />
+        <TextField
+          {...register('cpf', {
+            required: 'CPF é obrigatório.',
+            validate: (value) => isValidCPF(value) || 'CPF inválido.',
+          })}
+          placeholder="CPF"
+          label="CPF"
+          fullWidth
+          error={!!errors.cpf}
+          helperText={errors.cpf?.message ? String(errors.cpf.message) : ''}
+        />
+        <TextField
+          type="password"
+          {...register('password', {
+            required: 'Senha é obrigatória.',
+            onChange: (e) => {
+              const strength = evaluatePasswordStrength(e.target.value);
+              setPasswordStrength(strength);
+            }
+          })}
+          placeholder="Senha"
+          label="Senha"
+          fullWidth
+          error={!!errors.password}
+          helperText={errors.password?.message ? String(errors.password.message) : ''}
+        />
+        {isSignup && (
+          <>
+            <Typography variant="body2" className="text-sm text-gray-600">
+              Força da senha: <span className={
+                passwordStrength === 'strong' ? 'text-green-600' :
+                passwordStrength === 'medium' ? 'text-yellow-600' :
+                'text-red-600'
+              }>
+                {passwordStrength === 'strong' ? 'Forte' :
+                passwordStrength === 'medium' ? 'Média' :
+                'Fraca'}
+              </span>
+            </Typography>
             <TextField
-                value={cpf}
-                onChange={(e) => setCpf(e.target.value)}
-                placeholder="CPF"
-                className="p-2 border border-blue-500 rounded"
-                label="CPF"
-                fullWidth
-                error={!!cpfError}
-                helperText={cpfError}
+              type="password"
+              {...register('confirmPassword', {
+                required: 'Confirmação de senha é obrigatória.',
+                validate: (value) =>
+                  value === getValues('password') || 'As senhas não correspondem.',
+              })}
+              placeholder="Confirme sua senha"
+              label="Confirme sua senha"
+              fullWidth
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword?.message ? String(errors.confirmPassword.message) : ''}
             />
-            <TextField
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Senha"
-                className="p-2 border border-blue-500 rounded"
-                label="Senha"
-                fullWidth
-                error={!!passwordError}
-                helperText={passwordError}
-            />
-            {isSignup && (
-                <>
-                    <Typography variant="body2" className="text-sm text-gray-600">
-                        Força da senha: <span className={
-                            passwordStrength === 'strong' ? 'text-green-600' :
-                            passwordStrength === 'medium' ? 'text-yellow-600' :
-                            'text-red-600'
-                        }>
-                            {passwordStrength === 'strong' ? 'Forte' :
-                            passwordStrength === 'medium' ? 'Média' :
-                            'Fraca'}
-                        </span>
-                    </Typography>
-                    <TextField
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirme sua senha"
-                        className="p-2 border border-blue-500 rounded"
-                        label="Confirme sua senha"
-                        fullWidth
-                        error={!!confirmPasswordError}
-                        helperText={confirmPasswordError}
-                    />
-                </>
-            )}
-            <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-            >
-                {isSignup ? 'Cadastrar' : 'Entrar'}
-            </Button>
-        </form>
+          </>
+        )}
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={loading}
+        >
+          {loading ? <CircularProgress size={24} color="inherit" /> : isSignup ? 'Cadastrar' : 'Entrar'}
+        </Button>
+      </form>
     );
-};
+  };

@@ -3,9 +3,15 @@
     "outDir": "./dist",
     "baseUrl": "./src",
     "paths": {
-      "@api/*": ["api/*"]
+      "@api/*": [
+        "api/*"
+      ]
     },
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -21,7 +27,8 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "target": "ES2017"
   },
   "include": [
     "next-env.d.ts",
@@ -32,6 +39,8 @@
     "tailwind.config.mts",
     "src/pages/api/clientes/route.ts",
     "lib/prisma.js"
-  ],
-  "exclude": ["node_modules"]
+, "src/pages/form/form.js"  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

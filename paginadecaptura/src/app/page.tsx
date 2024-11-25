@@ -1,7 +1,6 @@
 "use client"
 import { ThemeProvider } from "@mui/material";
 import axios from "axios";
-import LoginSignupPage from "componentes/autenticacao/page";
 import { BtnToTop } from "componentes/botaoSubir";
 import FAQ from "componentes/faq";
 import Footer from "componentes/footer";
@@ -10,6 +9,7 @@ import Header from "componentes/header";
 import BoasVindas from "componentes/inicio";
 import React, { useEffect, useState } from "react";
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import LoginSignupPage from "./loginSignupPage";
 import { theme } from "./theme";
 
 const PaginaPrincipal: React.FC = () => {
