@@ -1,4 +1,5 @@
 import {
+  FormHelperText,
   Grid,
   TextField
 } from "@mui/material";
@@ -63,6 +64,9 @@ export const FormEndereco: React.FC = () => {
             error={!!errors.endereco?.apto}
             helperText={errors.endereco?.apto?.message}
           />
+          {!errors.endereco?.apto && (
+            <FormHelperText>Se existir bloco, digite-o em seguida do apartamento.</FormHelperText>
+          )}
         </Grid>
       </Grid>
     </Grid>
