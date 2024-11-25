@@ -35,7 +35,7 @@ const isValidCPF = (cpf: string): boolean => {
 // Esquema base de validação para residente
 export const residenteBaseSchema = z.object({
     nome: z.string().min(7, { message: 'Digite seu nome completo' }),
-    telefone: z.string().min(10, { message: 'Digite um telefone válido' }),
+    telefone: z.array(z.string().min(1, "Telefone é obrigatório")).max(3, "Você pode adicionar até 3 telefones"),
     email: z.string().min(1, { message: 'Insira um email' })
         .refine((text) => patterns.email.test(text), { message: "O email é inválido" }),
     tipoDocumento: z.enum(["RG", "CPF", "CNH"], { message: 'Selecione um tipo de documento válido' }),

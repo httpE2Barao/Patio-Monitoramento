@@ -6,7 +6,7 @@ export interface VeiculoData {
 
 export interface ResidenteData {
   nome: string;
-  telefone: string;
+  telefone: Array<string>;
   email: string;
   tipoDocumento: string;
   documento: string;
