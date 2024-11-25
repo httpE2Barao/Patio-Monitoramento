@@ -36,7 +36,7 @@ export const Form: React.FC<FormProps> = ({ moradorDados, setMoradorDados, handl
     resolver: zodResolver(schema),
     defaultValues: {
       endereco: { condominio: '', apto: '' },
-      residentes: [{ nome: '', telefone: '', email: '', tipoDocumento: 'CPF', documento: '' }],
+      residentes: [{ nome: '', telefone: [''], email: '', tipoDocumento: 'CPF', documento: '' }],
       veiculos: [{ cor: '', modelo: '', placa: '' }],
       feedback: '',
     }
