@@ -120,7 +120,7 @@ export const Form: React.FC<FormProps> = ({ moradorDados, setMoradorDados, handl
                   setRetornoForm(undefined);
                 }}
                 sx={{ ml: 2, fontSize: "large" }}>
-                Resetar
+                Limpar
               </Button>
               <Button type="submit" variant="contained" sx={{ fontSize: "large" }}>
                 Enviar
