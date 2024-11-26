@@ -5,7 +5,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Schema } from "../../pages/api/schema-zod";
+import { Schema } from "../schema-zod";
 import { CondominioSelect } from "./FormEndSelect";
 import { Titulo } from "./titulo";
 

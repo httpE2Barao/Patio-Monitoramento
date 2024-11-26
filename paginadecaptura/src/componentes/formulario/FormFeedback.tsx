@@ -1,7 +1,7 @@
 import { Box, Grid, TextField } from "@mui/material";
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { Schema } from "../../pages/api/schema-zod";
+import { Schema } from "../schema-zod";
 import { Titulo } from "./titulo";
 
 export const FormFeedback: React.FC = () => {

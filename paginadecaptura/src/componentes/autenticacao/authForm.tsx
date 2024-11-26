@@ -1,6 +1,5 @@
 import { Button, CircularProgress, TextField, Typography } from "@mui/material";
-import { CondominioSelect } from "componentes/formulario/FormEndSelect";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 
 interface AuthFormProps {
@@ -82,25 +81,6 @@ interface AuthFormProps {
     });
   
     const [passwordStrength, setPasswordStrength] = useState<string>('');
-    const [condominios, setCondominios] = useState<{ codigoCondominio: string; nomeCondominio: string }[]>([]);
-  
-    useEffect(() => {
-      const fetchCondominios = async () => {
-        try {
-          const response = await fetch("/api/condominios");
-          if (!response.ok) {
-            throw new Error(
-              `Erro ao obter condomínios: ${response.status} ${response.statusText}`
-            );
-          }
-          const data = await response.json();
-          setCondominios(data.condominios);
-        } catch (error) {
-          console.error("Erro ao obter condomínios:", error);
-        }
-      };
-      fetchCondominios();
-    }, []);
   
     const onSubmit = (data: FieldValues) => {
       if (isSignup && data.password !== data.confirmPassword) {
@@ -118,12 +98,6 @@ interface AuthFormProps {
             {error}
           </Typography>
         )}
-        <CondominioSelect 
-          control={control} 
-          error={errors.condominio?.message ? String(errors.condominio.message) : undefined}
-          loading={loading} 
-          condominios={condominios} 
-        />
         <TextField
           {...register('cpf', {
             required: 'CPF é obrigatório.',

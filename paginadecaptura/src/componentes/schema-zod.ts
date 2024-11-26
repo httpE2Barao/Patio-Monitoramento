@@ -68,7 +68,7 @@ export const residenteSchema = residenteBaseSchema;
 
 // Esquema de validação para endereço
 export const enderecoSchema = z.object({
-    condominio: z.string().nonempty('Selecione um condomínio'),
+    condominio: z.string().min(1, { message: 'Selecione um condomínio'}),
     apto: z.string().min(1, { message: 'Digite o apartamento e o bloco se existir' }),
 });
 
@@ -80,7 +80,7 @@ export const veiculoSchema = z.object({
 });
 
 // Esquema de validação para feedback
-export const feedbackSchema = z.string().max(100, { message: 'Digite um feedback' }).optional();
+export const feedbackSchema = z.string().max(100, { message: 'Feedback deve ter até 100 caracteres' }).nullable().optional();
 
 // Esquema geral de validação
 export const schema = z.object({

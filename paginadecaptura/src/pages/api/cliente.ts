@@ -1,6 +1,6 @@
-import { ClienteData } from 'componentes/classeCliente';
 import { parse } from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { ClienteData } from '../../componentes/classeCliente';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {

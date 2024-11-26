@@ -1,12 +1,21 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "paths": {
-      "@api/*": [
-        "api/*"
+      "@/app/*": [
+        "src/app/*"
+      ],
+      "@/components/*": [
+        "src/components/*"
       ]
     },
+    "strict": true,
+    "module": "esnext",
+    "target": "es2017",
+    "jsx": "preserve",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "lib": [
       "dom",
       "dom.iterable",
@@ -14,32 +23,24 @@
     ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
-    "noEmit": false,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
+    "noEmit": true,
     "incremental": true,
+    "isolatedModules": true,
     "plugins": [
       {
         "name": "next"
       }
-    ],
-    "target": "ES2017"
+    ]
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "src/app/middleware.mjs",
     ".next/types/**/*.ts",
     "src/componentes/formulario/utils.js",
     "tailwind.config.mts",
     "src/pages/api/clientes/route.ts",
-    "lib/prisma.js"
-, "src/pages/form/form.js"  ],
+  ],
   "exclude": [
     "node_modules"
   ]

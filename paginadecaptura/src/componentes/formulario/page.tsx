@@ -1,43 +1,26 @@
+"use client"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, CircularProgress, Container, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
-import { schema, Schema } from "../../pages/api/schema-zod";
-import Cliente from "../classeCliente";
+import { schema, Schema } from "../schema-zod";
 import { FormEndereco } from "./FormEndereco";
 import { FormFeedback } from "./FormFeedback";
 import { FormResidentes } from "./FormResidentes";
 import { FormRetorno } from "./FormRetorno";
 import { FormVeiculo } from "./FormVeiculo";
 
-type FormProps = {
-  moradorDados: {
-    mor_cond_id: string;
-    mor_cond_nome: string;
-    mor_apto: string;
-    mor_bloco: string;
-    mor_nome: string;
-    mor_parentesco: string;
-    mor_cpf: string;
-    mor_celular01: string;
-    mor_email: string;
-    mor_responsavel: string;
-    mor_obs: string;
-    mor_senhaapp: string;
-  };
-  setMoradorDados: React.Dispatch<React.SetStateAction<any>>;
-  handleSubmit: (e: any) => void;
-};
-
-export const Form: React.FC<FormProps> = ({ moradorDados, setMoradorDados, handleSubmit }) => {
+export const Form: React.FC = () => {
   const methods = useForm<Schema>({
     mode: "all",
     resolver: zodResolver(schema),
     defaultValues: {
-      endereco: { condominio: '', apto: '' },
-      residentes: [{ nome: '', telefone: [''], email: '', tipoDocumento: 'CPF', documento: '' }],
-      veiculos: [{ cor: '', modelo: '', placa: '' }],
-      feedback: '',
+      endereco: { condominio: "", apto: "" }, 
+      residentes: [
+        { nome: "", telefone: [""], email: "", tipoDocumento: "CPF", documento: "", parentesco: "" },
+      ],
+      veiculos: [{ cor: "", modelo: "", placa: "" }],
+      feedback: "",
     }
   });
 
@@ -71,19 +54,21 @@ export const Form: React.FC<FormProps> = ({ moradorDados, setMoradorDados, handl
   }, [tipoDocumento, trigger, formState.touchedFields.residentes]);
 
   const onSubmit = async (data: Schema) => {
-    setLoading(true);
-    const novoCliente = new Cliente(data);
-    try {
-      await novoCliente.enviarCliente();
-      setRetornoForm(true);
-    } catch (error) {
-      console.error(error);
-      setRetornoForm(false);
-    } finally {
-      setLoading(false);
-      reset();
-    }
-  };
+    
+    // setLoading(true);
+    // const novoCliente = new Cliente(data);
+
+    // try {
+    //   await novoCliente.enviarCliente();
+    //   setRetornoForm(true);
+    // } catch (error) {
+    //   console.error(error);
+    //   setRetornoForm(false);
+    // } finally {
+    //   setLoading(false);
+    //   reset();
+    // }
+    };
 
   return (
     <Container>
