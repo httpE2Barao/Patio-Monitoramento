@@ -25,7 +25,7 @@ export const FormularioLayout = () => {
   // Exibe um estado de carregamento enquanto verifica a autenticação
   if (isAuthenticated === null) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen font-semibold text-2xl">
         <p>Verificando autenticação...</p>
       </div>
     );
