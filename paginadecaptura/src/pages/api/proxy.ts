@@ -4,12 +4,28 @@ import { NextApiRequest, NextApiResponse } from "next";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method, body } = req;
 
-  // Defina o endpoint baseado no corpo da requisição
-  let endpoint = "/"; // Padrão
-  if (body?.action === "signup") {
-    endpoint = "/criar_senha";
-  } else if (body?.action === "login") {
-    endpoint = "/login";
+  if (method !== "POST") {
+    res.setHeader("Allow", ["POST"]);
+    return res.status(405).end(`Method ${method} Not Allowed`);
+  }
+
+  // Definir o endpoint baseado na ação fornecida no corpo da requisição
+  let endpoint = "/";
+  switch (body?.action) {
+    case "signup":
+      endpoint = "/criar_senha";
+      break;
+    case "login":
+      endpoint = "/login";
+      break;
+    case "verificar_apto":
+      endpoint = "/apto";
+      break;
+    case "novo_morador":
+      endpoint = "/moradores";
+      break;
+    default:
+      return res.status(400).json({ error: "Ação inválida" });
   }
 
   const url = `${process.env.API_URL}${endpoint}`;
@@ -17,12 +33,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const response = await axios({
       url,
-      method,
-      data: body,
+      method: "POST",
+      data: body.payload, // Para garantir que apenas o payload seja enviado
       headers: {
         Authorization: `Basic ${Buffer.from(
           `${process.env.API_USERNAME}:${process.env.API_PASSWORD}`
         ).toString("base64")}`,
+        "Content-Type": "application/json",
       },
     });
 

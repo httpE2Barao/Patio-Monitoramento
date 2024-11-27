@@ -1,5 +1,5 @@
 "use client"
-import { FormularioLayout } from "../../componentes/Form";
+import { FormularioLayout } from "../../componentes/formulario/FormLayout";
 
 export default function FormularioPage() {
   return <FormularioLayout />;

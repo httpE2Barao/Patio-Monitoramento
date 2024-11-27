@@ -108,6 +108,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             setError(response.data.resposta);
           } else {
             // Armazena CPF e senha no localStorage e redireciona para /form
+            localStorage.setItem("authToken", response.data.token);
             localStorage.setItem("cpf", data.cpf);
             localStorage.setItem("senha", data.password);
             router.push("/form");
