@@ -5,6 +5,18 @@ import React, { useEffect, useState } from "react";
 import api from "../../pages/api/service";
 import { AuthForm } from "./authForm";
 
+const ToggleFormButton: React.FC<{ isSignup: boolean; onToggle: () => void }> = ({
+  isSignup,
+  onToggle,
+}) => (
+  <button
+    onClick={onToggle}
+    className="text-blue-500 underline hover:text-blue-700 transition-colors duration-300"
+  >
+    {isSignup ? "Já sou cliente" : "Não tem uma conta? Cadastre-se"}
+  </button>
+);
+
 export const LoginSignup: React.FC = () => {
   const router = useRouter();
   const [isSignup, setIsSignup] = useState<boolean>(false);
@@ -12,10 +24,9 @@ export const LoginSignup: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    // Verifica se o usuário já está autenticado
     const token = localStorage.getItem("authToken");
     if (token) {
-      router.push("/form"); // Redireciona se o token existir
+      router.replace("/form");
     }
   }, [router]);
 
@@ -24,46 +35,47 @@ export const LoginSignup: React.FC = () => {
     setError("");
   };
 
+  const handleApiError = (err: any): string => {
+    if (err.response) {
+      console.error("Erro na API:", {
+        status: err.response.status,
+        data: err.response.data,
+      });
+      return err.response.data.error || "Erro no servidor. Tente novamente mais tarde.";
+    } else if (err.request) {
+      console.error("Nenhuma resposta da API:", err.request);
+      return "Sem resposta do servidor. Verifique sua conexão.";
+    } else {
+      console.error("Erro ao configurar a requisição:", err.message);
+      return "Erro desconhecido. Tente novamente mais tarde.";
+    }
+  };
+
   const handleSubmit = async (data: any) => {
     setError("");
     setLoading(true);
-
+  
     const { cpf, password } = data;
-
+  
     try {
-      const endpoint = isSignup ? "/criar_senha" : "/login";
-      const payload = { cpf, senha: password };
-
-      const response = await api.post(
-        `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`,
-        payload
-      );
-
+      const payload = {
+        cpf,
+        senha: password,
+        action: isSignup ? "signup" : "login", 
+      };
+  
+      // Chamada para a API Route
+      const response = await api.post("/proxy", payload);
+  
       if (response.data.resposta === "ok") {
-        localStorage.setItem("authToken", response.data.token); // Salva o token no localStorage
-        router.push("/form"); // Redireciona após o login bem-sucedido
+        localStorage.setItem("authToken", response.data.token);
+        router.push("/form");
       } else {
-        setError(
-          response.data.resposta ||
-            "Credenciais inválidas ou usuário não encontrado."
-        );
+        setError(response.data.resposta || "Credenciais inválidas ou usuário não encontrado.");
       }
     } catch (err: any) {
-      if (err.response) {
-        console.error("Erro na API:", {
-          status: err.response.status,
-          data: err.response.data,
-        });
-        setError(
-          err.response.data.error || "Erro no servidor. Tente novamente mais tarde."
-        );
-      } else if (err.request) {
-        console.error("Nenhuma resposta da API:", err.request);
-        setError("Sem resposta do servidor. Verifique sua conexão.");
-      } else {
-        console.error("Erro ao configurar a requisição:", err.message);
-        setError("Erro desconhecido. Tente novamente mais tarde.");
-      }
+      console.error("Erro na API:", err);
+      setError(err.response?.data || "Erro ao conectar ao servidor.");
     } finally {
       setLoading(false);
     }
@@ -96,12 +108,7 @@ export const LoginSignup: React.FC = () => {
           loading={loading}
         />
         <div className="flex justify-center xl:mt-4">
-          <button
-            onClick={handleToggleForm}
-            className="text-blue-500 underline hover:text-blue-700 transition-colors duration-300"
-          >
-            {isSignup ? "Já sou cliente" : "Não tem uma conta? Cadastre-se"}
-          </button>
+          <ToggleFormButton isSignup={isSignup} onToggle={handleToggleForm} />
         </div>
       </div>
     </div>
