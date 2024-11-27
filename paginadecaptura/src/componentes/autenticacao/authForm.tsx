@@ -96,8 +96,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
     setIsCheckingCpf(true);
     try {
-      // Verificação na API para ver se o cliente já está cadastrado
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL_MORADOR}/${cpf}`);
+      // Fazendo a verificação pelo proxy usando a URL do ambiente
+      const response = await axios.get(`/api/proxy`, {
+        params: {
+          endpoint: `${process.env.NEXT_PUBLIC_API_URL_MORADOR}/${cpf}`,
+        },
+      });
       
       if (isSignup) {
         // No signup, o CPF NÃO deve existir na base de dados
