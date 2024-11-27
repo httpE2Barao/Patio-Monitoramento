@@ -16,6 +16,17 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
   });
 
   const [parentescos, setParentescos] = useState<{ id: number, value: string }[]>([]);
+  const [cpfFromStorage, setCpfFromStorage] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Buscar o CPF do localStorage
+    const cpf = localStorage.getItem("cpf");
+    if (cpf) {
+      setCpfFromStorage(cpf);
+      setValue(`residentes.0.documento`, cpf); // Preencher automaticamente o campo de documento do primeiro residente
+      setValue(`residentes.0.tipoDocumento`, "CPF"); // Definir o tipo de documento do primeiro residente como "CPF"
+    }
+  }, [setValue]);
 
   useEffect(() => {
     fetch("/parentescos.json")
@@ -139,21 +150,38 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
                 {...register(`residentes.${index}.documento` as const)}
                 label="Documento"
                 fullWidth
+                value={index === 0 && cpfFromStorage ? cpfFromStorage : getValues(`residentes.${index}.documento`)}
+                onChange={(e) => {
+                  if (index !== 0) {
+                    setValue(`residentes.${index}.documento`, e.target.value);
+                  }
+                }}
                 error={!!errors.residentes?.[index]?.documento}
                 helperText={errors.residentes?.[index]?.documento?.message}
+                InputProps={{
+                  readOnly: index === 0, // Somente leitura para o primeiro residente se for CPF
+                }}
               />
-              <Controller
-                name={`residentes.${index}.tipoDocumento`}
-                control={control}
-                rules={{ required: 'Selecione um tipo de documento válido' }}
-                render={({ field }) => (
-                  <RadioGroup {...field} row sx={{ justifyContent: "space-around" }}>
-                    <FormControlLabel value="RG" control={<Radio />} label="RG" />
-                    <FormControlLabel value="CPF" control={<Radio />} label="CPF" />
-                    <FormControlLabel value="CNH" control={<Radio />} label="CNH" />
-                  </RadioGroup>
-                )}
-              />
+              {index === 0 ? (
+                // Se for o primeiro residente, mostra o tipo de documento como CPF fixo
+                <RadioGroup row sx={{ justifyContent: "space-around" }}>
+                  <FormControlLabel value="CPF" control={<Radio checked={true} />} label="CPF" />
+                </RadioGroup>
+              ) : (
+                // Para outros residentes, permite escolher o tipo de documento
+                <Controller
+                  name={`residentes.${index}.tipoDocumento`}
+                  control={control}
+                  rules={{ required: 'Selecione um tipo de documento válido' }}
+                  render={({ field }) => (
+                    <RadioGroup {...field} row sx={{ justifyContent: "space-around" }}>
+                      <FormControlLabel value="RG" control={<Radio />} label="RG" />
+                      <FormControlLabel value="CPF" control={<Radio />} label="CPF" />
+                      <FormControlLabel value="CNH" control={<Radio />} label="CNH" />
+                    </RadioGroup>
+                  )}
+                />
+              )}
               {errors.residentes?.[index]?.tipoDocumento && (
                 <p className="text-xs pt-1 text-red-600 pl-4">{errors.residentes?.[index]?.tipoDocumento?.message}</p>
               )}

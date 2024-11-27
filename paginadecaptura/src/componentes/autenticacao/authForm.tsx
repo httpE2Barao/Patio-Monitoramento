@@ -74,7 +74,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 }) => {
   const router = useRouter();
   const {
-    control,
     handleSubmit: handleFormSubmit,
     register,
     getValues,
@@ -84,67 +83,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   });
 
   const [passwordStrength, setPasswordStrength] = useState<string>('');
-  const [cpfError, setCpfError] = useState<string | null>(null);
-  const [isCheckingCpf, setIsCheckingCpf] = useState<boolean>(false);
-
-  const handleCpfBlur = async (cpf: string) => {
-    setCpfError(null); // Resetar o erro ao começar a verificar
-    if (!isValidCPF(cpf)) {
-      setCpfError("CPF inválido.");
-      return;
-    }
-
-    setIsCheckingCpf(true);
-    try {
-      // Fazendo a verificação pelo proxy usando a URL do ambiente
-      const response = await axios.get(`/api/proxy`, {
-        params: {
-          endpoint: `${process.env.NEXT_PUBLIC_API_URL_MORADOR}/${cpf}`,
-        },
-      });
-      
-      if (isSignup) {
-        // No signup, o CPF NÃO deve existir na base de dados
-        if (response.status === 200 && response.data.resposta === "já existe") {
-          setCpfError(`O CPF ${cpf} já está cadastrado. Por favor, faça login.`);
-        } else {
-          // CPF não encontrado, pode prosseguir com o cadastro
-          setCpfError(null);
-        }
-      } else {
-        // No login, o CPF DEVE existir na base de dados
-        if (response.status === 200 && response.data.resposta !== "já existe") {
-          setCpfError(`O CPF ${cpf} não está cadastrado. Por favor, cadastre-se.`);
-        } else {
-          // CPF encontrado, pode prosseguir com o login
-          setCpfError(null);
-        }
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (isSignup && error.response?.status === 404) {
-          // No signup, se o CPF não for encontrado, está OK para prosseguir
-          setCpfError(null);
-        } else if (!isSignup && error.response?.status === 404) {
-          // No login, se o CPF não for encontrado, não pode prosseguir
-          setCpfError(`O CPF ${cpf} não está cadastrado. Por favor, cadastre-se.`);
-        } else {
-          setCpfError("Erro ao verificar o CPF. Tente novamente mais tarde.");
-        }
-      } else {
-        setCpfError("Erro desconhecido. Tente novamente.");
-      }
-    } finally {
-      setIsCheckingCpf(false);
-    }
-  };
+  const [isProcessingSignup, setIsProcessingSignup] = useState<boolean>(false);
 
   const onSubmit = async (data: FieldValues) => {
-    if (cpfError) {
-      // Impede o envio se houver erro no CPF
-      setError(cpfError);
-      return;
-    }
+    setError(""); // Limpar o erro anterior
 
     if (isSignup) {
       if (data.password !== data.confirmPassword) {
@@ -152,11 +94,33 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         return;
       }
 
-      // Armazena CPF e senha no localStorage e redireciona para /form
-      localStorage.setItem("cpf", data.cpf);
-      localStorage.setItem("senha", data.password);
-      router.push("/form");
+      setIsProcessingSignup(true);
+      try {
+        // Fazendo a requisição de signup via proxy
+        const response = await axios.post(`/api/proxy`, {
+          action: "signup",
+          cpf: data.cpf,
+          senha: data.password,
+        });
+
+        if (response.status === 200) {
+          if (response.data.resposta.includes("já criou a senha de acesso")) {
+            setError(response.data.resposta);
+          } else {
+            // Armazena CPF e senha no localStorage e redireciona para /form
+            localStorage.setItem("cpf", data.cpf);
+            localStorage.setItem("senha", data.password);
+            router.push("/form");
+          }
+        }
+      } catch (err: any) {
+        // Caso ocorra um erro ao fazer a requisição
+        setError(err.response?.data?.resposta || "Erro ao tentar criar a conta. Tente novamente mais tarde.");
+      } finally {
+        setIsProcessingSignup(false);
+      }
     } else {
+      // Caso seja login
       handleParentSubmit(data);
     }
   };
@@ -173,19 +137,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         {...register('cpf', {
           required: 'CPF é obrigatório.',
           validate: (value) => isValidCPF(value) || 'CPF inválido.',
-          onBlur: (e) => handleCpfBlur(e.target.value),
         })}
         placeholder="CPF"
         label="CPF"
         fullWidth
-        error={!!errors.cpf || !!cpfError}
-        helperText={errors.cpf?.message ? String(errors.cpf.message) : cpfError}
+        error={!!errors.cpf}
+        helperText={errors.cpf?.message ? String(errors.cpf.message) : ''}
       />
-      {isCheckingCpf && (
-        <Typography variant="body2" color="textSecondary">
-          Verificando CPF...
-        </Typography>
-      )}
       <TextField
         type="password"
         {...register('password', {
@@ -233,9 +191,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         type="submit"
         variant="contained"
         color="primary"
-        disabled={loading || isCheckingCpf}
+        disabled={loading || isProcessingSignup}
       >
-        {loading ? <CircularProgress size={24} color="inherit" /> : isSignup ? 'Cadastrar' : 'Entrar'}
+        {loading || isProcessingSignup ? <CircularProgress size={24} color="inherit" /> : isSignup ? 'Cadastrar' : 'Entrar'}
       </Button>
     </form>
   );

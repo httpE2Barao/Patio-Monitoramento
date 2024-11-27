@@ -72,15 +72,7 @@ export const FormularioLayout = () => {
     <>
       <Header />
       <BoasVindas />
-      {/* Se houver uma mensagem de erro, exibe-a */}
-      {errorMessage ? (
-        <div className="flex items-center justify-center h-screen font-semibold text-2xl text-red-600">
-          <p>{errorMessage}</p>
-        </div>
-      ) : (
-        // Caso contrário, exibe o formulário
-        <Formulario cpf={cpf} senha={senha} />
-      )}
+      <Formulario cpf={cpf} senha={senha} />
       <FAQ />
       <Footer />
       <BtnToTop />
