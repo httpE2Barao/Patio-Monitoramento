@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const response = await axios({
       url,
       method: "POST",
-      data: body.payload, // Para garantir que apenas o payload seja enviado
+      data: body.payload, // Utiliza o payload enviado pelo cliente
       headers: {
         Authorization: `Basic ${Buffer.from(
           `${process.env.API_USERNAME}:${process.env.API_PASSWORD}`

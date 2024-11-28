@@ -1,9 +1,9 @@
 "use client";
+import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { AuthForm } from "./authForm";
-import axios from "axios";
 
 export const LoginSignup: React.FC = () => {
   const router = useRouter();
@@ -27,14 +27,14 @@ export const LoginSignup: React.FC = () => {
   const handleSubmit = async (data: any) => {
     setError("");
     setLoading(true);
-
+  
     const { cpf, password } = data;
-
+  
     try {
-      const endpoint = isSignup ? "/criar_senha" : "/login";
-      const payload = { cpf, senha: password };
-
-      // Enviando a requisição para criar senha ou login
+      const action = isSignup ? "signup" : "login";
+      const payload = { action, payload: { cpf, senha: password } };
+  
+      // Enviando a requisição para criar senha ou login usando o proxy
       const response = await axios.post("/api/proxy", payload);
 
       // Verificando a resposta da API
@@ -68,6 +68,7 @@ export const LoginSignup: React.FC = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="flex flex-col-reverse md:flex-row md:h-screen relative">
