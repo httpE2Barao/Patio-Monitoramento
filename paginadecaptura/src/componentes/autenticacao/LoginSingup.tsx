@@ -2,8 +2,8 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import api from "../../pages/api/service";
 import { AuthForm } from "./authForm";
+import axios from "axios";
 
 export const LoginSignup: React.FC = () => {
   const router = useRouter();
@@ -35,10 +35,7 @@ export const LoginSignup: React.FC = () => {
       const payload = { cpf, senha: password };
 
       // Enviando a requisição para criar senha ou login
-      const response = await api.post(
-        `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`,
-        payload
-      );
+      const response = await axios.post("/api/proxy", payload);
 
       // Verificando a resposta da API
       if (response.data && response.data.resposta === "ok") {
