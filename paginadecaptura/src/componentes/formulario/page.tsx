@@ -1,7 +1,13 @@
-"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, CircularProgress, Container, Grid, Typography } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Container,
+  Grid,
+  Typography
+} from "@mui/material";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { schema, Schema } from "../schema-zod";
@@ -13,17 +19,24 @@ import { FormVeiculo } from "./FormVeiculo";
 
 interface FormProps {
   cpf: string | null;
-  senha: string | null;
 }
 
-export const Form: React.FC<FormProps> = ({ cpf, senha }) => {
+export const Form: React.FC<FormProps> = ({ cpf }) => {
+  const router = useRouter();
   const methods = useForm<Schema>({
     mode: "all",
     resolver: zodResolver(schema),
     defaultValues: {
       endereco: { condominio: "", apto: "" },
       residentes: [
-        { nome: "", telefone: [""], email: "", tipoDocumento: "CPF", documento: cpf || "", parentesco: "" },
+        {
+          nome: "",
+          telefone: [""],
+          email: "",
+          tipoDocumento: "CPF",
+          documento: cpf || "",
+          parentesco: "",
+        },
       ],
       veiculos: [{ cor: "", modelo: "", placa: "" }],
       feedback: "",
@@ -44,7 +57,7 @@ export const Form: React.FC<FormProps> = ({ cpf, senha }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [aptoError, setAptoError] = useState<string>("");
 
-  const { reset, trigger, control, formState, setValue } = methods;
+  const { reset, trigger, control, formState, setValue, handleSubmit } = methods;
 
   const tipoDocumento = useWatch({
     name: "residentes",
@@ -54,51 +67,60 @@ export const Form: React.FC<FormProps> = ({ cpf, senha }) => {
   useEffect(() => {
     if (
       tipoDocumento &&
-      formState.touchedFields.residentes?.some((residente) => residente?.tipoDocumento)
+      formState.touchedFields.residentes?.some(
+        (residente) => residente?.tipoDocumento
+      )
     ) {
       trigger("residentes");
     }
   }, [tipoDocumento, trigger, formState.touchedFields.residentes]);
 
   // Função para verificar se o apartamento existe
-  const verificarApto = async (condominioId: string, apto: string, bloco: string): Promise<boolean> => {
+  const verificarApto = async (
+    condominioId: string,
+    apto: string,
+    bloco: string
+  ): Promise<boolean> => {
     try {
       const response = await axios.post(`/api/proxy`, {
         action: "verificar_apto",
         payload: {
-          acao: "listar",
           cond_id: condominioId,
+          apto,
+          bloco,
         },
       });
 
-      if (response.status === 200 && response.data.apartamentos) {
-        const aptoExiste = response.data.apartamentos.some(
-          (aptoObj: { apto: string; bloco: string }) => aptoObj.apto === apto && aptoObj.bloco === bloco
-        );
-
-        if (aptoExiste) {
-          return true;
-        } else {
-          setAptoError("Apartamento não encontrado. Verifique as informações e tente novamente.");
-          return false;
-        }
+      if (response.status === 200 && response.data.resposta === "ok") {
+        return true;
       } else {
-        setAptoError("Erro ao verificar o apartamento. Por favor, tente novamente.");
+        setAptoError(
+          response.data.erro ||
+            "Apartamento não encontrado. Verifique as informações e tente novamente."
+        );
         return false;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao verificar apartamento:", error);
-      setAptoError("Erro ao verificar o apartamento. Por favor, tente novamente mais tarde.");
+      setAptoError(
+        error.response?.data?.error ||
+          "Erro ao verificar o apartamento. Por favor, tente novamente mais tarde."
+      );
       return false;
     }
   };
 
   const onSubmit = async (data: Schema) => {
     setLoading(true);
-    console.log('Clicou no botão enviar');
+    console.log("Clicou no botão enviar");
 
-    if (!cpf || !senha) {
-      console.error("CPF ou senha não encontrados no localStorage. O usuário precisa estar autenticado.");
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      console.error(
+        "Token de autenticação não encontrado. O usuário precisa estar autenticado."
+      );
+      router.push("/auth");
       return;
     }
 
@@ -109,7 +131,11 @@ export const Form: React.FC<FormProps> = ({ cpf, senha }) => {
 
     try {
       // Verificar se o apartamento é válido antes de enviar
-      const aptoValido = await verificarApto(data.endereco.condominio, apartamento, bloco);
+      const aptoValido = await verificarApto(
+        data.endereco.condominio,
+        apartamento,
+        bloco
+      );
       if (!aptoValido) {
         setLoading(false);
         return;
@@ -117,37 +143,42 @@ export const Form: React.FC<FormProps> = ({ cpf, senha }) => {
 
       // Prepara os dados para o envio conforme o formato esperado pela API
       const moradorData = {
-        acao: "novo",
-        mor_cond_id: data.endereco.condominio,
-        mor_cond_nome: "Condomínio Teste", // Este campo deve ser adaptado conforme o select
-        mor_apto: apartamento,
-        mor_bloco: bloco,
-        mor_nome: data.residentes[0].nome,
-        mor_parentesco: data.residentes[0].parentesco || "Proprietário(a)",
-        mor_cpf: data.residentes[0].documento,
-        mor_celular01: data.residentes[0].telefone[0] || "",
-        mor_celular02: data.residentes[0].telefone[1] || "",
-        mor_celular03: data.residentes[0].telefone[2] || "",
-        mor_email: data.residentes[0].email,
-        mor_responsavel: "API Teste",
-        mor_obs: data.feedback || "",
-        mor_senhaapp: senha,
+        residentes: data.residentes.map((residente) => ({
+          nome: residente.nome,
+          telefone: residente.telefone,
+          email: residente.email,
+          tipoDocumento: residente.tipoDocumento,
+          documento: residente.documento,
+          parentesco: residente.parentesco || "Proprietário(a)",
+        })),
+        apto: apartamento,
+        bloco: bloco,
+        veiculos: data.veiculos || [],
+        feedback: data.feedback || "",
       };
 
       // Faz a requisição via proxy
-      const response = await axios.post(`/api/proxy`, {
-        action: "novo_morador",
-        data: moradorData,
-      });
+      const response = await axios.post(
+        `/api/proxy`,
+        {
+          action: "novo_morador",
+          payload: moradorData,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Inclui o token no header
+          },
+        }
+      );
 
-      if (response.status === 200 && response.data.resposta === "Morador Cadastrado com Sucesso") {
+      if (response.status === 200 && response.data.resposta === "ok") {
         setRetornoForm(true);
         localStorage.removeItem("formData");
       } else {
         setRetornoForm(false);
-        console.error("Erro ao cadastrar morador:", response.data.resposta);
+        console.error("Erro ao cadastrar morador:", response.data.error);
       }
-    } catch (error) {
+    } catch (error: any) {
       setRetornoForm(false);
       console.error("Erro ao enviar dados:", error);
     } finally {
@@ -159,8 +190,15 @@ export const Form: React.FC<FormProps> = ({ cpf, senha }) => {
   return (
     <Container>
       <FormProvider {...methods}>
-        <form className="flex gap-2 flex-col items-center justify-evenly" >
-          <Grid container spacing={1} sx={{ pb: 4, maxWidth: "100%", m: "auto" }}>
+      <form
+          className="flex gap-2 flex-col items-center justify-evenly"
+          onSubmit={handleSubmit(onSubmit)} 
+        >
+          <Grid
+            container
+            spacing={1}
+            sx={{ pb: 4, maxWidth: "100%", m: "auto" }}
+          >
             <Grid item xs={12}>
               <FormEndereco />
             </Grid>
@@ -186,10 +224,17 @@ export const Form: React.FC<FormProps> = ({ cpf, senha }) => {
             </Grid>
             <Grid item xs={12}>
               <span className="flex justify-center items-center mt-2">
-                {loading ? <CircularProgress /> : <FormRetorno enviado={retornoForm} />}
+                {loading ? (
+                  <CircularProgress />
+                ) : (
+                  <FormRetorno enviado={retornoForm} />
+                )}
               </span>
             </Grid>
-            <Grid item xs={12} sx={{ mt: 3, justifyContent: "space-around", display: "flex" }}>
+            <Grid
+              item
+              xs={12}
+              sx={{ mt: 3, justifyContent: "space-around", display: "flex" }}>
               <Button
                 variant="outlined"
                 onClick={() => {
@@ -202,7 +247,7 @@ export const Form: React.FC<FormProps> = ({ cpf, senha }) => {
               >
                 Limpar
               </Button>
-              <Button type="submit" variant="contained" sx={{ fontSize: "large" }} onClick={()=> onSubmit}>
+              <Button type="submit" variant="contained" sx={{ fontSize: "large" }}>
                 Enviar
               </Button>
             </Grid>

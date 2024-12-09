@@ -12,19 +12,16 @@ export const FormularioLayout = () => {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [cpf, setCpf] = useState<string | null>(null);
-  const [senha, setSenha] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const storedCpf = localStorage.getItem("cpf");
-    const storedSenha = localStorage.getItem("senha");
 
     if (!token) {
       router.push("/auth");
     } else {
       setIsAuthenticated(true); // Usuário autenticado
       setCpf(storedCpf); // Recupera o CPF armazenado
-      setSenha(storedSenha); // Recupera a senha armazenada
     }
   }, [router]);
 
@@ -41,7 +38,7 @@ export const FormularioLayout = () => {
     <>
       <Header />
       <BoasVindas />
-      <Formulario cpf={cpf} senha={senha} />
+      <Formulario cpf={cpf} />
       <FAQ />
       <Footer />
       <BtnToTop />

@@ -4,10 +4,9 @@ import { Form } from "./formulario/page";
 
 interface FormularioProps {
   cpf: string | null;
-  senha: string | null;
 }
 
-const Formulario: React.FC<FormularioProps> = ({ cpf, senha }) => {
+const Formulario: React.FC<FormularioProps> = ({ cpf }) => {
   return (
     <section id="formulario">
       <Container
@@ -26,7 +25,7 @@ const Formulario: React.FC<FormularioProps> = ({ cpf, senha }) => {
             borderRadius: ".7rem",
           }}
         >
-          <Form cpf={cpf} senha={senha} />
+          <Form cpf={cpf} />
         </Box>
       </Container>
     </section>
