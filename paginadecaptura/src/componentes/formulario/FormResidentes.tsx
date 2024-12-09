@@ -70,7 +70,7 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
         };
 
         return (
-          <Grid container spacing={2} key={field.id}>
+          <Grid container spacing={2} key={field.id} sx={{ mt: index > 0 ? 4 : 0 }}>
             <Grid item xs={12} md={6} className="pt-4">
               <TextField
                 {...register(`residentes.${index}.nome` as const)}
@@ -80,30 +80,30 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
                 helperText={errors.residentes?.[index]?.nome?.message}
               />
             </Grid>
-            {index !== 0 && (
-              <Grid item xs={12} md={6}>
-                <Controller
-                  name={`residentes.${index}.parentesco`}
-                  control={control}
-                  rules={{ required: "O campo de parentesco é obrigatório" }}
-                  render={({ field: { value, ...field } }) => (
-                    <Autocomplete
-                      {...field}
-                      options={parentescos}
-                      getOptionLabel={(option) => option.value}
-                      isOptionEqualToValue={(option, value) => option.id === value.id}
-                      onChange={(event, newValue) => {
-                        field.onChange(newValue?.value || "");
-                      }}
-                      renderInput={(params) => <TextField {...params} label="Nível de parentesco" fullWidth />}
-                    />
-                  )}
-                />
-                {errors.residentes?.[index]?.parentesco && (
-                  <p className="text-xs pt-1 text-red-600 pl-4">{errors.residentes?.[index]?.parentesco?.message}</p>
+
+            <Grid item xs={12} md={6}>
+              <Controller
+                name={`residentes.${index}.parentesco`}
+                control={control}
+                rules={{ required: "O campo de parentesco é obrigatório" }}
+                render={({ field: { value, ...field } }) => (
+                  <Autocomplete
+                    {...field}
+                    options={parentescos}
+                    getOptionLabel={(option) => option.value}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    onChange={(event, newValue) => {
+                      field.onChange(newValue?.value || "");
+                    }}
+                    renderInput={(params) => <TextField {...params} label="Nível de parentesco" fullWidth />}
+                  />
                 )}
-              </Grid>
-            )}
+              />
+              {errors.residentes?.[index]?.parentesco && (
+                <p className="text-xs pt-1 text-red-600 pl-4">{errors.residentes?.[index]?.parentesco?.message}</p>
+              )}
+            </Grid>
+      
             <Grid item xs={12} md={6}>
               <TextField
                 {...register(`residentes.${index}.email` as const)}
@@ -113,6 +113,7 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
                 helperText={errors.residentes?.[index]?.email?.message}
               />
             </Grid>
+      
             <Grid item xs={12} md={6}>
               {telefones.map((telefone, phoneIndex) => (
                 <div key={phoneIndex} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
@@ -145,6 +146,7 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
                 </div>
               ))}
             </Grid>
+      
             <Grid item xs={12} md={6}>
               <TextField
                 {...register(`residentes.${index}.documento` as const)}
@@ -159,16 +161,14 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
                 error={!!errors.residentes?.[index]?.documento}
                 helperText={errors.residentes?.[index]?.documento?.message}
                 InputProps={{
-                  readOnly: index === 0, // Somente leitura para o primeiro residente se for CPF
+                  readOnly: index === 0, // Apenas para o primeiro residente
                 }}
               />
               {index === 0 ? (
-                // Se for o primeiro residente, mostra o tipo de documento como CPF fixo
                 <RadioGroup row sx={{ justifyContent: "space-around" }}>
                   <FormControlLabel value="CPF" control={<Radio checked={true} />} label="CPF" />
                 </RadioGroup>
               ) : (
-                // Para outros residentes, permite escolher o tipo de documento
                 <Controller
                   name={`residentes.${index}.tipoDocumento`}
                   control={control}
@@ -186,6 +186,7 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
                 <p className="text-xs pt-1 text-red-600 pl-4">{errors.residentes?.[index]?.tipoDocumento?.message}</p>
               )}
             </Grid>
+      
             {index !== 0 && (
               <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-around" }}>
                 <Button

@@ -149,7 +149,7 @@ export const Form: React.FC<FormProps> = ({ cpf }) => {
           email: residente.email,
           tipoDocumento: residente.tipoDocumento,
           documento: residente.documento,
-          parentesco: residente.parentesco || "Proprietário(a)",
+          parentesco: residente.parentesco,
         })),
         apto: apartamento,
         bloco: bloco,
