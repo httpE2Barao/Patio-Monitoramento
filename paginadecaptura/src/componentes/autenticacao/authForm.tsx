@@ -107,10 +107,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           if (response.data.resposta.includes("já criou a senha de acesso")) {
             setError(response.data.resposta);
           } else {
-            // Armazena CPF e senha no localStorage e redireciona para /form
-            localStorage.setItem("authToken", response.data.token);
-            localStorage.setItem("cpf", data.cpf);
-            localStorage.setItem("senha", data.password);
+            // Enviar a senha para /api/auth para armazená-la
+            await axios.post('/api/auth', {
+              cpf: data.cpf,
+              senha: data.password,
+            });
+            
+            // Redirecionar para /form
             router.push("/form");
           }
         }

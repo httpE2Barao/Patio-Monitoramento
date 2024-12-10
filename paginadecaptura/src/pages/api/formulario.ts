@@ -7,70 +7,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (method !== 'POST') {
     res.setHeader('Allow', ['POST']);
-    return res.status(405).end(`Method ${method} Not Allowed`);
+    return res.status(405).json({ error: `Method ${method} Not Allowed` });
   }
 
   try {
-    const cookieHeader = req.headers.cookie || '';
-    const cookies = parse(cookieHeader);
-    const cpf = cookies.cpf;
-    const moradorId = cookies.morador_id;
-    const condominioId = cookies.condominio_id;
+    // Parse cookies
+    const cookies = parse(req.headers.cookie || '');
+    const { cpf, morador_id: moradorId, condominio_id: condominioId } = cookies;
 
-    if (!cpf || !moradorId || !condominioId) {
+    if (!cpf || !condominioId) {
       return res.status(401).json({ error: 'Usuário não autenticado.' });
     }
 
-    let endpoint = '/';
-    let payload = body.payload;
+    // Determine payload and action
+    const { action, payload } = body;
 
-    switch (body?.action) {
-      case 'listar_moradores':
-        endpoint = '/listar_moradores';
-        payload = {
-          ...payload,
-          cond_id: condominioId,
-        };
-        break;
-      case 'novo_morador':
-        endpoint = '/moradores';
-        payload = {
-          ...payload,
-          cond_id: condominioId,
-        };
-        // Antes de cadastrar o novo morador, garantir que o apartamento exista
-        await ensureApartmentExists(condominioId, payload, req, res);
-        break;
-      case 'editar_morador':
-        endpoint = '/editar_morador';
-        payload = {
-          ...payload,
-          morador_id: moradorId,
-        };
-        break;
-      default:
-        return res.status(400).json({ error: 'Ação inválida' });
+    if (!action || !payload) {
+      return res.status(400).json({ error: 'Ação ou payload ausente.' });
     }
 
-    const url = `${process.env.API_URL}${endpoint}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/${action === 'novo_apto' ? 'apto' : 'moradores'}`;
 
-    const response = await axios({
-      url,
-      method: 'POST',
-      data: payload,
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.API_USERNAME}:${process.env.API_PASSWORD}`
-        ).toString('base64')}`,
-        'Content-Type': 'application/json',
-      },
+    const dataToSend = {
+      acao: action,
+      ...payload,
+    };
+
+    // Check if an apartment needs to be ensured for "novo_morador"
+    if (action === 'novo_morador') {
+      await ensureApartmentExists(condominioId, dataToSend);
+    }
+
+    const response = await axios.post(url, dataToSend, {
+      headers: getApiHeaders(),
     });
 
-    return res.status(response.status).json(response.data);
+    res.status(response.status).json(response.data);
   } catch (error: any) {
     console.error('Erro na API Proxy:', {
       message: error.message,
-      code: error.code,
       response: error.response?.data,
     });
 
@@ -80,72 +55,58 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-async function ensureApartmentExists(condominioId: string, payload: any, req: NextApiRequest, res: NextApiResponse) {
+async function ensureApartmentExists(condominioId: string, payload: any) {
   const { mor_apto, mor_bloco } = payload;
 
-  // Se não foi fornecido apartamento, não há o que checar
   if (!mor_apto) return;
 
-  // Primeiro, verificar se o apto já existe
-  const aptoUrl = `${process.env.API_URL}/apto`;
-
   try {
-    const listarResponse = await axios.post(
-      aptoUrl,
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/moradores`,
       {
-        acao: "listar",
-        cond_id: condominioId
+        acao: 'listar',
+        cond_id: condominioId,
+        mor_apto,
+        mor_bloco: mor_bloco || '',
       },
-      {
-        headers: {
-          Authorization: `Basic ${Buffer.from(`${process.env.API_USERNAME}:${process.env.API_PASSWORD}`).toString('base64')}`,
-          'Content-Type': 'application/json',
-        },
-      }
+      { headers: getApiHeaders() }
     );
 
-    // listarResponse.data provavelmente será um array de apartamentos.
-    // Vamos verificar se o apto/bloco desejado está presente.
-    const apartamentos = Array.isArray(listarResponse.data) ? listarResponse.data : [];
-    const aptoExistente = apartamentos.find((apto: any) => {
-      return apto.apto === mor_apto && apto.bloco === (mor_bloco || "");
-    });
-
-    if (aptoExistente) {
-      // Apartamento já existe, não é necessário criar.
-      return;
-    } else {
-      // Apartamento não encontrado, criar um novo apartamento
+    // If the apartment doesn't exist, create it
+    if (Array.isArray(response.data) && response.data.length === 0) {
       await criarApartamento(condominioId, mor_apto, mor_bloco);
     }
   } catch (error: any) {
-    console.error("Erro ao listar aptos:", error.response?.data || error.message);
-    throw error;
+    console.error('Erro ao verificar existência do apartamento:', error.response?.data || error.message);
+    await criarApartamento(condominioId, mor_apto, mor_bloco);
   }
 }
 
 async function criarApartamento(condominioId: string, apto: string, bloco: string) {
-  const aptoUrl = `${process.env.API_URL}/apto`;
-
   try {
     const response = await axios.post(
-      aptoUrl,
+      `${process.env.NEXT_PUBLIC_API_URL}/apto`,
       {
-        acao: "novo",
+        acao: 'novo',
         cond_id: condominioId,
-        apto: apto,
-        bloco: bloco || ""
+        apto,
+        bloco: bloco || '',
       },
-      {
-        headers: {
-          Authorization: `Basic ${Buffer.from(`${process.env.API_USERNAME}:${process.env.API_PASSWORD}`).toString('base64')}`,
-          'Content-Type': 'application/json',
-        },
-      }
+      { headers: getApiHeaders() }
     );
-    // Se criado com sucesso, ótimo. Caso contrário, será pego pelo catch.
+
+    console.log('Apartamento criado com sucesso:', response.data);
   } catch (error: any) {
-    console.error("Erro ao criar novo apto:", error.response?.data || error.message);
+    console.error('Erro ao criar apartamento:', error.response?.data || error.message);
     throw error;
   }
+}
+
+function getApiHeaders() {
+  return {
+    Authorization: `Basic ${Buffer.from(
+      `${process.env.NEXT_PUBLIC_API_USERNAME}:${process.env.NEXT_PUBLIC_API_PASSWORD}`
+    ).toString('base64')}`,
+    'Content-Type': 'application/json',
+  };
 }

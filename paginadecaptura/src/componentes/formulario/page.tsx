@@ -1,20 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
-  CircularProgress,
   Container,
   Grid,
   Typography
 } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { useState } from "react";
+import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { schema, Schema } from "../schema-zod";
 import { FormEndereco } from "./FormEndereco";
 import { FormFeedback } from "./FormFeedback";
 import { FormResidentes } from "./FormResidentes";
-import { FormRetorno } from "./FormRetorno";
 import { FormVeiculo } from "./FormVeiculo";
 
 interface FormProps {
@@ -24,10 +22,15 @@ interface FormProps {
 export const Form: React.FC<FormProps> = ({ cpf }) => {
   const router = useRouter();
   const methods = useForm<Schema>({
-    mode: "all",
     resolver: zodResolver(schema),
-    defaultValues: {
-      endereco: { condominio: "", apto: "" },
+    defaultValues: { 
+      endereco: { 
+        condominio: {
+          codigoCondominio: "", 
+          nomeCondominio: "" 
+        }, 
+        apto: "" 
+      },
       residentes: [
         {
           nome: "",
@@ -53,152 +56,109 @@ export const Form: React.FC<FormProps> = ({ cpf }) => {
     control: methods.control,
   });
 
-  const [retornoForm, setRetornoForm] = useState<boolean | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
   const [aptoError, setAptoError] = useState<string>("");
 
-  const { reset, trigger, control, formState, setValue, handleSubmit } = methods;
-
-  const tipoDocumento = useWatch({
-    name: "residentes",
-    control,
-  });
-
-  useEffect(() => {
-    if (
-      tipoDocumento &&
-      formState.touchedFields.residentes?.some(
-        (residente) => residente?.tipoDocumento
-      )
-    ) {
-      trigger("residentes");
-    }
-  }, [tipoDocumento, trigger, formState.touchedFields.residentes]);
-
-  // Função para verificar se o apartamento existe
-  const verificarApto = async (
-    condominioId: string,
-    apto: string,
-    bloco: string
-  ): Promise<boolean> => {
-    try {
-      const response = await axios.post(`/api/proxy`, {
-        action: "verificar_apto",
-        payload: {
-          cond_id: condominioId,
-          apto,
-          bloco,
-        },
-      });
-
-      if (response.status === 200 && response.data.resposta === "ok") {
-        return true;
-      } else {
-        setAptoError(
-          response.data.erro ||
-            "Apartamento não encontrado. Verifique as informações e tente novamente."
-        );
-        return false;
-      }
-    } catch (error: any) {
-      console.error("Erro ao verificar apartamento:", error);
-      setAptoError(
-        error.response?.data?.error ||
-          "Erro ao verificar o apartamento. Por favor, tente novamente mais tarde."
-      );
-      return false;
-    }
-  };
+  const { reset, handleSubmit } = methods;
 
   const onSubmit = async (data: Schema) => {
     setLoading(true);
-    console.log("Clicou no botão enviar");
-
-    const token = localStorage.getItem("authToken");
-
-    if (!token) {
-      console.error(
-        "Token de autenticação não encontrado. O usuário precisa estar autenticado."
-      );
-      router.push("/auth");
-      return;
-    }
-
-    // Separar o apartamento e o bloco da string fornecida
-    const [apartamento, bloco = ""] = data.endereco.apto.trim().split(" ");
-
-    setAptoError(""); // Limpar erro anterior de apartamento
-
+  
     try {
-      // Verificar se o apartamento é válido antes de enviar
-      const aptoValido = await verificarApto(
-        data.endereco.condominio,
-        apartamento,
-        bloco
-      );
-      if (!aptoValido) {
-        setLoading(false);
-        return;
+      const [apartamento, bloco = ""] = data.endereco.apto.trim().split(" ");
+      const condominioId = data.endereco.condominio.codigoCondominio;
+
+      console.log("Verificando se o cliente já existe via proxy...");
+      const { data: moradoresResponse } = await axios.post(`/api/proxy`, {
+        action: "listar_moradores",
+        payload: {
+          mor_cond_id: condominioId,
+          mor_apto: apartamento || "",
+          mor_bloco: bloco || "",
+        },
+      });
+
+      if (moradoresResponse?.Moradores?.length > 0) {
+        console.log("Cliente encontrado:", moradoresResponse.Moradores[0]);
+
+        const cliente = moradoresResponse.Moradores[0];
+
+        // Atualizar formulário com os dados do cliente
+        reset({
+          endereco: {
+            condominio: {
+              codigoCondominio: cliente.idCondominio,
+              nomeCondominio: cliente.nomeCondominio,
+            },
+            apto: cliente.idCasaApto,
+          },
+          residentes: [
+            {
+              nome: cliente.nomeMorador,
+              telefone: [cliente.celular],
+              email: cliente.eMail,
+              tipoDocumento: "RG",
+              documento: cliente.rg,
+              parentesco: cliente.cargoCasa || "Proprietário(a)",
+            },
+          ],
+          veiculos: [], // Preencha se necessário
+          feedback: "",
+        });
+
+        // Adicionar senha ao payload
+        data.residentes[0].documento = cliente.rg;
+        data.residentes[0].telefone[0] = cliente.celular;
+        data.feedback = `Senha recuperada: ${cliente.senhWeb}`;
       }
 
-      // Prepara os dados para o envio conforme o formato esperado pela API
-      const moradorData = {
-        residentes: data.residentes.map((residente) => ({
-          nome: residente.nome,
-          telefone: residente.telefone,
-          email: residente.email,
-          tipoDocumento: residente.tipoDocumento,
-          documento: residente.documento,
-          parentesco: residente.parentesco,
-        })),
-        apto: apartamento,
-        bloco: bloco,
-        veiculos: data.veiculos || [],
-        feedback: data.feedback || "",
+      console.log("Cliente verificado ou atualizado com sucesso.");
+      
+      // Continue o fluxo para salvar ou atualizar o cliente
+      const moradorPayload = {
+        mor_cond_id: condominioId,
+        mor_cond_nome: data.endereco.condominio.nomeCondominio,
+        mor_apto: apartamento,
+        mor_bloco: bloco || "",
+        mor_nome: data.residentes[0].nome,
+        mor_parentesco: data.residentes[0].parentesco || "Outros",
+        mor_cpf: data.residentes[0].documento,
+        mor_celular01: data.residentes[0].telefone[0],
+        mor_celular02: data.residentes[0].telefone[1] || "",
+        mor_celular03: data.residentes[0].telefone[2] || "",
+        mor_email: data.residentes[0].email,
+        mor_responsavel: "Formulário de Cadastro",
+        mor_obs: data.feedback || "",
       };
 
-      // Faz a requisição via proxy
-      const response = await axios.post(
-        `/api/proxy`,
-        {
-          action: "novo_morador",
-          payload: moradorData,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Inclui o token no header
-          },
-        }
-      );
+      console.log("Enviando dados do morador via proxy...");
+      const moradorResponse = await axios.post(`/api/proxy`, {
+        action: "novo_morador",
+        payload: moradorPayload,
+      });
 
-      if (response.status === 200 && response.data.resposta === "ok") {
-        setRetornoForm(true);
-        localStorage.removeItem("formData");
+      if (moradorResponse.data.resposta?.includes("Sucesso")) {
+        alert("Processo concluído com sucesso!");
       } else {
-        setRetornoForm(false);
-        console.error("Erro ao cadastrar morador:", response.data.error);
+        console.error("Erro ao processar morador:", moradorResponse.data.error);
+        alert("Erro ao processar o morador.");
       }
-    } catch (error: any) {
-      setRetornoForm(false);
-      console.error("Erro ao enviar dados:", error);
+    } catch (error) {
+      console.error("Erro no fluxo:", error);
+      alert("Erro no processo. Tente novamente.");
     } finally {
       setLoading(false);
-      reset();
     }
   };
 
   return (
     <Container>
       <FormProvider {...methods}>
-      <form
-          className="flex gap-2 flex-col items-center justify-evenly"
-          onSubmit={handleSubmit(onSubmit)} 
+        <form
+          className="flex gap-2 flex-col items-center justify-evenly pb-4"
+          onSubmit={handleSubmit(onSubmit)}
         >
-          <Grid
-            container
-            spacing={1}
-            sx={{ pb: 4, maxWidth: "100%", m: "auto" }}
-          >
+          <Grid container spacing={1}>
             <Grid item xs={12}>
               <FormEndereco />
             </Grid>
@@ -223,31 +183,7 @@ export const Form: React.FC<FormProps> = ({ cpf }) => {
               <FormFeedback />
             </Grid>
             <Grid item xs={12}>
-              <span className="flex justify-center items-center mt-2">
-                {loading ? (
-                  <CircularProgress />
-                ) : (
-                  <FormRetorno enviado={retornoForm} />
-                )}
-              </span>
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              sx={{ mt: 3, justifyContent: "space-around", display: "flex" }}>
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  reset();
-                  setRetornoForm(undefined);
-                  setAptoError("");
-                  localStorage.removeItem("formData");
-                }}
-                sx={{ ml: 2, fontSize: "large" }}
-              >
-                Limpar
-              </Button>
-              <Button type="submit" variant="contained" sx={{ fontSize: "large" }}>
+              <Button type="submit" variant="contained">
                 Enviar
               </Button>
             </Grid>

@@ -1,5 +1,4 @@
 import {
-  FormHelperText,
   Grid,
   TextField
 } from "@mui/material";
@@ -56,17 +55,14 @@ export const FormEndereco: React.FC = () => {
           />
         </Grid>
         <Grid item xs={12} md={6}>
-          <TextField
-            {...register(`endereco.apto` as const)}
-            label="Apartamento e Bloco"
-            placeholder="Exemplo: 55 B1"
-            fullWidth
-            error={!!errors.endereco?.apto}
-            helperText={errors.endereco?.apto?.message}
-          />
-          {!errors.endereco?.apto && (
-            <FormHelperText>Digite o bloco em seguida do apartamento se existir.</FormHelperText>
-          )}
+        <TextField
+          {...register("endereco.apto")} 
+          label="Apartamento e Bloco"
+          placeholder="Exemplo: 55 B1"
+          fullWidth
+          error={!!errors.endereco?.apto}
+          helperText={errors.endereco?.apto?.message || "Digite o bloco em seguida do apartamento se existir."}
+        />
         </Grid>
       </Grid>
     </Grid>

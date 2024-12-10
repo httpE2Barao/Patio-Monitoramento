@@ -69,7 +69,6 @@ export const LoginSignup: React.FC = () => {
     }
   };
   
-
   return (
     <div className="flex flex-col-reverse md:flex-row md:h-screen relative">
       <div className="w-full md:w-1/2 md:relative md:my-auto max-w-[1300px] order-2 md:order-none">

@@ -15,13 +15,11 @@ export const FormularioLayout = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    const storedCpf = localStorage.getItem("cpf");
 
     if (!token) {
       router.push("/auth");
     } else {
       setIsAuthenticated(true); // Usuário autenticado
-      setCpf(storedCpf); // Recupera o CPF armazenado
     }
   }, [router]);
 

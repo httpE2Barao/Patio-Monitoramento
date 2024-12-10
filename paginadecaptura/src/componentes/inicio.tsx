@@ -23,7 +23,7 @@ const BoasVindas = () => {
                 maxWidth: {
                     xs: "70em",
                     sm: "70em",
-                    // lg: "80vw",
+                    lg: "80vw",
                     xl: "1000px",
                 },
                 Height: {
