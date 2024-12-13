@@ -38,12 +38,11 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
       .catch(err => console.error("Erro ao carregar os parentescos:", err));
   }, []);
 
-  // Forçar sincronização automática dos telefones após carregar valores
   useEffect(() => {
     fields.forEach((field, index) => {
       const currentTelefones = getValues(`residentes.${index}.telefone`);
       if (!currentTelefones || currentTelefones.length === 0) {
-        setValue(`residentes.${index}.telefone`, [""]); // Inicializa com uma lista vazia
+        setValue(`residentes.${index}.telefone`, [""]); 
       } else {
         setValue(`residentes.${index}.telefone`, currentTelefones); // Garante que telefones não estejam "em branco"
       }

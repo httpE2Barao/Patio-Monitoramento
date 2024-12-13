@@ -1,5 +1,6 @@
 "use client";
 import axios from "axios";
+import CryptoJS from "crypto-js";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -12,10 +13,9 @@ export const LoginSignup: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    // Verifica se o usuário já está autenticado
     const token = localStorage.getItem("authToken");
     if (token) {
-      router.push("/form"); // Redireciona se o token existir
+      router.push("/form");
     }
   }, [router]);
 
@@ -27,48 +27,54 @@ export const LoginSignup: React.FC = () => {
   const handleSubmit = async (data: any) => {
     setError("");
     setLoading(true);
-  
     const { cpf, password } = data;
-  
+
     try {
       const action = isSignup ? "signup" : "login";
-      const payload = { action, payload: { cpf, senha: password } };
-  
-      // Enviando a requisição para criar senha ou login usando o proxy
-      const response = await axios.post("/api/proxy", payload);
 
-      // Verificando a resposta da API
+      // Criptografa CPF e senha
+      const encryptedCPF = CryptoJS.AES.encrypt(cpf, "chave-de-seguranca").toString();
+      const encryptedPassword = CryptoJS.AES.encrypt(password, "chave-de-seguranca").toString();
+
+      // Armazena os valores criptografados
+      localStorage.setItem("encryptedCPF", encryptedCPF);
+      localStorage.setItem("encryptedPassword", encryptedPassword);
+
+      // Monta o payload para o backend
+      const payload = {
+        action,
+        payload: {
+          cpf,   // Necessário caso o backend exija o CPF em texto puro para login
+          senha: password,
+        },
+      };
+
+      console.log("Enviando payload:", payload);
+
+      // Chamada de API
+      const response = await axios.post("/api/proxy", payload);
+      console.log("Resposta da API:", response.data);
+
       if (response.data && response.data.resposta === "ok") {
-        localStorage.setItem("cpf", cpf);
-        localStorage.setItem("authToken", response.data.token); // Salva o token no localStorage
-        router.push("/form"); // Redireciona após o login bem-sucedido
+        localStorage.setItem("authToken", response.data.token);
+        router.push("/form");
       } else {
-        setError(
-          response.data.resposta ||
-          "Credenciais inválidas ou usuário não encontrado."
-        );
+        setError(response.data.resposta || "Credenciais inválidas.");
       }
     } catch (err: any) {
       if (err.response) {
-        console.error("Erro na API:", {
-          status: err.response.status,
-          data: err.response.data,
-        });
-        setError(
-          err.response.data.error || "Erro no servidor. Tente novamente mais tarde."
-        );
+        setError(err.response.data.error || "Erro no servidor.");
       } else if (err.request) {
-        console.error("Nenhuma resposta da API:", err.request);
-        setError("Sem resposta do servidor. Verifique sua conexão.");
+        setError("Sem resposta do servidor.");
       } else {
-        console.error("Erro ao configurar a requisição:", err.message);
-        setError("Erro desconhecido. Tente novamente mais tarde.");
+        setError("Erro desconhecido.");
       }
+      console.error("Erro:", err);
     } finally {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="flex flex-col-reverse md:flex-row md:h-screen relative">
       <div className="w-full md:w-1/2 md:relative md:my-auto max-w-[1300px] order-2 md:order-none">

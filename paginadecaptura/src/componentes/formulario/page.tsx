@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { schema, Schema } from "../schema-zod";
 import { FormEndereco } from "./FormEndereco";
@@ -58,17 +58,46 @@ export const Form: React.FC<FormProps> = ({ cpf }) => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [aptoError, setAptoError] = useState<string>("");
-
   const { reset, handleSubmit } = methods;
+  const [decryptedPassword, setDecryptedPassword] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Recuperar e descriptografar a senha do localStorage
+    const encryptedPassword = localStorage.getItem("encryptedPassword");
+    if (encryptedPassword) {
+      try {
+        const bytes = CryptoJS.AES.decrypt(encryptedPassword, "chave-de-seguranca");
+        const originalPassword = bytes.toString(CryptoJS.enc.Utf8);
+        setDecryptedPassword(originalPassword);
+        console.log("Senha descriptografada:", originalPassword);
+      } catch (err) {
+        console.error("Erro ao descriptografar a senha:", err);
+      }
+    }
+  }, [decryptedPassword]);
 
   const onSubmit = async (data: Schema) => {
     setLoading(true);
-  
     try {
+      console.log("Dados do formulário enviados para onSubmit:", data);
+
       const [apartamento, bloco = ""] = data.endereco.apto.trim().split(" ");
       const condominioId = data.endereco.condominio.codigoCondominio;
 
-      console.log("Verificando se o cliente já existe via proxy...");
+      // Recuperar a senha criptografada e descriptografar
+      let originalPassword = "";
+      const encryptedPassword = localStorage.getItem("encryptedPassword");
+      if (encryptedPassword) {
+        try {
+          const bytes = CryptoJS.AES.decrypt(encryptedPassword, "chave-de-seguranca");
+          originalPassword = bytes.toString(CryptoJS.enc.Utf8);
+          console.log("Senha descriptografada (para payload):", originalPassword);
+        } catch (err) {
+          console.error("Erro ao descriptografar a senha:", err);
+        }
+      }
+
+      console.log("Chamando a API listar_moradores...");
       const { data: moradoresResponse } = await axios.post(`/api/proxy`, {
         action: "listar_moradores",
         payload: {
@@ -77,13 +106,11 @@ export const Form: React.FC<FormProps> = ({ cpf }) => {
           mor_bloco: bloco || "",
         },
       });
+      console.log("Resposta da API listar_moradores:", moradoresResponse);
 
       if (moradoresResponse?.Moradores?.length > 0) {
-        console.log("Cliente encontrado:", moradoresResponse.Moradores[0]);
-
         const cliente = moradoresResponse.Moradores[0];
-
-        // Atualizar formulário com os dados do cliente
+        console.log("Cliente encontrado:", cliente);
         reset({
           endereco: {
             condominio: {
@@ -97,29 +124,25 @@ export const Form: React.FC<FormProps> = ({ cpf }) => {
               nome: cliente.nomeMorador,
               telefone: [cliente.celular],
               email: cliente.eMail,
-              tipoDocumento: "RG",
+              tipoDocumento: cliente.tipoDocumento || "CPF",
               documento: cliente.rg,
-              parentesco: cliente.cargoCasa || "Proprietário(a)",
+              parentesco: cliente.cargoCasa || "Outros",
             },
           ],
-          veiculos: [], // Preencha se necessário
+          veiculos: [],
           feedback: "",
         });
-
-        // Adicionar senha ao payload
         data.residentes[0].documento = cliente.rg;
         data.residentes[0].telefone[0] = cliente.celular;
         data.feedback = `Senha recuperada: ${cliente.senhWeb}`;
       }
 
-      console.log("Cliente verificado ou atualizado com sucesso.");
-      
-      // Continue o fluxo para salvar ou atualizar o cliente
+      console.log("Preparando payload para envio do morador...");
       const moradorPayload = {
         mor_cond_id: condominioId,
         mor_cond_nome: data.endereco.condominio.nomeCondominio,
         mor_apto: apartamento,
-        mor_bloco: bloco || "",
+        mor_bloco: bloco,
         mor_nome: data.residentes[0].nome,
         mor_parentesco: data.residentes[0].parentesco || "Outros",
         mor_cpf: data.residentes[0].documento,
@@ -129,13 +152,17 @@ export const Form: React.FC<FormProps> = ({ cpf }) => {
         mor_email: data.residentes[0].email,
         mor_responsavel: "Formulário de Cadastro",
         mor_obs: data.feedback || "",
+        mor_senhaapp: originalPassword,
       };
 
-      console.log("Enviando dados do morador via proxy...");
+      console.log("Payload do morador:", moradorPayload);
+
+      console.log("Chamando a API novo_morador...");
       const moradorResponse = await axios.post(`/api/proxy`, {
         action: "novo_morador",
         payload: moradorPayload,
       });
+      console.log("Resposta da API novo_morador:", moradorResponse.data);
 
       if (moradorResponse.data.resposta?.includes("Sucesso")) {
         alert("Processo concluído com sucesso!");
@@ -148,8 +175,9 @@ export const Form: React.FC<FormProps> = ({ cpf }) => {
       alert("Erro no processo. Tente novamente.");
     } finally {
       setLoading(false);
+      console.log("Processo concluído.");
     }
-  };
+  };  
 
   return (
     <Container>
