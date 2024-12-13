@@ -9,7 +9,7 @@ export interface FormNumberProps {
 }
 
 export const FormResidentes: React.FC<FormNumberProps> = () => {
-  const { control, register, formState: { errors }, setValue, getValues } = useFormContext<Schema>();
+  const { control, register, formState: { errors }, setValue, getValues, watch } = useFormContext<Schema>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "residentes"
@@ -17,6 +17,9 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
 
   const [parentescos, setParentescos] = useState<{ id: number, value: string }[]>([]);
   const [cpfFromStorage, setCpfFromStorage] = useState<string | null>(null);
+
+  // Assistindo alterações nos residentes para garantir sincronia dos valores
+  const residentes = watch("residentes");
 
   useEffect(() => {
     // Buscar o CPF do localStorage
@@ -35,14 +38,17 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
       .catch(err => console.error("Erro ao carregar os parentescos:", err));
   }, []);
 
+  // Forçar sincronização automática dos telefones após carregar valores
   useEffect(() => {
     fields.forEach((field, index) => {
       const currentTelefones = getValues(`residentes.${index}.telefone`);
       if (!currentTelefones || currentTelefones.length === 0) {
-        setValue(`residentes.${index}.telefone`, [""]);
+        setValue(`residentes.${index}.telefone`, [""]); // Inicializa com uma lista vazia
+      } else {
+        setValue(`residentes.${index}.telefone`, currentTelefones); // Garante que telefones não estejam "em branco"
       }
     });
-  }, [fields, getValues, setValue]);
+  }, [fields, residentes, getValues, setValue]);
 
   return (
     <>
@@ -103,7 +109,7 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
                 <p className="text-xs pt-1 text-red-600 pl-4">{errors.residentes?.[index]?.parentesco?.message}</p>
               )}
             </Grid>
-      
+
             <Grid item xs={12} md={6}>
               <TextField
                 {...register(`residentes.${index}.email` as const)}
@@ -113,7 +119,7 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
                 helperText={errors.residentes?.[index]?.email?.message}
               />
             </Grid>
-      
+
             <Grid item xs={12} md={6}>
               {telefones.map((telefone, phoneIndex) => (
                 <div key={phoneIndex} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
@@ -146,7 +152,7 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
                 </div>
               ))}
             </Grid>
-      
+
             <Grid item xs={12} md={6}>
               <TextField
                 {...register(`residentes.${index}.documento` as const)}
@@ -186,7 +192,7 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
                 <p className="text-xs pt-1 text-red-600 pl-4">{errors.residentes?.[index]?.tipoDocumento?.message}</p>
               )}
             </Grid>
-      
+
             {index !== 0 && (
               <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-around" }}>
                 <Button
