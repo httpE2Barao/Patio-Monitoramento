@@ -42,6 +42,11 @@
     width: 50vw;
   }
 }
+@media screen and (max-height: 500px) {
+  .img-auth {
+    display: none;
+  }
+}
 
 .container-start-box > h1 {
   max-width: 90vw;

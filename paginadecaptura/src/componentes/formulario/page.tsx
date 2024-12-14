@@ -6,6 +6,7 @@ import {
   Typography
 } from "@mui/material";
 import axios from "axios";
+import CryptoJS from "crypto-js";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
@@ -15,11 +16,7 @@ import { FormFeedback } from "./FormFeedback";
 import { FormResidentes } from "./FormResidentes";
 import { FormVeiculo } from "./FormVeiculo";
 
-interface FormProps {
-  cpf: string | null;
-}
-
-export const Form: React.FC<FormProps> = ({ cpf }) => {
+export const Form: React.FC = () => {
   const router = useRouter();
   const methods = useForm<Schema>({
     resolver: zodResolver(schema),
@@ -37,7 +34,7 @@ export const Form: React.FC<FormProps> = ({ cpf }) => {
           telefone: [""],
           email: "",
           tipoDocumento: "CPF",
-          documento: cpf || "",
+          documento: "",
           parentesco: "",
         },
       ],
@@ -58,12 +55,13 @@ export const Form: React.FC<FormProps> = ({ cpf }) => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [aptoError, setAptoError] = useState<string>("");
-  const { reset, handleSubmit } = methods;
+  const { reset, handleSubmit, setValue } = methods;
   const [decryptedPassword, setDecryptedPassword] = useState<string | null>(null);
 
   useEffect(() => {
-    // Recuperar e descriptografar a senha do localStorage
     const encryptedPassword = localStorage.getItem("encryptedPassword");
+    const encryptedCPF = localStorage.getItem("encryptedCPF");
+
     if (encryptedPassword) {
       try {
         const bytes = CryptoJS.AES.decrypt(encryptedPassword, "chave-de-seguranca");
@@ -74,7 +72,20 @@ export const Form: React.FC<FormProps> = ({ cpf }) => {
         console.error("Erro ao descriptografar a senha:", err);
       }
     }
-  }, [decryptedPassword]);
+
+    if (encryptedCPF) {
+      try {
+        const bytes = CryptoJS.AES.decrypt(encryptedCPF, "chave-de-seguranca");
+        const originalCPF = bytes.toString(CryptoJS.enc.Utf8);
+        console.log("CPF descriptografado:", originalCPF);
+
+        // Preencher o campo "documento" do primeiro residente
+        setValue("residentes.0.documento", originalCPF);
+      } catch (err) {
+        console.error("Erro ao descriptografar o CPF:", err);
+      }
+    }
+  }, [setValue]);
 
   const onSubmit = async (data: Schema) => {
     setLoading(true);

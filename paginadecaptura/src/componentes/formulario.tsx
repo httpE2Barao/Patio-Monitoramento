@@ -25,7 +25,7 @@ const Formulario: React.FC<FormularioProps> = ({ cpf }) => {
             borderRadius: ".7rem",
           }}
         >
-          <Form cpf={cpf} />
+          <Form />
         </Box>
       </Container>
     </section>

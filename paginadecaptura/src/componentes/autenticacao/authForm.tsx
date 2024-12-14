@@ -86,7 +86,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   const [isProcessingSignup, setIsProcessingSignup] = useState<boolean>(false);
 
   const onSubmit = async (data: FieldValues) => {
-    setError(""); // Limpar o erro anterior
+    setError(""); 
 
     if (isSignup) {
       if (data.password !== data.confirmPassword) {
