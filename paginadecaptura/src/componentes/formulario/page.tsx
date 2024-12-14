@@ -174,7 +174,7 @@ export const Form: React.FC = () => {
         const { data: listarMoradoresResponse } = await axios.post("/api/proxy", {
           action: "listar_moradores",
           payload: {
-            acao: "listar", // Define a ação explicitamente
+            acao: "listar",
             mor_cond_id: condominioId,
             mor_apto: apartamento,
             mor_bloco: bloco,
