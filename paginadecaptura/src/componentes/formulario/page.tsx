@@ -1,10 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Button,
-  Container,
-  Grid,
-  Typography
-} from "@mui/material";
+import { Button, Container, Grid, Typography } from "@mui/material";
 import axios from "axios";
 import CryptoJS from "crypto-js";
 import { useRouter } from "next/navigation";
@@ -18,15 +13,15 @@ import { FormVeiculo } from "./FormVeiculo";
 
 export const Form: React.FC = () => {
   const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [aptoError, setAptoError] = useState<string>("");
+
   const methods = useForm<Schema>({
     resolver: zodResolver(schema),
-    defaultValues: { 
-      endereco: { 
-        condominio: {
-          codigoCondominio: "", 
-          nomeCondominio: "" 
-        }, 
-        apto: "" 
+    defaultValues: {
+      endereco: {
+        condominio: { codigoCondominio: "", nomeCondominio: "" },
+        apto: "",
       },
       residentes: [
         {
@@ -53,14 +48,23 @@ export const Form: React.FC = () => {
     control: methods.control,
   });
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const [aptoError, setAptoError] = useState<string>("");
-  const { reset, handleSubmit, setValue } = methods;
-  const [decryptedPassword, setDecryptedPassword] = useState<string | null>(null);
+  const { handleSubmit, setValue } = methods;
+  const [decryptedPassword, setDecryptedPassword] = useState<string>("");
 
   useEffect(() => {
-    const encryptedPassword = localStorage.getItem("encryptedPassword");
     const encryptedCPF = localStorage.getItem("encryptedCPF");
+    const encryptedPassword = localStorage.getItem("encryptedPassword");
+
+    if (encryptedCPF) {
+      try {
+        const bytes = CryptoJS.AES.decrypt(encryptedCPF, "chave-de-seguranca");
+        const originalCPF = bytes.toString(CryptoJS.enc.Utf8);
+        setValue("residentes.0.documento", originalCPF);
+        console.log("CPF descriptografado:", originalCPF);
+      } catch (err) {
+        console.error("Erro ao descriptografar o CPF:", err);
+      }
+    }
 
     if (encryptedPassword) {
       try {
@@ -72,84 +76,71 @@ export const Form: React.FC = () => {
         console.error("Erro ao descriptografar a senha:", err);
       }
     }
-
-    if (encryptedCPF) {
-      try {
-        const bytes = CryptoJS.AES.decrypt(encryptedCPF, "chave-de-seguranca");
-        const originalCPF = bytes.toString(CryptoJS.enc.Utf8);
-        console.log("CPF descriptografado:", originalCPF);
-
-        // Preencher o campo "documento" do primeiro residente
-        setValue("residentes.0.documento", originalCPF);
-      } catch (err) {
-        console.error("Erro ao descriptografar o CPF:", err);
-      }
-    }
   }, [setValue]);
 
+  const verificarOuCriarApartamento = async (condominioId: string, apartamento: string, bloco: string) => {
+    try {
+      console.log("Verificando apartamento na API...");
+  
+      const { data: verificarAptoResponse } = await axios.post("/api/proxy", {
+        action: "verificar_apto",
+        payload: {
+          acao: "listar", // Define a ação explicitamente
+          cond_id: condominioId,
+          apto: apartamento,
+          bloco: bloco,
+        },
+      });
+  
+      console.log("Resposta da API verificar_apto:", verificarAptoResponse);
+  
+      if (verificarAptoResponse?.resposta === "Apartamento não encontrado") {
+        console.log("Apartamento não encontrado. Criando um novo...");
+  
+        const { data: criarAptoResponse } = await axios.post("/api/proxy", {
+          action: "criar_apartamento",
+          payload: {
+            acao: "novo", // Define a ação explicitamente
+            cond_id: condominioId,
+            apto: apartamento,
+            bloco: bloco,
+          },
+        });
+  
+        console.log("Resposta da API criar_apartamento:", criarAptoResponse);
+  
+        if (criarAptoResponse?.resposta?.includes("Sucesso")) {
+          console.log("Apartamento criado com sucesso.");
+          return true;
+        } else if (criarAptoResponse?.resposta?.includes("Erro! Esse apto já esta cadastrado")) {
+          console.log("Apartamento já cadastrado. Continuando o processo...");
+          return true;
+        } else {
+          throw new Error("Erro ao criar apartamento. Verifique os dados e tente novamente.");
+        }
+      }
+  
+      console.log("Apartamento já existe. Continuando...");
+      return true;
+    } catch (error) {
+      console.error("Erro ao verificar ou criar apartamento:", error);
+      throw error;
+    }
+  };
+  
   const onSubmit = async (data: Schema) => {
     setLoading(true);
     try {
       console.log("Dados do formulário enviados para onSubmit:", data);
-
+  
       const [apartamento, bloco = ""] = data.endereco.apto.trim().split(" ");
       const condominioId = data.endereco.condominio.codigoCondominio;
-
-      // Recuperar a senha criptografada e descriptografar
-      let originalPassword = "";
-      const encryptedPassword = localStorage.getItem("encryptedPassword");
-      if (encryptedPassword) {
-        try {
-          const bytes = CryptoJS.AES.decrypt(encryptedPassword, "chave-de-seguranca");
-          originalPassword = bytes.toString(CryptoJS.enc.Utf8);
-          console.log("Senha descriptografada (para payload):", originalPassword);
-        } catch (err) {
-          console.error("Erro ao descriptografar a senha:", err);
-        }
-      }
-
-      console.log("Chamando a API listar_moradores...");
-      const { data: moradoresResponse } = await axios.post(`/api/proxy`, {
-        action: "listar_moradores",
-        payload: {
-          mor_cond_id: condominioId,
-          mor_apto: apartamento || "",
-          mor_bloco: bloco || "",
-        },
-      });
-      console.log("Resposta da API listar_moradores:", moradoresResponse);
-
-      if (moradoresResponse?.Moradores?.length > 0) {
-        const cliente = moradoresResponse.Moradores[0];
-        console.log("Cliente encontrado:", cliente);
-        reset({
-          endereco: {
-            condominio: {
-              codigoCondominio: cliente.idCondominio,
-              nomeCondominio: cliente.nomeCondominio,
-            },
-            apto: cliente.idCasaApto,
-          },
-          residentes: [
-            {
-              nome: cliente.nomeMorador,
-              telefone: [cliente.celular],
-              email: cliente.eMail,
-              tipoDocumento: cliente.tipoDocumento || "CPF",
-              documento: cliente.rg,
-              parentesco: cliente.cargoCasa || "Outros",
-            },
-          ],
-          veiculos: [],
-          feedback: "",
-        });
-        data.residentes[0].documento = cliente.rg;
-        data.residentes[0].telefone[0] = cliente.celular;
-        data.feedback = `Senha recuperada: ${cliente.senhWeb}`;
-      }
-
-      console.log("Preparando payload para envio do morador...");
-      const moradorPayload = {
+  
+      // Verifica e cria o apartamento, se necessário
+      await verificarOuCriarApartamento(condominioId, apartamento, bloco);
+  
+      const payloadMorador = {
+        acao: "novo", // Define a ação explicitamente
         mor_cond_id: condominioId,
         mor_cond_nome: data.endereco.condominio.nomeCondominio,
         mor_apto: apartamento,
@@ -163,23 +154,71 @@ export const Form: React.FC = () => {
         mor_email: data.residentes[0].email,
         mor_responsavel: "Formulário de Cadastro",
         mor_obs: data.feedback || "",
-        mor_senhaapp: originalPassword,
+        mor_senhaapp: decryptedPassword,
       };
-
-      console.log("Payload do morador:", moradorPayload);
-
-      console.log("Chamando a API novo_morador...");
-      const moradorResponse = await axios.post(`/api/proxy`, {
+  
+      console.log("Payload do morador:", payloadMorador);
+  
+      // Tentar cadastrar o morador
+      const { data: novoMoradorResponse } = await axios.post("/api/proxy", {
         action: "novo_morador",
-        payload: moradorPayload,
+        payload: payloadMorador,
       });
-      console.log("Resposta da API novo_morador:", moradorResponse.data);
-
-      if (moradorResponse.data.resposta?.includes("Sucesso")) {
-        alert("Processo concluído com sucesso!");
+  
+      console.log("Resposta da API novo_morador:", novoMoradorResponse);
+  
+      if (novoMoradorResponse.resposta?.includes("Erro ! O CPF Informado já está cadastrado")) {
+        console.log("CPF já cadastrado, refazendo chamada com 'editar_morador'...");
+  
+        // Tentar listar os moradores para encontrar o ID
+        const { data: listarMoradoresResponse } = await axios.post("/api/proxy", {
+          action: "listar_moradores",
+          payload: {
+            acao: "listar", // Define a ação explicitamente
+            mor_cond_id: condominioId,
+            mor_apto: apartamento,
+            mor_bloco: bloco,
+          },
+        });
+  
+        console.log("Resposta da API listar_moradores:", listarMoradoresResponse);
+  
+        if (listarMoradoresResponse.Moradores?.length > 0) {
+          const moradorExistente = listarMoradoresResponse.Moradores.find(
+            (morador: any) => morador.rg === data.residentes[0].documento
+          );
+  
+          if (!moradorExistente) {
+            throw new Error("Erro ao localizar morador existente para edição.");
+          }
+  
+          // Atualiza o payload com o ID do morador
+          const editarPayload = {
+            ...payloadMorador,
+            acao: "editar", // Atualiza a ação para edição
+            mor_id: moradorExistente.idregistro,
+          };
+  
+          const { data: editarMoradorResponse } = await axios.post("/api/proxy", {
+            action: "editar_morador",
+            payload: editarPayload,
+          });
+  
+          console.log("Resposta da API editar_morador:", editarMoradorResponse);
+  
+          if (editarMoradorResponse.resposta?.includes("Sucesso")) {
+            alert("Morador atualizado com sucesso!");
+          } else {
+            alert(`Erro ao atualizar morador: ${editarMoradorResponse.resposta}`);
+          }
+        } else {
+          console.error("Nenhum morador encontrado na listagem.");
+          throw new Error("Erro ao localizar morador existente para edição.");
+        }
+      } else if (novoMoradorResponse.resposta?.includes("Sucesso")) {
+        alert("Cadastro enviado com sucesso!");
       } else {
-        console.error("Erro ao processar morador:", moradorResponse.data.error);
-        alert("Erro ao processar o morador.");
+        alert(`Erro ao cadastrar morador: ${novoMoradorResponse.resposta}`);
       }
     } catch (error) {
       console.error("Erro no fluxo:", error);
@@ -188,7 +227,7 @@ export const Form: React.FC = () => {
       setLoading(false);
       console.log("Processo concluído.");
     }
-  };  
+  };   
 
   return (
     <Container>
@@ -222,8 +261,8 @@ export const Form: React.FC = () => {
               <FormFeedback />
             </Grid>
             <Grid item xs={12}>
-              <Button type="submit" variant="contained">
-                Enviar
+              <Button type="submit" variant="contained" disabled={loading}>
+                {loading ? "Enviando..." : "Cadastrar"}
               </Button>
             </Grid>
           </Grid>
