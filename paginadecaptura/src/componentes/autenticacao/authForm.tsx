@@ -87,44 +87,94 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
   const onSubmit = async (data: FieldValues) => {
     setError(""); 
-
+  
     if (isSignup) {
       if (data.password !== data.confirmPassword) {
         setError('As senhas não correspondem.');
         return;
       }
-
+  
+      try {
+        // 1) Verifica se usuário existe através de uma chamada de LOGIN
+        const loginCheck = await axios.post(`/api/proxy`, {
+          action: "login",
+          payload: {
+            cpf: data.cpf,
+            senha: data.password,
+          },
+        });
+  
+        // loginCheck.status = 200, mas precisamos analisar loginCheck.data.resposta
+        const respostaLogin = loginCheck.data?.resposta || "";
+  
+        // Se a resposta contiver algo indicando login bem-sucedido, o usuário já existe.
+        // Ajuste conforme a resposta real do seu backend em caso de sucesso no login.
+        if (
+          respostaLogin.includes("login realizado com sucesso") ||
+          respostaLogin.includes("ok") ||
+          loginCheck.data?.status === "ok"
+        ) {
+          setError("Usuário já existe! Faça login em vez de cadastrar.");
+          return;
+        }
+  
+        // Caso a resposta contenha "Erro! Não foi localizado nenhum morador" ou "Erro!CPF ou Senha inválido:"
+        // interpretamos que o usuário NÃO existe ainda, então podemos continuar com o signup.
+        if (
+          respostaLogin.includes("Não foi localizado nenhum morador") ||
+          respostaLogin.includes("CPF ou Senha inválido")
+        ) {
+          // Aqui, de fato, seguimos com o SIGNUP (pois esse usuário não existe)
+        } else {
+          // Se não for nenhuma das opções acima, tratamos como erro.
+          setError("Erro inesperado ao verificar usuário: " + respostaLogin);
+          return;
+        }
+  
+      } catch (err: any) {
+        // Se cair no catch, houve um erro HTTP diferente de 2xx.
+        // Trate aqui, se necessário. Mas provavelmente você não vai cair aqui 
+        // se o backend retorna status 200 mesmo com erro.
+        const mensagemErro = err?.response?.data?.resposta || err?.response?.data?.error || err.message;
+        setError("Erro ao verificar usuário: " + mensagemErro);
+        return;
+      }
+  
+      // 2) Prossegue com o fluxo normal de signup (somente se a verificação acima permitiu)
       setIsProcessingSignup(true);
       try {
-        // Fazendo a requisição de signup via proxy
         const response = await axios.post(`/api/proxy`, {
           action: "signup",
-          cpf: data.cpf,
-          senha: data.password,
+          payload: {
+            cpf: data.cpf,
+            senha: data.password,
+          },
         });
-
+      
         if (response.status === 200) {
-          if (response.data.resposta.includes("já criou a senha de acesso")) {
+          if (response.data.resposta?.includes("já criou a senha de acesso")) {
             setError(response.data.resposta);
           } else {
-            // Enviar a senha para /api/auth para armazená-la
+            // === Chamada para /api/auth gera o cookie JWT ===
             await axios.post('/api/auth', {
               cpf: data.cpf,
               senha: data.password,
             });
             
-            // Redirecionar para /form
+            // Nesse momento, o cookie 'authToken' foi definido no header da resposta
+            // O navegador salva esse cookie, e o usuário já está autenticado.
             router.push("/form");
           }
         }
       } catch (err: any) {
-        // Caso ocorra um erro ao fazer a requisição
         setError(err.response?.data?.resposta || "Erro ao tentar criar a conta. Tente novamente mais tarde.");
-      } finally {
+      }
+       finally {
         setIsProcessingSignup(false);
       }
+  
     } else {
-      // Caso seja login
+      // Fluxo de login
       handleParentSubmit(data);
     }
   };

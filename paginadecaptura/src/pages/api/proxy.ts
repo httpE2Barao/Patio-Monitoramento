@@ -2,7 +2,14 @@ import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 
 interface RequestBody {
-  action: "signup" | "login" | "verificar_apto" | "criar_apartamento" | "novo_morador" | "listar_moradores" | "editar_morador";
+  action:
+    | "signup"
+    | "login"
+    | "verificar_apto"
+    | "criar_apartamento"
+    | "novo_morador"
+    | "listar_moradores"
+    | "editar_morador";
   payload: Record<string, any>;
 }
 
@@ -38,9 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     apartamento: "/apto",
   };
 
-  // Garantir que a action seja uma chave válida de actionMap
   const action = body.action as keyof typeof actionMap;
-
   const acao = actionMap[action];
   const endpoint = endpointMap[acao];
 
@@ -48,15 +53,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Ação ou endpoint inválido fornecido." });
   }
 
-  // Construir a URL da API externa
   const apiUrl = process.env.API_URL;
   if (!apiUrl) {
     return res.status(500).json({ error: "URL da API não configurada no ambiente." });
   }
+
   const url = `${apiUrl}${endpoint}`;
 
   try {
-    // Fazer requisição para a API externa
     const response = await axios.post(
       url,
       { acao, ...body.payload },
