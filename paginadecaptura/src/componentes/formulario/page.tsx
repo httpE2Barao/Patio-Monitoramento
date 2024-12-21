@@ -115,7 +115,13 @@ export const Form: React.FC = () => {
     }
   };
   
-  const gerenciarMorador = async (condominioId: string, apartamento: string, bloco: string, data: Schema, decryptedPassword: string) => {
+  const gerenciarMorador = async (
+    condominioId: string,
+    apartamento: string,
+    bloco: string,
+    data: Schema,
+    decryptedPassword: string
+  ) => {
     try {
       const payloadMoradorBase = {
         mor_cond_id: condominioId,
@@ -139,7 +145,7 @@ export const Form: React.FC = () => {
         ...payloadMoradorBase,
         acao: "novo",
       });
-      
+  
       console.log("Resposta da API novo_morador:", novoMoradorResponse);
   
       if (novoMoradorResponse.resposta?.includes("Erro ! O CPF Informado já está cadastrado")) {
@@ -149,26 +155,52 @@ export const Form: React.FC = () => {
         const listarMoradoresResponse = await chamarApi("listar_moradores", {
           acao: "listar",
           mor_cond_id: condominioId,
-          mor_apto: apartamento,
-          mor_bloco: bloco,
+          mor_apto: "", // Busca geral no condomínio
+          mor_bloco: "",
         });
   
         console.log("Resposta da API listar_moradores:", listarMoradoresResponse);
   
-        const moradorExistente = listarMoradoresResponse?.Moradores?.find(
-          (morador: any) => morador.rg === data.residentes[0].documento
+        const moradores = listarMoradoresResponse?.Moradores || [];
+        if (!Array.isArray(moradores)) {
+          throw new Error("Formato inesperado na resposta de listar_moradores.");
+        }
+  
+        // Verificar se o RG corresponde ao morador na lista
+        const moradorExistente = moradores.find(
+          (morador: any) => morador.rg === data.residentes[0].documento // Buscando pelo RG
         );
   
         if (!moradorExistente) {
           throw new Error("Erro ao localizar morador existente para edição.");
         }
   
-        // Atualizar morador com o ID encontrado
-        const editarMoradorResponse = await chamarApi("editar_morador", {
-          ...payloadMoradorBase,
-          acao: "editar",
-          mor_id: moradorExistente.idregistro,
-        });
+        console.log("Morador existente encontrado:", moradorExistente);
+  
+        // Atualizar morador com os dados mesclados (novos prevalecem)
+        const editarMoradorPayload = {
+          mor_id: moradorExistente.idregistro, // ID do morador existente
+          mor_cond_id: condominioId,           // ID do condomínio do formulário
+          mor_cond_nome: data.endereco.condominio.nomeCondominio, // Nome do condomínio do formulário
+          mor_apto: apartamento,               // Apartamento atualizado do formulário
+          mor_bloco: bloco,                    // Bloco atualizado do formulário
+          mor_nome: data.residentes[0].nome,   // Nome atualizado do formulário
+          mor_parentesco: data.residentes[0].parentesco || "Outros", // Parentesco atualizado
+          mor_cpf: data.residentes[0].documento, // CPF do formulário
+          mor_celular01: data.residentes[0].telefone[0], // Telefones do formulário
+          mor_celular02: data.residentes[0].telefone[1] || "",
+          mor_celular03: data.residentes[0].telefone[2] || "",
+          mor_email: data.residentes[0].email, // Email atualizado
+          mor_responsavel: "Formulário de Cadastro", // Informação adicional
+          mor_obs: data.feedback || "", // Feedback do formulário
+          mor_senhaapp: decryptedPassword, // Senha descriptografada
+          acao: "editar", // Ação de edição
+        };
+        
+  
+        console.log("Payload enviado para editar_morador:", editarMoradorPayload);
+  
+        const editarMoradorResponse = await chamarApi("editar_morador", editarMoradorPayload);
   
         console.log("Resposta da API editar_morador:", editarMoradorResponse);
   

@@ -20,35 +20,31 @@ export const LoginSignup: React.FC = () => {
   }, [router]);
 
   const handleToggleForm = () => {
-    setIsSignup((prevState) => {
-      console.log(`Flow: toggling form, isSignup from ${prevState} to ${!prevState}`);
-      return !prevState;
-    });
+    setIsSignup((prevState) => !prevState);
     setError("");
-  };  
+  };
 
   const handleSubmit = async (data: any) => {
     console.log("Flow: handleSubmit called");
     setError("");
     setLoading(true);
-    const cpfLimpo = data.cpf.replace(/\D/g, '');
+    const cpfLimpo = data.cpf.replace(/\D/g, ""); // Remove caracteres não numéricos
     const cpf = cpfLimpo;
     const { password } = data;
 
     try {
       if (isSignup) {
         console.log("Flow: signup logic start");
+        // Armazena CPF e senha criptografados localmente
         const encryptedCPF = CryptoJS.AES.encrypt(cpf, "chave-de-seguranca").toString();
         const encryptedPassword = CryptoJS.AES.encrypt(password, "chave-de-seguranca").toString();
         localStorage.setItem("encryptedCPF", encryptedCPF);
         localStorage.setItem("encryptedPassword", encryptedPassword);
 
+        // Verifica se o CPF já está cadastrado
         const payloadLoginCheck = {
           action: "login",
-          payload: {
-            cpf,
-            senha: password,
-          },
+          payload: { cpf, senha: password },
         };
 
         console.log("Flow: checking if user exists");
@@ -59,61 +55,36 @@ export const LoginSignup: React.FC = () => {
           console.log("Flow: user exists, stopping signup");
           setError("Cliente já cadastrado! Por favor, faça login.");
           setLoading(false);
+          return; // Interrompe o fluxo
+        }
+
+        if (loginCheckResponse.data.resposta === "ok") {
+          setError("Cliente já cadastrado! Por favor, faça login.");
+          setLoading(false);
           return;
         }
-
-        if (
-          loginCheckResponse.data &&
-          (loginCheckResponse.data.resposta?.includes("CPF não cadastrado") ||
-           loginCheckResponse.data.resposta?.includes("CPF ou Senha inválido"))
-        ) {
-          console.log("Flow: new user, continuing to signup");
-          const payloadSignup = {
-            action: "signup",
-            payload: {
-              cpf,
-              senha: password,
-            },
-          };
-
-          console.log("Flow: signup request");
-          const signupResponse = await axios.post("/api/proxy", payloadSignup);
-          console.log("Flow: signup response:", signupResponse.data);
-
-          if (signupResponse.data && signupResponse.data.resposta === "ok") {
-            console.log("Flow: signup success, redirecting to /form");
-            localStorage.setItem("authToken", signupResponse.data.token);
+      
+        if (loginCheckResponse.data.resposta?.includes("Não foi localizado nenhum morador")) {
+            localStorage.setItem("authToken", data.token);
             router.push("/form");
-          } else {
-            console.log("Flow: signup error");
-            setError(signupResponse.data.resposta || "Não foi possível criar a conta.");
-          }
-        } else {
-          console.log("Flow: unknown signup check result");
-          setError(loginCheckResponse.data.resposta || "Erro ao verificar cadastro.");
         }
+
       } else {
         console.log("Flow: login logic start");
-        const action = "login";
-        const encryptedCPF = CryptoJS.AES.encrypt(cpf, "chave-de-seguranca").toString();
-        const encryptedPassword = CryptoJS.AES.encrypt(password, "chave-de-seguranca").toString();
-        localStorage.setItem("encryptedCPF", encryptedCPF);
-        localStorage.setItem("encryptedPassword", encryptedPassword);
 
-        const payload = {
-          action,
-          payload: {
-            cpf,
-            senha: password,
-          },
+        const payloadLogin = {
+          action: "login",
+          payload: { cpf, senha: password },
         };
 
         console.log("Flow: login request");
-        const response = await axios.post("/api/proxy", payload);
+        const response = await axios.post("/api/proxy", payloadLogin);
         console.log("Flow: login response:", response.data);
 
         if (response.data && response.data.resposta === "ok") {
-          console.log("Flow: login success, redirecting to /form");
+          console.log("Flow: login success");
+
+          // Armazena o token e redireciona
           localStorage.setItem("authToken", response.data.token);
           router.push("/form");
         } else {

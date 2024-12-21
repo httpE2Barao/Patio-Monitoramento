@@ -66,13 +66,12 @@ async function ensureApartmentExists(condominioId: string, payload: any) {
       {
         acao: 'listar',
         cond_id: condominioId,
-        mor_apto,
+        mor_apto: '',
         mor_bloco: mor_bloco || '',
       },
       { headers: getApiHeaders() }
     );
 
-    // If the apartment doesn't exist, create it
     if (Array.isArray(response.data) && response.data.length === 0) {
       await criarApartamento(condominioId, mor_apto, mor_bloco);
     }
