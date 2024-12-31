@@ -18,6 +18,7 @@ export const Form: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [aptoError, setAptoError] = useState<string>("");
+  const [DecryptedPassword, setDecryptedPassword] = useState<string>("");
 
   // ========= Configuração do react-hook-form ========= //
   const methods = useForm<Schema>({
@@ -59,20 +60,25 @@ export const Form: React.FC = () => {
 
   useEffect(() => {
     console.log("Form: useEffect iniciado");
+    
     // 1) Verifica se existe token de autenticação no localStorage
     const authToken = localStorage.getItem("authToken");
     console.log("Form: authToken encontrado:", authToken);
     if (!authToken) {
       console.log("Form: Token não encontrado, redirecionando para /auth");
-      alert("Você não está autenticado! Faça login primeiro.");
+      setSnackbar({
+        open: true,
+        message: "Você não está autenticado! Faça login primeiro.",
+        severity: 'error',
+      });
       router.push("/auth");
       return;
     }
-
+  
     // 2) Carrega do localStorage a versão criptografada do CPF
     const encryptedCPF = localStorage.getItem("encryptedCPF");
     const encryptedPassword = localStorage.getItem("encryptedPassword");
-
+  
     // 3) Carrega o hashedPassword
     const storedHashedPassword = localStorage.getItem("hashedPassword");
     if (storedHashedPassword) {
@@ -81,11 +87,11 @@ export const Form: React.FC = () => {
     } else {
       console.log("Form: hashedPassword não encontrado");
     }
-
+  
     // 4) Se tiver apto/bloco salvos
     const storedApto = localStorage.getItem("mor_apto");
     const storedBloco = localStorage.getItem("mor_bloco");
-
+  
     // =============== Decriptando CPF e setando no form =============== //
     if (encryptedCPF) {
       try {
@@ -100,30 +106,32 @@ export const Form: React.FC = () => {
     } else {
       console.log("Form: encryptedCPF não encontrado no localStorage");
     }
-
-    // Se quiser decriptar a senha, faça algo semelhante:
+  
+    // =============== Decriptando a Senha e setando no estado =============== //
     if (encryptedPassword) {
       try {
         console.log("Form: Decriptando senha");
         const bytesPass = CryptoJS.AES.decrypt(encryptedPassword, ENCRYPTION_KEY);
         const originalPass = bytesPass.toString(CryptoJS.enc.Utf8);
         console.log("Form: Senha decriptografada:", originalPass);
-        // Se desejar, você pode setar a senha no form ou usar conforme necessário
+        setDecryptedPassword(originalPass); // Armazena a senha descriptografada
       } catch (err) {
         console.error("Form: Erro ao descriptografar a senha:", err);
       }
     } else {
       console.log("Form: encryptedPassword não encontrado no localStorage");
     }
-
-    // 5) Se você tiver um campo único "apto" no schema, e concatena com espaço:
+  
+    // 5) Se você tiver campos separados para apto e bloco
     if (storedApto || storedBloco) {
       console.log("Form: Setando apto e bloco no formulário");
-      setValue("endereco.apto", `${storedApto ?? ""} ${storedBloco ?? ""}`.trim());
+      const AptoBloco = storedApto + '' + storedBloco;
+      setValue("endereco.apto", AptoBloco ?? "");
     }
-
+  
     console.log("Form: useEffect finalizado");
   }, [router, setValue]);
+  
 
   // ========= Função genérica para chamadas de API ========= //
   const chamarApi = async (action: string, payload: Record<string, any>) => {
@@ -219,7 +227,7 @@ export const Form: React.FC = () => {
         mor_email: data.residentes[0].email,
         mor_responsavel: "Formulário de Cadastro",
         mor_obs: data.feedback || "",
-        mor_senhaapp: hashedPassword,
+        mor_senhaapp: DecryptedPassword,
       };
 
       console.log("gerenciarMorador: Payload base para morador:", payloadMoradorBase);
@@ -431,3 +439,7 @@ export const Form: React.FC = () => {
     </Container>
   );
 };
+function setSnackbar(arg0: { open: boolean; message: string; severity: string; }) {
+  throw new Error("Function not implemented.");
+}
+
