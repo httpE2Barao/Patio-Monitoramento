@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { AuthForm } from "./authForm";
 
+// Carrega a chave de criptografia do .env
+const ENCRYPTION_KEY = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || "chave-de-seguranca";
+
 export const LoginSignup: React.FC = () => {
   const router = useRouter();
   const [isSignup, setIsSignup] = useState<boolean>(false);
@@ -13,100 +16,135 @@ export const LoginSignup: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log("useEffect: Verificando token de autenticação...");
     const token = localStorage.getItem("authToken");
+    console.log("useEffect: Token encontrado:", token);
     if (token) {
+      console.log("useEffect: Token válido, redirecionando para /form");
       router.push("/form");
+    } else {
+      console.log("useEffect: Token não encontrado, permanecendo em /auth");
     }
   }, [router]);
 
   const handleToggleForm = () => {
     setIsSignup((prevState) => !prevState);
     setError("");
+    console.log(`handleToggleForm: Formulário alterado para ${isSignup ? "Login" : "Signup"}`);
   };
 
   const handleSubmit = async (data: any) => {
-    console.log("Flow: handleSubmit called");
+    console.log("handleSubmit: Iniciando processo de", isSignup ? "signup" : "login");
     setError("");
     setLoading(true);
-    const cpfLimpo = data.cpf.replace(/\D/g, ""); // Remove caracteres não numéricos
-    const cpf = cpfLimpo;
+
+    const cpf = data.cpf.replace(/\D/g, "");
     const { password } = data;
+
+    console.log("handleSubmit: CPF limpo:", cpf);
+    console.log("handleSubmit: Senha recebida:", password);
 
     try {
       if (isSignup) {
-        console.log("Flow: signup logic start");
-        // Armazena CPF e senha criptografados localmente
-        const encryptedCPF = CryptoJS.AES.encrypt(cpf, "chave-de-seguranca").toString();
-        const encryptedPassword = CryptoJS.AES.encrypt(password, "chave-de-seguranca").toString();
-        localStorage.setItem("encryptedCPF", encryptedCPF);
-        localStorage.setItem("encryptedPassword", encryptedPassword);
-
-        // Verifica se o CPF já está cadastrado
-        const payloadLoginCheck = {
+        console.log("handleSubmit: Fluxo de Signup iniciado");
+        // 1. Verifica se usuário já existe
+        console.log("handleSubmit: Verificando existência do usuário no backend");
+        const loginCheckResponse = await axios.post("/api/proxy", {
           action: "login",
           payload: { cpf, senha: password },
-        };
+        });
 
-        console.log("Flow: checking if user exists");
-        const loginCheckResponse = await axios.post("/api/proxy", payloadLoginCheck);
-        console.log("Flow: login check response:", loginCheckResponse.data);
+        console.log("handleSubmit: Resposta da verificação de login:", loginCheckResponse.data);
 
-        if (loginCheckResponse.data && loginCheckResponse.data.resposta === "ok") {
-          console.log("Flow: user exists, stopping signup");
+        // Se loginCheckResponse.data.resposta === "ok", usuário já existe
+        if (loginCheckResponse.data?.resposta === "ok") {
+          console.log("handleSubmit: Usuário já cadastrado");
           setError("Cliente já cadastrado! Por favor, faça login.");
-          setLoading(false);
-          return; // Interrompe o fluxo
+          return; // Interrompe fluxo
         }
 
-        if (loginCheckResponse.data.resposta === "ok") {
-          setError("Cliente já cadastrado! Por favor, faça login.");
-          setLoading(false);
-          return;
-        }
-      
-        if (loginCheckResponse.data.resposta?.includes("Não foi localizado nenhum morador")) {
-            localStorage.setItem("authToken", data.token);
+        // Se diz "Não foi localizado nenhum morador", então criamos
+        if (loginCheckResponse.data.resposta?.includes("Erro!CPF ou Senha inválido: ")) {
+          console.log("handleSubmit: Usuário não encontrado, criando novo usuário");
+          
+          // 2. Cria usuário
+            console.log("handleSubmit: Signup bem-sucedido");
+            // Salva token localmente
+            const authToken = data.mor_cond_id || "autenticado";
+            console.log("handleSubmit: Salvando authToken no localStorage:", authToken);
+            localStorage.setItem("authToken", authToken);
+
+            // === Criptografa e salva CPF e Senha no localStorage ===
+            console.log("handleSubmit: Criptografando CPF e senha");
+            const encryptedCPF = CryptoJS.AES.encrypt(cpf, ENCRYPTION_KEY).toString();
+            const encryptedPassword = CryptoJS.AES.encrypt(password, ENCRYPTION_KEY).toString();
+
+            console.log("handleSubmit: Salvando CPF e senha criptografados no localStorage");
+            localStorage.setItem("encryptedCPF", encryptedCPF);
+            localStorage.setItem("encryptedPassword", encryptedPassword);
+
+            console.log("handleSubmit: Redirecionando para /form");
             router.push("/form");
+          } else {
+          // Qualquer outra mensagem cai aqui
+          console.log("handleSubmit: Resposta inesperada do servidor:", loginCheckResponse.data?.resposta);
+          setError("Resposta inesperada do servidor: " + loginCheckResponse.data?.resposta);
         }
 
       } else {
-        console.log("Flow: login logic start");
-
+        // Fluxo de login
+        console.log("handleSubmit: Fluxo de Login iniciado");
         const payloadLogin = {
           action: "login",
           payload: { cpf, senha: password },
         };
-
-        console.log("Flow: login request");
+        console.log("handleSubmit: Enviando requisição de login ao backend");
         const response = await axios.post("/api/proxy", payloadLogin);
-        console.log("Flow: login response:", response.data);
 
-        if (response.data && response.data.resposta === "ok") {
-          console.log("Flow: login success");
+        console.log("handleSubmit: Resposta do login:", response.data);
 
-          // Armazena o token e redireciona
-          localStorage.setItem("authToken", response.data.token);
+        if (response.data?.resposta === "ok") {
+          console.log("handleSubmit: Login bem-sucedido");
+          // Salva token localmente
+          // Como o backend não envia token, definimos 'authToken' manualmente
+          const authToken = response.data.mor_cond_id || "autenticado";
+          console.log("handleSubmit: Salvando authToken no localStorage:", authToken);
+          localStorage.setItem("authToken", authToken);
+
+          // === Criptografa e salva CPF e Senha no localStorage ===
+          console.log("handleSubmit: Criptografando CPF e senha");
+          const encryptedCPF = CryptoJS.AES.encrypt(cpf, ENCRYPTION_KEY).toString();
+          const encryptedPassword = CryptoJS.AES.encrypt(password, ENCRYPTION_KEY).toString();
+
+          console.log("handleSubmit: Salvando CPF e senha criptografados no localStorage");
+          localStorage.setItem("encryptedCPF", encryptedCPF);
+          localStorage.setItem("encryptedPassword", encryptedPassword);
+
+          console.log("handleSubmit: Redirecionando para /form");
           router.push("/form");
         } else {
-          console.log("Flow: login error");
+          console.log("handleSubmit: Erro no login:", response.data.resposta);
           setError(response.data.resposta || "Credenciais inválidas.");
         }
       }
     } catch (err: any) {
-      console.log("Flow: error caught in try/catch");
+      console.log("handleSubmit: Erro capturado no try/catch:", err);
       if (err.response) {
+        console.log("handleSubmit: Erro de resposta do servidor:", err.response.data);
         setError(err.response.data.error || "Erro no servidor.");
       } else if (err.request) {
+        console.log("handleSubmit: Erro na requisição:", err.request);
         setError("Sem resposta do servidor.");
       } else {
+        console.log("handleSubmit: Erro desconhecido:", err.message);
         setError("Erro desconhecido.");
       }
     } finally {
-      console.log("Flow: final, setting loading false");
       setLoading(false);
+      console.log("handleSubmit: Processo finalizado, loading setado para false");
     }
   };
-
+  
   return (
     <div className="flex flex-col-reverse md:flex-row md:h-screen relative">
       <div className="img-auth w-full md:w-1/2 md:relative md:my-auto max-w-[1300px] order-2 md:order-none">

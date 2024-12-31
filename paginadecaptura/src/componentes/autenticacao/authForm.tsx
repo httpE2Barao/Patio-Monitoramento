@@ -1,8 +1,8 @@
+"use client";
 import { Button, CircularProgress, TextField, Typography } from "@mui/material";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
+import CryptoJS from "crypto-js";
+import { useState } from "react";
 
 interface AuthFormProps {
   isSignup: boolean;
@@ -13,11 +13,8 @@ interface AuthFormProps {
 }
 
 const isValidCPF = (cpf: string): boolean => {
-  cpf = cpf.replace(/\D/g, '');
-
-  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
-    return false;
-  }
+  cpf = cpf.replace(/\D/g, "");
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
 
   let sum = 0;
   let remainder;
@@ -26,28 +23,16 @@ const isValidCPF = (cpf: string): boolean => {
     sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
   }
   remainder = (sum * 10) % 11;
-
-  if (remainder === 10 || remainder === 11) {
-    remainder = 0;
-  }
-
-  if (remainder !== parseInt(cpf.substring(9, 10))) {
-    return false;
-  }
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cpf.substring(9, 10))) return false;
 
   sum = 0;
   for (let i = 1; i <= 10; i++) {
     sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
   }
   remainder = (sum * 10) % 11;
-
-  if (remainder === 10 || remainder === 11) {
-    remainder = 0;
-  }
-
-  if (remainder !== parseInt(cpf.substring(10, 11))) {
-    return false;
-  }
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cpf.substring(10, 11))) return false;
 
   return true;
 };
@@ -57,11 +42,11 @@ const evaluatePasswordStrength = (password: string): string => {
   const mediumPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
   if (strongPasswordPattern.test(password)) {
-    return 'strong';
+    return "strong";
   } else if (mediumPasswordPattern.test(password)) {
-    return 'medium';
+    return "medium";
   } else {
-    return 'weak';
+    return "weak";
   }
 };
 
@@ -72,182 +57,131 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   handleSubmit: handleParentSubmit,
   loading,
 }) => {
-  const router = useRouter();
+  const [passwordStrength, setPasswordStrength] = useState<string>("");
+
   const {
-    handleSubmit: handleFormSubmit,
+    handleSubmit,
     register,
     getValues,
-    formState: { errors }
+    formState: { errors },
   } = useForm<FieldValues>({
-    mode: 'onChange',
+    mode: "onChange",
   });
-
-  const [passwordStrength, setPasswordStrength] = useState<string>('');
-  const [isProcessingSignup, setIsProcessingSignup] = useState<boolean>(false);
-
-  const onSubmit = async (data: FieldValues) => {
-    setError(""); 
   
-    if (isSignup) {
-      if (data.password !== data.confirmPassword) {
-        setError('As senhas não correspondem.');
-        return;
-      }
+  const onSubmit = (data: FieldValues) => {
+    setError("");
   
-      try {
-        // 1) Verifica se usuário existe através de uma chamada de LOGIN
-        const loginCheck = await axios.post(`/api/proxy`, {
-          action: "login",
-          payload: {
-            cpf: data.cpf,
-            senha: data.password,
-          },
-        });
+    // Gera hash e salva no localStorage (se realmente quer fazer isso no filho)
+    const hashedPassword = CryptoJS.SHA256(data.password).toString();
+    localStorage.setItem("hashedPassword", hashedPassword);
   
-        // loginCheck.status = 200, mas precisamos analisar loginCheck.data.resposta
-        const respostaLogin = loginCheck.data?.resposta || "";
-  
-        // Se a resposta contiver algo indicando login bem-sucedido, o usuário já existe.
-        // Ajuste conforme a resposta real do seu backend em caso de sucesso no login.
-        if (
-          respostaLogin.includes("login realizado com sucesso") ||
-          respostaLogin.includes("ok") ||
-          loginCheck.data?.status === "ok"
-        ) {
-          setError("Usuário já existe! Faça login em vez de cadastrar.");
-          return;
-        }
-  
-        // Caso a resposta contenha "Erro! Não foi localizado nenhum morador" ou "Erro!CPF ou Senha inválido:"
-        // interpretamos que o usuário NÃO existe ainda, então podemos continuar com o signup.
-        if (
-          respostaLogin.includes("Não foi localizado nenhum morador") ||
-          respostaLogin.includes("CPF ou Senha inválido")
-        ) {
-          // Aqui, de fato, seguimos com o SIGNUP (pois esse usuário não existe)
-        } else {
-          // Se não for nenhuma das opções acima, tratamos como erro.
-          setError("Erro inesperado ao verificar usuário: " + respostaLogin);
-          return;
-        }
-  
-      } catch (err: any) {
-        // Se cair no catch, houve um erro HTTP diferente de 2xx.
-        // Trate aqui, se necessário. Mas provavelmente você não vai cair aqui 
-        // se o backend retorna status 200 mesmo com erro.
-        const mensagemErro = err?.response?.data?.resposta || err?.response?.data?.error || err.message;
-        setError("Erro ao verificar usuário: " + mensagemErro);
-        return;
-      }
-  
-      // 2) Prossegue com o fluxo normal de signup (somente se a verificação acima permitiu)
-      setIsProcessingSignup(true);
-      try {
-        const response = await axios.post(`/api/proxy`, {
-          action: "signup",
-          payload: {
-            cpf: data.cpf,
-            senha: data.password,
-          },
-        });
-      
-        if (response.status === 200) {
-          if (response.data.resposta?.includes("já criou a senha de acesso")) {
-            setError(response.data.resposta);
-          } else {
-            // === Chamada para /api/auth gera o cookie JWT ===
-            await axios.post('/api/auth', {
-              cpf: data.cpf,
-              senha: data.password,
-            });
-            
-            // Nesse momento, o cookie 'authToken' foi definido no header da resposta
-            // O navegador salva esse cookie, e o usuário já está autenticado.
-            router.push("/form");
-          }
-        }
-      } catch (err: any) {
-        setError(err.response?.data?.resposta || "Erro ao tentar criar a conta. Tente novamente mais tarde.");
-      }
-       finally {
-        setIsProcessingSignup(false);
-      }
-  
-    } else {
-      // Fluxo de login
-      handleParentSubmit(data);
+    // Se for cadastro, verificar as senhas
+    if (isSignup && data.password !== data.confirmPassword) {
+      setError("As senhas não correspondem.");
+      return;
     }
-  };
+  
+    // Chama a função do pai. O pai vai fazer a chamada real ao backend.
+    handleParentSubmit(data);
+  };  
 
   return (
-    <form onSubmit={handleFormSubmit(onSubmit)} className="flex flex-col gap-4 px-10 min-lg:h-[50vh]">
-      <h2 className='text-2xl font-medium'>{isSignup ? 'Cadastro' : 'Login'}</h2>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-4 px-10 min-lg:h-[50vh]"
+    >
+      <h2 className="text-2xl font-medium">
+        {isSignup ? "Cadastro" : "Login"}
+      </h2>
+
       {error && (
         <Typography variant="body2" color="error">
           {error}
         </Typography>
       )}
+
       <TextField
-        {...register('cpf', {
-          required: 'CPF é obrigatório.',
-          validate: (value) => isValidCPF(value) || 'CPF inválido.',
+        {...register("cpf", {
+          required: "CPF é obrigatório.",
+          validate: (value) => isValidCPF(value) || "CPF inválido.",
         })}
         placeholder="CPF"
         label="CPF"
         fullWidth
         error={!!errors.cpf}
-        helperText={errors.cpf?.message ? String(errors.cpf.message) : ''}
+        helperText={errors.cpf?.message ? String(errors.cpf.message) : ""}
       />
+
       <TextField
         type="password"
-        {...register('password', {
-          required: 'Senha é obrigatória.',
+        {...register("password", {
+          required: "Senha é obrigatória.",
           onChange: (e) => {
             const strength = evaluatePasswordStrength(e.target.value);
             setPasswordStrength(strength);
-          }
+          },
         })}
         placeholder="Senha"
         label="Senha"
         fullWidth
         error={!!errors.password}
-        helperText={errors.password?.message ? String(errors.password.message) : ''}
+        helperText={errors.password?.message ? String(errors.password.message) : ""}
       />
+
       {isSignup && (
         <>
           <Typography variant="body2" className="text-sm text-gray-600">
-            Força da senha: <span className={
-              passwordStrength === 'strong' ? 'text-green-600' :
-              passwordStrength === 'medium' ? 'text-yellow-600' :
-              'text-red-600'
-            }>
-              {passwordStrength === 'strong' ? 'Forte' :
-              passwordStrength === 'medium' ? 'Média' :
-              'Fraca'}
+            Força da senha:{" "}
+            <span
+              className={
+                passwordStrength === "strong"
+                  ? "text-green-600"
+                  : passwordStrength === "medium"
+                  ? "text-yellow-600"
+                  : "text-red-600"
+              }
+            >
+              {passwordStrength === "strong"
+                ? "Forte"
+                : passwordStrength === "medium"
+                ? "Média"
+                : "Fraca"}
             </span>
           </Typography>
+
           <TextField
             type="password"
-            {...register('confirmPassword', {
-              required: 'Confirmação de senha é obrigatória.',
+            {...register("confirmPassword", {
+              required: "Confirmação de senha é obrigatória.",
               validate: (value) =>
-                value === getValues('password') || 'As senhas não correspondem.',
+                value === getValues("password") || "As senhas não correspondem.",
             })}
             placeholder="Confirme sua senha"
             label="Confirme sua senha"
             fullWidth
             error={!!errors.confirmPassword}
-            helperText={errors.confirmPassword?.message ? String(errors.confirmPassword.message) : ''}
+            helperText={
+              errors.confirmPassword?.message
+                ? String(errors.confirmPassword.message)
+                : ""
+            }
           />
         </>
       )}
+
       <Button
         type="submit"
         variant="contained"
         color="primary"
-        disabled={loading || isProcessingSignup}
+        disabled={loading}
       >
-        {loading || isProcessingSignup ? <CircularProgress size={24} color="inherit" /> : isSignup ? 'Cadastrar' : 'Entrar'}
+        {loading ? (
+          <CircularProgress size={24} color="inherit" />
+        ) : isSignup ? (
+          "Cadastrar"
+        ) : (
+          "Entrar"
+        )}
       </Button>
     </form>
   );
