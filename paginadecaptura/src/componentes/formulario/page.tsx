@@ -173,10 +173,11 @@ export const Form: React.FC = () => {
         apto: apartamento,
         bloco,
       });
-
+  
       console.log("verificarOuCriarApartamento: Resposta da verificação:", verificarAptoResponse);
-
-      if (verificarAptoResponse?.resposta === "Apartamento não encontrado") {
+  
+      // Se o apartamento não for encontrado, criar um novo
+      if (verificarAptoResponse?.resposta === "Erro! Condomínio ou apto não localizado, verifique o apto,bloco ou id do condominio se está correto") {
         console.log("verificarOuCriarApartamento: Apartamento não encontrado. Criando novo apartamento...");
         const criarAptoResponse = await chamarApi("criar_apartamento", {
           acao: "novo",
@@ -184,23 +185,29 @@ export const Form: React.FC = () => {
           apto: apartamento,
           bloco,
         });
-
+  
         console.log("verificarOuCriarApartamento: Resposta da criação do apartamento:", criarAptoResponse);
-
+  
+        // Verifica se a criação foi bem-sucedida
         if (!criarAptoResponse?.resposta?.includes("Sucesso")) {
-          console.error("verificarOuCriarApartamento: Erro ao criar apartamento.");
-          throw new Error("Erro ao criar apartamento.");
+          console.error("verificarOuCriarApartamento: Erro ao criar apartamento:", criarAptoResponse?.resposta);
+          throw new Error(criarAptoResponse?.resposta || "Erro ao criar apartamento.");
         }
+  
+        console.log("verificarOuCriarApartamento: Apartamento criado com sucesso.");
+        return true; // Apartamento criado
       } else {
         console.log("verificarOuCriarApartamento: Apartamento já existe ou outra resposta.");
       }
+  
       console.log("verificarOuCriarApartamento: Apartamento verificado/criado com sucesso.");
-      return true;
+      return true; // Apartamento já existente
     } catch (error: any) {
       console.error("verificarOuCriarApartamento: Erro ao verificar ou criar apartamento:", error.message);
       throw error;
     }
   };
+  
 
   // ========= Cria ou edita morador conforme necessidade ========= //
   const gerenciarMorador = async (
@@ -208,7 +215,7 @@ export const Form: React.FC = () => {
     apartamento: string,
     bloco: string,
     data: Schema,
-    hashedPassword: string
+    DecryptedPassword: string
   ): Promise<string> => {
     try {
       console.log("gerenciarMorador: Iniciando gerenciamento de morador");
@@ -304,7 +311,7 @@ export const Form: React.FC = () => {
           mor_email: data.residentes[0].email,
           mor_responsavel: "Formulário de Cadastro",
           mor_obs: data.feedback || "",
-          mor_senhaapp: hashedPassword,
+          mor_senhaapp: DecryptedPassword,
           acao: "editar",
         };
 
