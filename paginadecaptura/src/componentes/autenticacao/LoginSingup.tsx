@@ -90,7 +90,6 @@ export const LoginSignup: React.FC = () => {
           console.log("handleSubmit: Resposta inesperada do servidor:", loginCheckResponse.data?.resposta);
           setError("Resposta inesperada do servidor: " + loginCheckResponse.data?.resposta);
         }
-
       } else {
         // Fluxo de login
         console.log("handleSubmit: Fluxo de Login iniciado");
@@ -105,23 +104,33 @@ export const LoginSignup: React.FC = () => {
 
         if (response.data?.resposta === "ok") {
           console.log("handleSubmit: Login bem-sucedido");
+        
           // Salva token localmente
-          // Como o backend não envia token, definimos 'authToken' manualmente
           const authToken = response.data.mor_cond_id || "autenticado";
           console.log("handleSubmit: Salvando authToken no localStorage:", authToken);
           localStorage.setItem("authToken", authToken);
-
+        
+          // 1) Salva o cond_id (mor_cond_id) no localStorage
+          const condId = response.data.mor_cond_id || "";
+          const condNome = response.data.mor_cond_nome || "";
+          console.log("handleSubmit: Salvando mor_cond_id no localStorage:", condId);
+          localStorage.setItem("mor_cond_id", condId);
+          localStorage.setItem("nome_condominio", condNome);
+        
+          // 2) Salva apto e bloco no localStorage
+          const morApto = response.data.mor_apto || "";
+          const morBloco = response.data.mor_bloco || "";
+          console.log("handleSubmit: Salvando mor_apto e mor_bloco no localStorage:", morApto, morBloco);
+          localStorage.setItem("mor_apto", morApto);
+          localStorage.setItem("mor_bloco", morBloco);
+        
           // === Criptografa e salva CPF e Senha no localStorage ===
-          console.log("handleSubmit: Criptografando CPF e senha");
           const encryptedCPF = CryptoJS.AES.encrypt(cpf, ENCRYPTION_KEY).toString();
           const encryptedPassword = CryptoJS.AES.encrypt(password, ENCRYPTION_KEY).toString();
-
-          console.log("handleSubmit: Salvando CPF e senha criptografados no localStorage");
           localStorage.setItem("encryptedCPF", encryptedCPF);
           localStorage.setItem("encryptedPassword", encryptedPassword);
-
-          console.log("handleSubmit: Redirecionando para /form");
-          router.push("/form");
+        
+          router.push("/form");             
         } else {
           console.log("handleSubmit: Erro no login:", response.data.resposta);
           setError(response.data.resposta || "Credenciais inválidas.");

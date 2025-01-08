@@ -1,8 +1,20 @@
 "use client";
-import { Button, CircularProgress, TextField, Typography } from "@mui/material";
-import { FieldValues, useForm } from "react-hook-form";
+import {
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+} from "@mui/material";
 import CryptoJS from "crypto-js";
-import { useState } from "react";
+import React, { useState } from "react";
+import {
+  FieldValues,
+  FormProvider,
+  SubmitHandler,
+  useForm,
+} from "react-hook-form";
+import { chamarApi } from "src/utils/chamarAPI";
+import { CondominioSelect } from "../formulario/FormEndSelect";
 
 interface AuthFormProps {
   isSignup: boolean;
@@ -12,6 +24,7 @@ interface AuthFormProps {
   loading: boolean;
 }
 
+// Funções de validação
 const isValidCPF = (cpf: string): boolean => {
   cpf = cpf.replace(/\D/g, "");
   if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
@@ -59,130 +72,227 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 }) => {
   const [passwordStrength, setPasswordStrength] = useState<string>("");
 
+  const methods = useForm<FieldValues>({
+    mode: "onChange",
+  });
+
   const {
     handleSubmit,
     register,
     getValues,
     formState: { errors },
-  } = useForm<FieldValues>({
-    mode: "onChange",
-  });
-  
-  const onSubmit = (data: FieldValues) => {
+    control,
+  } = methods;
+
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setError("");
   
-    // Gera hash e salva no localStorage (se realmente quer fazer isso no filho)
+    // Gera hash da senha e salva no localStorage (exemplo)
     const hashedPassword = CryptoJS.SHA256(data.password).toString();
     localStorage.setItem("hashedPassword", hashedPassword);
   
+    const normalizeDoc = (cpf: string | null | undefined): string => {
+      return (cpf || '').replace(/\D/g, '');
+    };
+
     // Se for cadastro, verificar as senhas
     if (isSignup && data.password !== data.confirmPassword) {
       setError("As senhas não correspondem.");
       return;
     }
   
-    // Chama a função do pai. O pai vai fazer a chamada real ao backend.
-    handleParentSubmit(data);
-  };  
+    // Se for cadastro (isSignup), vamos buscar moradores do condomínio para checar RG x CPF
+    if (isSignup) {
+      const condominio = data.condominio;
+  
+      if (!condominio || typeof condominio !== 'object' || !condominio.codigoCondominio) {
+        setError("Por favor, selecione um condomínio válido.");
+        return;
+      }
+  
+      const mor_cond_id = condominio.codigoCondominio;
+  
+      // Log do CPF e ID do Condomínio
+      console.log("CPF inserido pelo usuário:", data.cpf);
+      console.log("ID do Condomínio selecionado:", mor_cond_id);
+  
+      try {
+        // Usa a função chamarApi para listar moradores
+        const response = await chamarApi("listar_moradores", {
+          acao: "listar",
+          mor_cond_id,
+          mor_apto: "",
+          mor_bloco: "",
+        });
+  
+        console.log("Resposta completa da API:", response);
+  
+        const { resposta, Moradores } = response;
+  
+        // Se a API retornou um erro
+        if (resposta && typeof resposta === "string") {
+          console.error("Erro da API:", resposta);
+          setError(resposta);
+          return;
+        }
+  
+        // Verifique se 'Moradores' está presente e é um array
+        if (!Moradores || !Array.isArray(Moradores)) {
+          console.error("Estrutura inválida na resposta da API:", response);
+          throw new Error("Resposta inválida da API ao listar moradores.");
+        }
+  
+        console.log("Lista de moradores retornados:", Moradores);
+  
+        // Compare o RG retornado com o CPF inserido.
+        const normalizedCPF = normalizeDoc(data.cpf);
+        let found = false;
+        for (let index = 0; index < Moradores.length; index++) {
+          const m = Moradores[index];
+          console.log(`Comparando CPF com RG do morador ${index + 1}:`, {
+            cpf: data.cpf,
+            rg: m.rg,
+          });
+  
+          const normalizedRG = normalizeDoc(m.rg);
+  
+          if (normalizedRG === normalizedCPF) {
+            console.log(`Match encontrado com o morador ${index + 1}:`, m);
+            found = true;
+            setError("Morador já existe, faça login.");
+            return; // Interrompe o submit
+          }
+        }
+  
+        if (!found) {
+          console.warn("Nenhum morador encontrado com o CPF informado.");
+          // Continue com o cadastro
+        } else {
+          console.log("CPF encontrado entre os RGs cadastrados.");
+        }
+      } catch (err: any) {
+        console.error("Erro ao listar moradores:", err);
+        setError(err.error || "Não foi possível verificar seus dados no condomínio.");
+        return;
+      }
+    }
+  
+    // Se passou pela verificação (ou se não é signup), chamamos o submit do pai
+    await handleParentSubmit(data);
+  };   
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-4 px-10 min-lg:h-[50vh]"
-    >
-      <h2 className="text-2xl font-medium">
-        {isSignup ? "Cadastro" : "Login"}
-      </h2>
-
-      {error && (
-        <Typography variant="body2" color="error">
-          {error}
-        </Typography>
-      )}
-
-      <TextField
-        {...register("cpf", {
-          required: "CPF é obrigatório.",
-          validate: (value) => isValidCPF(value) || "CPF inválido.",
-        })}
-        placeholder="CPF"
-        label="CPF"
-        fullWidth
-        error={!!errors.cpf}
-        helperText={errors.cpf?.message ? String(errors.cpf.message) : ""}
-      />
-
-      <TextField
-        type="password"
-        {...register("password", {
-          required: "Senha é obrigatória.",
-          onChange: (e) => {
-            const strength = evaluatePasswordStrength(e.target.value);
-            setPasswordStrength(strength);
-          },
-        })}
-        placeholder="Senha"
-        label="Senha"
-        fullWidth
-        error={!!errors.password}
-        helperText={errors.password?.message ? String(errors.password.message) : ""}
-      />
-
-      {isSignup && (
-        <>
-          <Typography variant="body2" className="text-sm text-gray-600">
-            Força da senha:{" "}
-            <span
-              className={
-                passwordStrength === "strong"
-                  ? "text-green-600"
-                  : passwordStrength === "medium"
-                  ? "text-yellow-600"
-                  : "text-red-600"
-              }
-            >
-              {passwordStrength === "strong"
-                ? "Forte"
-                : passwordStrength === "medium"
-                ? "Média"
-                : "Fraca"}
-            </span>
-          </Typography>
-
-          <TextField
-            type="password"
-            {...register("confirmPassword", {
-              required: "Confirmação de senha é obrigatória.",
-              validate: (value) =>
-                value === getValues("password") || "As senhas não correspondem.",
-            })}
-            placeholder="Confirme sua senha"
-            label="Confirme sua senha"
-            fullWidth
-            error={!!errors.confirmPassword}
-            helperText={
-              errors.confirmPassword?.message
-                ? String(errors.confirmPassword.message)
-                : ""
-            }
-          />
-        </>
-      )}
-
-      <Button
-        type="submit"
-        variant="contained"
-        color="primary"
-        disabled={loading}
+    <FormProvider {...methods}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-4 px-10 min-lg:h-[50vh]"
       >
-        {loading ? (
-          <CircularProgress size={24} color="inherit" />
-        ) : isSignup ? (
-          "Cadastrar"
-        ) : (
-          "Entrar"
+        <h2 className="text-2xl font-medium">
+          {isSignup ? "Cadastro" : "Login"}
+        </h2>
+
+        {error && (
+          <Typography variant="body2" color="error">
+            {error}
+          </Typography>
         )}
-      </Button>
-    </form>
+
+        {/* CondominioSelect só aparece em modo cadastro */}
+        {isSignup && (
+          <CondominioSelect
+            name="condominio" // Deve corresponder ao Schema
+            disabled={false}
+            control={control} // Passe o control corretamente
+          />
+        )}
+
+        <TextField
+          {...register("cpf", {
+            required: "CPF é obrigatório.",
+            validate: (value) => isValidCPF(value) || "CPF inválido.",
+          })}
+          placeholder="CPF"
+          label="CPF"
+          fullWidth
+          error={!!errors.cpf}
+          helperText={errors.cpf?.message ? String(errors.cpf.message) : ""}
+        />
+
+        <TextField
+          type="password"
+          {...register("password", {
+            required: "Senha é obrigatória.",
+            onChange: (e) => {
+              const strength = evaluatePasswordStrength(e.target.value);
+              setPasswordStrength(strength);
+            },
+          })}
+          placeholder="Senha"
+          label="Senha"
+          fullWidth
+          error={!!errors.password}
+          helperText={
+            errors.password?.message ? String(errors.password.message) : ""
+          }
+        />
+
+        {isSignup && (
+          <>
+            <Typography variant="body2" className="text-sm text-gray-600">
+              Força da senha:{" "}
+              <span
+                className={
+                  passwordStrength === "strong"
+                    ? "text-green-600"
+                    : passwordStrength === "medium"
+                    ? "text-yellow-600"
+                    : "text-red-600"
+                }
+              >
+                {passwordStrength === "strong"
+                  ? "Forte"
+                  : passwordStrength === "medium"
+                  ? "Média"
+                  : "Fraca"}
+              </span>
+            </Typography>
+
+            <TextField
+              type="password"
+              {...register("confirmPassword", {
+                required: "Confirmação de senha é obrigatória.",
+                validate: (value) =>
+                  value === getValues("password") ||
+                  "As senhas não correspondem.",
+              })}
+              placeholder="Confirme sua senha"
+              label="Confirme sua senha"
+              fullWidth
+              error={!!errors.confirmPassword}
+              helperText={
+                errors.confirmPassword?.message
+                  ? String(errors.confirmPassword.message)
+                  : ""
+              }
+            />
+          </>
+        )}
+
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={loading}
+        >
+          {loading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : isSignup ? (
+            "Cadastrar"
+          ) : (
+            "Entrar"
+          )}
+        </Button>
+      </form>
+    </FormProvider>
   );
 };

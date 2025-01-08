@@ -1,15 +1,14 @@
 "use client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { clearSpecificLocalStorageData } from "src/utils/limparLocal";
 
 const Header = () => {
     const router = useRouter();
 
     const handleLogout = () => {
       // Remove informações sensíveis do armazenamento local
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("cpf");
-      localStorage.removeItem("password");
+      clearSpecificLocalStorageData();
   
       // Redireciona para a página de autenticação
       router.push("/auth");
