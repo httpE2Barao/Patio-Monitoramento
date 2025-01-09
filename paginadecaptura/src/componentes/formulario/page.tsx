@@ -152,48 +152,83 @@ export const Form: React.FC = () => {
   // ========= Verifica/cria apartamento se não existir ========= //
   const verificarOuCriarApartamento = async (
     condominioId: string,
-    apartamento: string,
-    bloco: string
+    apartamento: string, // ex: "200"
+    bloco: string        // ex: ""
   ) => {
     try {
-      const verificarAptoResponse = await chamarApi("verificar_apto", {
+      console.log("DEBUG > [verificarOuCriarApartamento] Inicio:");
+      console.log("DEBUG > condominioId =", condominioId);
+      console.log("DEBUG > apartamento digitado =", apartamento);
+      console.log("DEBUG > bloco digitado =", bloco);
+  
+      const listarResponse = await chamarApi("verificar_apto", {
         acao: "listar",
         cond_id: condominioId,
-        apto: apartamento,
-        bloco,
       });
-
-      // Desestruturei para facilitar
-      const { resposta } = verificarAptoResponse;
-
-      // transforme "resposta" em string
-      const respStr = String(resposta || "");
-
-      // Se contiver algo que indique "não encontrado", cria o apto
-      if (respStr.includes("Erro!") || respStr.includes("Erro !")) {
-        const criarAptoResponse = await chamarApi("criar_apartamento", {
+  
+      console.log("DEBUG > listarResponse =", listarResponse);
+  
+      const aptos = listarResponse.apto || [];
+      console.log("DEBUG > aptos array =", aptos);
+  
+      // Debug comparando cada item
+      for (const item of aptos) {
+        console.log(
+          "DEBUG > Checando item:",
+          {
+            idCasaApto: item.idCasaApto,
+            bloco: item.bloco,
+          },
+          "VS:",
+          {
+            apartamento,
+            bloco,
+          }
+        );
+      }
+  
+      // Ajuste a comparação com trim
+      const aptoEncontrado = aptos.find((a: any) => {
+        const aptoDb = String(a.idCasaApto || "").trim();
+        const blocoDb = String(a.bloco || "").trim();
+  
+        const aptoForm = String(apartamento || "").trim();
+        const blocoForm = String(bloco || "").trim();
+  
+        return aptoDb === aptoForm && blocoDb === blocoForm;
+      });
+  
+      if (aptoEncontrado) {
+        console.log("DEBUG > aptoEncontrado =", aptoEncontrado);
+        console.log("DEBUG > Apto já existe, ID =", aptoEncontrado.idregistro);
+        // Retorne o id (ex: aptoEncontrado.idregistro)
+        return aptoEncontrado.idregistro; 
+      } else {
+        console.log("DEBUG > Não encontrou, vai criar apto =", apartamento, "bloco =", bloco);
+  
+        const criarResponse = await chamarApi("criar_apartamento", {
           acao: "novo",
           cond_id: condominioId,
           apto: apartamento,
-          bloco,
+          bloco: bloco,
         });
-
-        if (!criarAptoResponse?.resposta?.includes("Sucesso")) {
-          throw new Error(
-            criarAptoResponse?.resposta || "Erro ao criar apartamento."
-          );
+        
+        console.log("DEBUG > criarResponse =", criarResponse);
+  
+        if (!criarResponse?.resposta?.includes("Sucesso")) {
+          console.log("DEBUG > criarResponse.resposta =", criarResponse?.resposta);
+          throw new Error(criarResponse?.resposta || "Erro ao criar apartamento.");
         }
-        return true; // Apartamento criado
+        // Se a API retornar { idregistro: 999, resposta: "Sucesso" }
+        console.log("DEBUG > Apartamento criado, retornando ID =", criarResponse.idregistro);
+        return criarResponse.idregistro;
       }
-
-      // Caso contrário, assumo que já existe ou não é erro
-      return true;
     } catch (error: any) {
       console.error("Erro ao verificar ou criar apartamento:", error.message);
       throw error;
     }
-  };
-
+  };  
+  
   // ========= Cria ou edita morador conforme necessidade ========= //
   const gerenciarMorador = async (
     condominioId: string,
@@ -315,13 +350,12 @@ export const Form: React.FC = () => {
         apartamento,
         bloco,
         data,
-        hashedPassword
+        DecryptedPassword
       );
 
       setFeedbackMessage(mensagem); // Exibe a mensagem retornada
     } catch (error: unknown) {
       console.error("Erro no fluxo:", error);
-      setFeedbackMessage("Erro desconhecido no processo. Tente novamente.");
     } finally {
       setLoading(false);
       // Remove dados do localStorage (mas pode manter se quiser re-editar)
@@ -379,7 +413,7 @@ export const Form: React.FC = () => {
           ref={feedbackRef}
         >
           <Typography
-            variant="h2"
+            variant="h4"
             color="primary"
             align="center"
             style={{ letterSpacing: "1px", fontWeight: "normal", padding: "1em" }}

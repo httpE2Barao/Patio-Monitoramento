@@ -47,96 +47,67 @@ export const LoginSignup: React.FC = () => {
     try {
       if (isSignup) {
         console.log("handleSubmit: Fluxo de Signup iniciado");
-        // 1. Verifica se usuário já existe
-        console.log("handleSubmit: Verificando existência do usuário no backend");
-        const loginCheckResponse = await axios.post("/api/proxy", {
-          action: "login",
-          payload: { cpf, senha: password },
-        });
+          console.log("handleSubmit: Criando novo usuário");
+          // Salva token localmente
+          const authToken = data.mor_cond_id || "autenticado";
+          console.log("handleSubmit: Salvando authToken no localStorage:", authToken);
+          localStorage.setItem("authToken", authToken);
 
-        console.log("handleSubmit: Resposta da verificação de login:", loginCheckResponse.data);
+          // === Criptografa e salva CPF e Senha no localStorage ===
+          console.log("handleSubmit: Criptografando CPF e senha");
+          const encryptedCPF = CryptoJS.AES.encrypt(cpf, ENCRYPTION_KEY).toString();
+          const encryptedPassword = CryptoJS.AES.encrypt(password, ENCRYPTION_KEY).toString();
 
-        // Se loginCheckResponse.data.resposta === "ok", usuário já existe
-        if (loginCheckResponse.data?.resposta === "ok") {
-          console.log("handleSubmit: Usuário já cadastrado");
-          setError("Cliente já cadastrado! Por favor, faça login.");
-          return; // Interrompe fluxo
-        }
+          console.log("handleSubmit: Salvando CPF e senha criptografados no localStorage");
+          localStorage.setItem("encryptedCPF", encryptedCPF);
+          localStorage.setItem("encryptedPassword", encryptedPassword);
 
-        // Se diz "Não foi localizado nenhum morador", então criamos
-        if (loginCheckResponse.data.resposta?.includes("Erro!CPF ou Senha inválido: ")) {
-          console.log("handleSubmit: Usuário não encontrado, criando novo usuário");
-          
-          // 2. Cria usuário
-            console.log("handleSubmit: Signup bem-sucedido");
-            // Salva token localmente
-            const authToken = data.mor_cond_id || "autenticado";
-            console.log("handleSubmit: Salvando authToken no localStorage:", authToken);
-            localStorage.setItem("authToken", authToken);
-
-            // === Criptografa e salva CPF e Senha no localStorage ===
-            console.log("handleSubmit: Criptografando CPF e senha");
-            const encryptedCPF = CryptoJS.AES.encrypt(cpf, ENCRYPTION_KEY).toString();
-            const encryptedPassword = CryptoJS.AES.encrypt(password, ENCRYPTION_KEY).toString();
-
-            console.log("handleSubmit: Salvando CPF e senha criptografados no localStorage");
-            localStorage.setItem("encryptedCPF", encryptedCPF);
-            localStorage.setItem("encryptedPassword", encryptedPassword);
-
-            console.log("handleSubmit: Redirecionando para /form");
-            router.push("/form");
-          } else {
-          // Qualquer outra mensagem cai aqui
-          console.log("handleSubmit: Resposta inesperada do servidor:", loginCheckResponse.data?.resposta);
-          setError("Resposta inesperada do servidor: " + loginCheckResponse.data?.resposta);
-        }
+          console.log("handleSubmit: Redirecionando para /form");
+          router.push("/form");
       } else {
-        // Fluxo de login
-        console.log("handleSubmit: Fluxo de Login iniciado");
-        const payloadLogin = {
-          action: "login",
-          payload: { cpf, senha: password },
-        };
-        console.log("handleSubmit: Enviando requisição de login ao backend");
+          // Fluxo de login
+          console.log("handleSubmit: Fluxo de Login iniciado");
+          const payloadLogin = {
+            action: "login",
+            payload: { cpf, senha: password },
+          };
+          console.log("handleSubmit: Enviando requisição de login ao backend");
         const response = await axios.post("/api/proxy", payloadLogin);
 
         console.log("handleSubmit: Resposta do login:", response.data);
-
+        
         if (response.data?.resposta === "ok") {
           console.log("handleSubmit: Login bem-sucedido");
-        
+          
           // Salva token localmente
           const authToken = response.data.mor_cond_id || "autenticado";
-          console.log("handleSubmit: Salvando authToken no localStorage:", authToken);
           localStorage.setItem("authToken", authToken);
-        
+          
           // 1) Salva o cond_id (mor_cond_id) no localStorage
           const condId = response.data.mor_cond_id || "";
           const condNome = response.data.mor_cond_nome || "";
-          console.log("handleSubmit: Salvando mor_cond_id no localStorage:", condId);
           localStorage.setItem("mor_cond_id", condId);
           localStorage.setItem("nome_condominio", condNome);
-        
+          
           // 2) Salva apto e bloco no localStorage
           const morApto = response.data.mor_apto || "";
           const morBloco = response.data.mor_bloco || "";
-          console.log("handleSubmit: Salvando mor_apto e mor_bloco no localStorage:", morApto, morBloco);
           localStorage.setItem("mor_apto", morApto);
           localStorage.setItem("mor_bloco", morBloco);
-        
+          
           // === Criptografa e salva CPF e Senha no localStorage ===
           const encryptedCPF = CryptoJS.AES.encrypt(cpf, ENCRYPTION_KEY).toString();
           const encryptedPassword = CryptoJS.AES.encrypt(password, ENCRYPTION_KEY).toString();
           localStorage.setItem("encryptedCPF", encryptedCPF);
           localStorage.setItem("encryptedPassword", encryptedPassword);
-        
+          
           router.push("/form");             
         } else {
           console.log("handleSubmit: Erro no login:", response.data.resposta);
           setError(response.data.resposta || "Credenciais inválidas.");
         }
-      }
-    } catch (err: any) {
+      }} 
+      catch (err: any) {
       console.log("handleSubmit: Erro capturado no try/catch:", err);
       if (err.response) {
         console.log("handleSubmit: Erro de resposta do servidor:", err.response.data);

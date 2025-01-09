@@ -104,8 +104,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     // Se for cadastro (isSignup), vamos buscar moradores do condomínio para checar RG x CPF
     if (isSignup) {
       const condominio = data.condominio;
-
-      console.log(condominio);
   
       if (!condominio || typeof condominio !== 'object' || !condominio.codigoCondominio) {
         setError("Por favor, selecione um condomínio válido.");
@@ -113,10 +111,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       }
   
       const mor_cond_id = condominio.codigoCondominio;
-  
-      // Log do CPF e ID do Condomínio
-      console.log("CPF inserido pelo usuário:", data.cpf);
-      console.log("ID do Condomínio selecionado:", mor_cond_id);
   
       try {
         // Usa a função chamarApi para listar moradores
