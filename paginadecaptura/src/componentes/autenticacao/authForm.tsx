@@ -151,10 +151,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         let found = false;
         for (let index = 0; index < Moradores.length; index++) {
           const m = Moradores[index];
-          console.log(`Comparando CPF com RG do morador ${index + 1}:`, {
-            cpf: data.cpf,
-            rg: m.rg,
-          });
   
           const normalizedRG = normalizeDoc(m.rg);
   
@@ -260,19 +256,28 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             <TextField
               type="password"
               {...register("confirmPassword", {
-                required: "Confirmação de senha é obrigatória.",
-                validate: (value) =>
-                  value === getValues("password") ||
-                  "As senhas não correspondem.",
+                required: "Confirmação de senha é obrigatória.",                  
+                  validate: (value: string) => {
+                    // Se a função retornar "weak", bloqueia a submissão
+                    if (evaluatePasswordStrength(value) === "weak") {
+                      return "A senha deve ter pelo menos força MÉDIA.";
+                    }
+                    if(value !== getValues("password")) {
+                      return "As senhas não correspondem."
+                    } 
+                    return true; // Ok se for "medium" ou "strong"
+                  },
+                onChange: (e) => {
+                  const strength = evaluatePasswordStrength(e.target.value);
+                  setPasswordStrength(strength);
+                }
               })}
               placeholder="Confirme sua senha"
               label="Confirme sua senha"
               fullWidth
               error={!!errors.confirmPassword}
               helperText={
-                errors.confirmPassword?.message
-                  ? String(errors.confirmPassword.message)
-                  : ""
+                errors.confirmPassword?.message ? String(errors.confirmPassword.message) : ""
               }
             />
           </>
