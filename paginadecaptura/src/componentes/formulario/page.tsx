@@ -48,7 +48,7 @@ export const Form: React.FC = () => {
     },
   });
 
-  const { handleSubmit, setValue, control } = methods;
+  const { handleSubmit, setValue, control, reset } = methods;
 
   // Cria arrays controlados para residentes e veículos
   const { fields: residentesFields } = useFieldArray({
@@ -120,7 +120,7 @@ export const Form: React.FC = () => {
     }
 
     if (storedApto || storedBloco) {
-      const AptoBloco = storedApto + '' + storedBloco;
+      const AptoBloco = storedApto + "" + storedBloco;
       setValue("endereco.apto", AptoBloco ?? "");
     }
 
@@ -144,7 +144,10 @@ export const Form: React.FC = () => {
       console.log("verificarOuCriarApartamento: Resposta da verificação:", verificarAptoResponse);
       
       // Se o apartamento não for encontrado, criar um novo
-      if (verificarAptoResponse?.resposta === "Erro! Condomínio ou apto não localizado, verifique o apto,bloco ou id do condominio se está correto") {
+      if (
+        verificarAptoResponse?.resposta ===
+        "Erro! Condomínio ou apto não localizado, verifique o apto,bloco ou id do condominio se está correto"
+      ) {
         const criarAptoResponse = await chamarApi("criar_apartamento", {
           acao: "novo",
           cond_id: condominioId,
@@ -199,8 +202,11 @@ export const Form: React.FC = () => {
       });
 
       // 2) Se já existir, edita
-      if (novoMoradorResponse.resposta?.includes("Erro ! O CPF Informado já está cadastrado")) {
+      if (
+        novoMoradorResponse.resposta?.includes("Erro ! O CPF Informado já está cadastrado")
+      ) {
         setEditar(true);
+        
         const listarMoradoresResponse = await chamarApi("listar_moradores", {
           acao: "listar",
           mor_cond_id: condominioId,
@@ -209,7 +215,9 @@ export const Form: React.FC = () => {
         });
 
         const moradores = listarMoradoresResponse?.Moradores || [];
-        const moradorExistente = moradores.find((morador: any) => morador.rg === data.residentes[0].documento);
+        const moradorExistente = moradores.find(
+          (morador: any) => morador.rg === data.residentes[0].documento
+        );
 
         if (!moradorExistente) {
           throw new Error("Morador existente não encontrado para edição.");
@@ -265,7 +273,6 @@ export const Form: React.FC = () => {
 
   // ========= Fluxo principal: onSubmit ========= //
   const onSubmit = async (data: Schema) => {
-    console.log(`Clicou em enviar! e chamou a função`);
     setLoading(true);
     try {
       const [apartamento, bloco = ""] = data.endereco.apto.trim().split(" ");
@@ -275,9 +282,15 @@ export const Form: React.FC = () => {
       await verificarOuCriarApartamento(condominioId, apartamento, bloco);
 
       // Tenta criar/editar o morador
-      const mensagem = await gerenciarMorador(condominioId, apartamento, bloco, data, hashedPassword);
+      const mensagem = await gerenciarMorador(
+        condominioId,
+        apartamento,
+        bloco,
+        data,
+        hashedPassword
+      );
 
-      setFeedbackMessage(mensagem); // Exibe a mensagem de sucesso
+      setFeedbackMessage(mensagem); // Exibe a mensagem retornada
     } catch (error: unknown) {
       console.error("Erro no fluxo:", error);
       setFeedbackMessage("Erro desconhecido no processo. Tente novamente.");
@@ -291,9 +304,23 @@ export const Form: React.FC = () => {
     console.log("Erros de validação:", errors);
   };
 
+  // ========= Funções para resetar e logout ========= //
+  const handleReset = () => {
+    reset(); 
+    setFeedbackMessage(null); 
+  };
+
+  const handleLogout = () => {
+    // Remove informações sensíveis do armazenamento local
+    clearSpecificLocalStorageData();
+
+    // Redireciona para a página de autenticação
+    router.push("/auth");
+  };
+
   useEffect(() => {
     if (feedbackMessage && feedbackRef.current) {
-      feedbackRef.current.scrollIntoView({ behavior: "smooth" }); 
+      feedbackRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [feedbackMessage]);
 
@@ -302,24 +329,45 @@ export const Form: React.FC = () => {
       {feedbackMessage ? (
         <Grid
           container
+          direction="column"
           justifyContent="center"
           alignItems="center"
           style={{ height: "100vh" }}
-          ref={feedbackRef} 
+          ref={feedbackRef}
         >
-          <Typography variant="h2" color="primary" align="center" style={{ letterSpacing: "1px", fontWeight: "normal", padding: "1em" }}>
-            {Editar ? "Cadastro atualizado com sucesso!" : "Cadastro realizado com sucesso!"}
+          <Typography
+            variant="h2"
+            color="primary"
+            align="center"
+            style={{ letterSpacing: "1px", fontWeight: "normal", padding: "1em" }}
+          >
+            {feedbackMessage}
           </Typography>
+
+          {/* Botões para resetar e fazer logout */}
+          <Grid item container justifyContent="center" spacing={4}>
+            <Grid item>
+              <Button variant="contained" color="secondary" onClick={handleReset} sx={{fontSize:"1.3em"}}>
+                Voltar
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button variant="contained" color="primary" onClick={handleLogout} sx={{fontSize:"1.3em"}}>
+                Sair
+              </Button>
+            </Grid>
+          </Grid>
         </Grid>
       ) : (
         // Formulário padrão
         <FormProvider {...methods}>
           <form
             className="flex gap-2 flex-col items-center justify-evenly pb-4"
-            onSubmit={handleSubmit(onSubmit, onError)}>
+            onSubmit={handleSubmit(onSubmit, onError)}
+          >
             <Grid container spacing={1}>
               <Grid item xs={12}>
-                <FormEndereco isAptoDisabled={isAptoDisabled}/>
+                <FormEndereco isAptoDisabled={isAptoDisabled} />
               </Grid>
 
               {aptoError && (
@@ -347,7 +395,7 @@ export const Form: React.FC = () => {
               </Grid>
 
               <Grid item xs={12}>
-                <Button type="submit" variant="contained" disabled={loading}>
+                <Button type="submit" variant="contained" disabled={loading}  sx={{fontSize:"1.1em"}}>
                   {loading ? "Enviando..." : "Cadastrar"}
                 </Button>
               </Grid>
