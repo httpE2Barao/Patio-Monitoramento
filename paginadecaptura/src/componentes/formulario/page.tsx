@@ -152,40 +152,16 @@ export const Form: React.FC = () => {
   // ========= Verifica/cria apartamento se não existir ========= //
   const verificarOuCriarApartamento = async (
     condominioId: string,
-    apartamento: string, // ex: "200"
-    bloco: string        // ex: ""
+    apartamento: string, 
+    bloco: string        
   ) => {
     try {
-      console.log("DEBUG > [verificarOuCriarApartamento] Inicio:");
-      console.log("DEBUG > condominioId =", condominioId);
-      console.log("DEBUG > apartamento digitado =", apartamento);
-      console.log("DEBUG > bloco digitado =", bloco);
-  
       const listarResponse = await chamarApi("verificar_apto", {
         acao: "listar",
         cond_id: condominioId,
       });
-  
-      console.log("DEBUG > listarResponse =", listarResponse);
-  
+    
       const aptos = listarResponse.apto || [];
-      console.log("DEBUG > aptos array =", aptos);
-  
-      // Debug comparando cada item
-      for (const item of aptos) {
-        console.log(
-          "DEBUG > Checando item:",
-          {
-            idCasaApto: item.idCasaApto,
-            bloco: item.bloco,
-          },
-          "VS:",
-          {
-            apartamento,
-            bloco,
-          }
-        );
-      }
   
       // Ajuste a comparação com trim
       const aptoEncontrado = aptos.find((a: any) => {
@@ -203,9 +179,7 @@ export const Form: React.FC = () => {
         console.log("DEBUG > Apto já existe, ID =", aptoEncontrado.idregistro);
         // Retorne o id (ex: aptoEncontrado.idregistro)
         return aptoEncontrado.idregistro; 
-      } else {
-        console.log("DEBUG > Não encontrou, vai criar apto =", apartamento, "bloco =", bloco);
-  
+      } else {  
         const criarResponse = await chamarApi("criar_apartamento", {
           acao: "novo",
           cond_id: condominioId,
@@ -220,7 +194,6 @@ export const Form: React.FC = () => {
           throw new Error(criarResponse?.resposta || "Erro ao criar apartamento.");
         }
         // Se a API retornar { idregistro: 999, resposta: "Sucesso" }
-        console.log("DEBUG > Apartamento criado, retornando ID =", criarResponse.idregistro);
         return criarResponse.idregistro;
       }
     } catch (error: any) {
