@@ -15,20 +15,18 @@ export const FormEndereco: React.FC<FormEnderecoProps> = ({ isAptoDisabled }) =>
   const {
     register,
     control,
-    watch,
     formState: { errors },
   } = useFormContext<Schema>();
-
-  // Monitorar os valores dos campos para desabilitação
-  const codigoCondominio = watch("endereco.condominio.codigoCondominio");
-  const aptoValue = watch("endereco.apto");
 
   return (
     <Grid item xs={12}>
       <Titulo titulo="Endereço" />
       <Grid container key={0} spacing={2}>
         <Grid item xs={12} md={6}>
-        <CondominioSelect name="condominio" disabled={false} />
+        <CondominioSelect
+          control={control}
+          disabled={false}
+        />
         </Grid>
         <Grid item xs={12} md={6}>
           <TextField

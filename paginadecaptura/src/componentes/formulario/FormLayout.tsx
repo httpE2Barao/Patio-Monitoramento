@@ -11,7 +11,6 @@ import BoasVindas from "../inicio";
 export const FormularioLayout = () => {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [cpf, setCpf] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -36,7 +35,7 @@ export const FormularioLayout = () => {
     <>
       <Header />
       <BoasVindas />
-      <Formulario cpf={cpf} />
+      <Formulario />
       <FAQ />
       <Footer />
       <BtnToTop />

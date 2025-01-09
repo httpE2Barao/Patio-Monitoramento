@@ -2,11 +2,7 @@ import { Box, Container } from "@mui/material";
 import React from "react";
 import { Form } from "./formulario/page";
 
-interface FormularioProps {
-  cpf: string | null;
-}
-
-const Formulario: React.FC<FormularioProps> = ({ cpf }) => {
+const Formulario: React.FC = () => {
   return (
     <section id="formulario">
       <Container

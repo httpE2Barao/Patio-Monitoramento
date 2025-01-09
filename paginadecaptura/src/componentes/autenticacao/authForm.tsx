@@ -104,6 +104,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     // Se for cadastro (isSignup), vamos buscar moradores do condomínio para checar RG x CPF
     if (isSignup) {
       const condominio = data.condominio;
+
+      console.log(condominio);
   
       if (!condominio || typeof condominio !== 'object' || !condominio.codigoCondominio) {
         setError("Por favor, selecione um condomínio válido.");
@@ -197,12 +199,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           </Typography>
         )}
 
-        {/* CondominioSelect só aparece em modo cadastro */}
         {isSignup && (
           <CondominioSelect
-            name="condominio" // Deve corresponder ao Schema
-            disabled={false}
-            control={control} // Passe o control corretamente
+            name="condominio"
+            control={control} 
           />
         )}
 

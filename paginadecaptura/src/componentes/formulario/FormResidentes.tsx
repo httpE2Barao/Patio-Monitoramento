@@ -166,7 +166,7 @@ export const FormResidentes: React.FC<FormNumberProps> = () => {
                 error={!!errors.residentes?.[index]?.documento}
                 helperText={errors.residentes?.[index]?.documento?.message}
                 InputProps={{
-                  readOnly: index === 0, // Apenas para o primeiro residente
+                  readOnly: index === 0, 
                 }}
               />
               {index === 0 ? (

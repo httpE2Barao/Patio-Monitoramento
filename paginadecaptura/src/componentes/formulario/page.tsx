@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { chamarApi } from "src/utils/chamarAPI";
 import { clearSpecificLocalStorageData } from "src/utils/limparLocal";
-import { schema, Schema } from "../schema-zod";
+import { Schema, schema } from "../schema-zod";
 import { FormEndereco } from "./FormEndereco";
 import { FormFeedback } from "./FormFeedback";
 import { FormResidentes } from "./FormResidentes";
@@ -133,6 +133,7 @@ export const Form: React.FC = () => {
     bloco: string
   ) => {
     try {
+      console.log("verificarOuCriarApartamento: Verificando apartamento...");
       const verificarAptoResponse = await chamarApi("verificar_apto", {
         acao: "listar",
         cond_id: condominioId,
@@ -140,8 +141,10 @@ export const Form: React.FC = () => {
         bloco,
       });
 
+      console.log("verificarOuCriarApartamento: Resposta da verificação:", verificarAptoResponse);
+      
       // Se o apartamento não for encontrado, criar um novo
-      if (verificarAptoResponse?.resposta === "Erro! Condomínio ou apto não localizado") {
+      if (verificarAptoResponse?.resposta === "Erro! Condomínio ou apto não localizado, verifique o apto,bloco ou id do condominio se está correto") {
         const criarAptoResponse = await chamarApi("criar_apartamento", {
           acao: "novo",
           cond_id: condominioId,
@@ -149,6 +152,8 @@ export const Form: React.FC = () => {
           bloco,
         });
 
+        console.log("verificarOuCriarApartamento: Apartamento não encontrado. Criando novo apartamento...");
+        
         if (!criarAptoResponse?.resposta?.includes("Sucesso")) {
           throw new Error(criarAptoResponse?.resposta || "Erro ao criar apartamento.");
         }
@@ -210,11 +215,6 @@ export const Form: React.FC = () => {
           throw new Error("Morador existente não encontrado para edição.");
         }
 
-        // Atualiza os valores no formulário com dados existentes
-        setValue("endereco.apto", moradorExistente.mor_apto || "");
-        setValue("endereco.condominio.nomeCondominio", moradorExistente.mor_cond_nome || "");
-        setValue("endereco.apto", moradorExistente.mor_bloco || "");
-
         // Agora faz a edição do morador
         const editarMoradorPayload = {
           mor_id: moradorExistente.idregistro,
@@ -234,6 +234,8 @@ export const Form: React.FC = () => {
           mor_senhaapp: DecryptedPassword,
           acao: "editar",
         };
+
+        console.log("gerenciarMorador: Payload para edição do morador:", editarMoradorPayload);
 
         const editarMoradorResponse = await chamarApi("editar_morador", editarMoradorPayload);
 
@@ -263,6 +265,7 @@ export const Form: React.FC = () => {
 
   // ========= Fluxo principal: onSubmit ========= //
   const onSubmit = async (data: Schema) => {
+    console.log(`Clicou em enviar! e chamou a função`);
     setLoading(true);
     try {
       const [apartamento, bloco = ""] = data.endereco.apto.trim().split(" ");
@@ -284,9 +287,13 @@ export const Form: React.FC = () => {
     }
   };
 
+  const onError = (errors: any) => {
+    console.log("Erros de validação:", errors);
+  };
+
   useEffect(() => {
     if (feedbackMessage && feedbackRef.current) {
-      feedbackRef.current.scrollIntoView({ behavior: "smooth" }); // Rola até a área de feedback
+      feedbackRef.current.scrollIntoView({ behavior: "smooth" }); 
     }
   }, [feedbackMessage]);
 
@@ -309,8 +316,7 @@ export const Form: React.FC = () => {
         <FormProvider {...methods}>
           <form
             className="flex gap-2 flex-col items-center justify-evenly pb-4"
-            onSubmit={handleSubmit(onSubmit)}
-          >
+            onSubmit={handleSubmit(onSubmit, onError)}>
             <Grid container spacing={1}>
               <Grid item xs={12}>
                 <FormEndereco isAptoDisabled={isAptoDisabled}/>

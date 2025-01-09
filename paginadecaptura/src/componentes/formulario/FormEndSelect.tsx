@@ -8,15 +8,15 @@ interface Condominio {
 }
 
 interface CondominioSelectProps {
-  name?: string;
-  control?: any;              
-  disabled?: boolean;        
-  label?: string;
+  name?: string; 
+  control?: any; 
+  disabled?: boolean; 
+  label?: string; 
 }
 
 export const CondominioSelect: React.FC<CondominioSelectProps> = ({
   control,
-  name = "endereco.condominio.codigoCondominio",
+  name = "endereco.condominio",
   disabled = false,
   label = "Condomínio",
 }) => {
@@ -24,9 +24,7 @@ export const CondominioSelect: React.FC<CondominioSelectProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Se estivermos sem control, guardamos o valor selecionado no próprio estado
-  const [valueLocal, setValueLocal] = useState<Condominio | null>(null);
-
+  // Fetch dos condomínios ao carregar o componente
   useEffect(() => {
     const fetchCondominios = async () => {
       try {
@@ -49,15 +47,10 @@ export const CondominioSelect: React.FC<CondominioSelectProps> = ({
     fetchCondominios();
   }, []);
 
-  /**
-   * Função que retorna o JSX do <Autocomplete />
-   * Recebe por parâmetro:
-   * - `value`: o valor controlado (que pode vir do RHF ou do estado local)
-   * - `onChange`: a função de onChange a ser chamada quando o usuário seleciona algo
-   */
   const renderAutocomplete = (
     value: Condominio | null,
-    onChange: (newValue: Condominio | null) => void
+    onChange: (newValue: Condominio | null) => void,
+    fieldError: string | undefined
   ) => (
     <Autocomplete
       options={condominios}
@@ -83,8 +76,8 @@ export const CondominioSelect: React.FC<CondominioSelectProps> = ({
           label={label}
           variant="outlined"
           placeholder="Nome do condomínio"
-          error={!!error}
-          helperText={error}
+          error={!!fieldError}
+          helperText={fieldError || error}
         />
       )}
       noOptionsText={`Digite pelo menos 4 caracteres para ver os resultados`}
@@ -100,13 +93,15 @@ export const CondominioSelect: React.FC<CondominioSelectProps> = ({
           name={name}
           control={control}
           rules={{ required: "Condomínio é obrigatório" }}
-          render={({ field }) =>
-            renderAutocomplete(field.value || null, field.onChange)
+          render={({ field, fieldState }) =>
+            renderAutocomplete(field.value || null, (newValue) => {
+              field.onChange(newValue); // Define o valor como {codigoCondominio, nomeCondominio}
+            }, fieldState.error?.message)
           }
         />
       ) : (
         // Caso contrário, renderizamos com estado local
-        renderAutocomplete(valueLocal, (newValue) => setValueLocal(newValue))
+        renderAutocomplete(null, () => {}, undefined)
       )}
     </FormControl>
   );
