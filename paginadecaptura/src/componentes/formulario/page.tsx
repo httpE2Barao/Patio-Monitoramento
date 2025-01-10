@@ -61,7 +61,7 @@ export const Form: React.FC = () => {
           parentesco: "",
         },
       ],
-      veiculos: [{ cor: "", modelo: "", placa: "" }],
+      // veiculos: [{ cor: "", modelo: "", placa: "" }],
       feedback: "",
     },
   });
@@ -71,10 +71,10 @@ export const Form: React.FC = () => {
     name: "residentes",
     control,
   });
-  const { fields: veiculosFields } = useFieldArray({
-    name: "veiculos",
-    control,
-  });
+  // const { fields: veiculosFields } = useFieldArray({
+  //   name: "veiculos",
+  //   control,
+  // });
 
   // ========= Carregar dados do localStorage no useEffect ========= //
   useEffect(() => {
