@@ -133,8 +133,10 @@ export const Form: React.FC = () => {
   
     // Preenche no form o condomínio
     if (storedCondId && storedCondNome) {
-      setValue("endereco.condominio.codigoCondominio", storedCondId);
-      setValue("endereco.condominio.nomeCondominio", storedCondNome);
+      setValue("endereco.condominio", {
+        codigoCondominio: storedCondId,
+        nomeCondominio: storedCondNome,
+      })
     }
   
     // Junta apto e bloco

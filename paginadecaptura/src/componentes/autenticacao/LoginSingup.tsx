@@ -34,50 +34,47 @@ export const LoginSignup: React.FC = () => {
   };
 
   const handleSubmit = async (data: any) => {
-    console.log("handleSubmit: Iniciando processo de", isSignup ? "signup" : "login");
+    console.log("LoginSingup: Iniciando processo de", isSignup ? "signup" : "login");
     setError("");
     setLoading(true);
 
     const cpf = data.cpf.replace(/\D/g, "");
     const { password } = data;
 
-    console.log("handleSubmit: CPF limpo:", cpf);
-    console.log("handleSubmit: Senha recebida:", password);
-
     try {
       if (isSignup) {
-        console.log("handleSubmit: Fluxo de Signup iniciado");
-          console.log("handleSubmit: Criando novo usuário");
+        console.log("LoginSingup: Fluxo de Signup iniciado");
+          console.log("LoginSingup: Criando novo usuário");
           // Salva token localmente
           const authToken = data.mor_cond_id || "autenticado";
-          console.log("handleSubmit: Salvando authToken no localStorage:", authToken);
+          console.log("LoginSingup: Salvando authToken no localStorage:", authToken);
           localStorage.setItem("authToken", authToken);
 
           // === Criptografa e salva CPF e Senha no localStorage ===
-          console.log("handleSubmit: Criptografando CPF e senha");
+          console.log("LoginSingup: Criptografando CPF e senha");
           const encryptedCPF = CryptoJS.AES.encrypt(cpf, ENCRYPTION_KEY).toString();
           const encryptedPassword = CryptoJS.AES.encrypt(password, ENCRYPTION_KEY).toString();
 
-          console.log("handleSubmit: Salvando CPF e senha criptografados no localStorage");
+          console.log("LoginSingup: Salvando CPF e senha criptografados no localStorage");
           localStorage.setItem("encryptedCPF", encryptedCPF);
           localStorage.setItem("encryptedPassword", encryptedPassword);
 
-          console.log("handleSubmit: Redirecionando para /form");
+          console.log("LoginSingup: Redirecionando para /form");
           router.push("/form");
       } else {
           // Fluxo de login
-          console.log("handleSubmit: Fluxo de Login iniciado");
+          console.log("LoginSingup: Fluxo de Login iniciado");
           const payloadLogin = {
             action: "login",
             payload: { cpf, senha: password },
           };
-          console.log("handleSubmit: Enviando requisição de login ao backend");
+          console.log("LoginSingup: Enviando requisição de login ao backend");
         const response = await axios.post("/api/proxy", payloadLogin);
 
-        console.log("handleSubmit: Resposta do login:", response.data);
+        console.log("LoginSingup: Resposta do login:", response.data);
         
         if (response.data?.resposta === "ok") {
-          console.log("handleSubmit: Login bem-sucedido");
+          console.log("LoginSingup: Login bem-sucedido");
           
           // Salva token localmente
           const authToken = response.data.mor_cond_id || "autenticado";
@@ -87,7 +84,7 @@ export const LoginSignup: React.FC = () => {
           const condId = response.data.mor_cond_id || "";
           const condNome = response.data.mor_cond_nome || "";
           localStorage.setItem("mor_cond_id", condId);
-          localStorage.setItem("nome_condominio", condNome);
+          localStorage.setItem("mor_cond_nome", condNome);
           
           // 2) Salva apto e bloco no localStorage
           const morApto = response.data.mor_apto || "";
@@ -103,25 +100,25 @@ export const LoginSignup: React.FC = () => {
           
           router.push("/form");             
         } else {
-          console.log("handleSubmit: Erro no login:", response.data.resposta);
+          console.log("LoginSingup: Erro no login:", response.data.resposta);
           setError(response.data.resposta || "Credenciais inválidas.");
         }
       }} 
       catch (err: any) {
-      console.log("handleSubmit: Erro capturado no try/catch:", err);
+      console.log("LoginSingup: Erro capturado no try/catch:", err);
       if (err.response) {
-        console.log("handleSubmit: Erro de resposta do servidor:", err.response.data);
+        console.log("LoginSingup: Erro de resposta do servidor:", err.response.data);
         setError(err.response.data.error || "Erro no servidor.");
       } else if (err.request) {
-        console.log("handleSubmit: Erro na requisição:", err.request);
+        console.log("LoginSingup: Erro na requisição:", err.request);
         setError("Sem resposta do servidor.");
       } else {
-        console.log("handleSubmit: Erro desconhecido:", err.message);
+        console.log("LoginSingup: Erro desconhecido:", err.message);
         setError("Erro desconhecido.");
       }
     } finally {
       setLoading(false);
-      console.log("handleSubmit: Processo finalizado, loading setado para false");
+      console.log("LoginSingup: Processo finalizado, loading setado para false");
     }
   };
   
