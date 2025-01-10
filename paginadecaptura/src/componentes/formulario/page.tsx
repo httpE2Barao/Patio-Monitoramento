@@ -107,10 +107,6 @@ export const Form: React.FC = () => {
       try {
         const bytes = CryptoJS.AES.decrypt(encryptedCPF, ENCRYPTION_KEY);
         const originalCPF = bytes.toString(CryptoJS.enc.Utf8);
-  
-        // Já define no form
-        setValue("residentes.0.documento", originalCPF);
-        // Armazena no state
         setStoredCPF(originalCPF);
       } catch (err) {
         console.error("Erro ao descriptografar o CPF:", err);
