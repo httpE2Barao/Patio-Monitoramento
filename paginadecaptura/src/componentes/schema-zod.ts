@@ -89,7 +89,7 @@ export const feedbackSchema = z.string().max(100, { message: 'Feedback deve ter 
 export const schema = z.object({
     endereco: enderecoSchema,
     residentes: z.array(residenteSchema),
-    veiculos: z.array(veiculoSchema),
+    // veiculos: z.array(veiculoSchema),
     feedback: feedbackSchema,
 });
 

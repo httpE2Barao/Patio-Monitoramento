@@ -25,7 +25,7 @@ export const FormEndereco: React.FC<FormEnderecoProps> = ({ isAptoDisabled }) =>
         <Grid item xs={12} md={6}>
         <CondominioSelect
           control={control}
-          disabled={false}
+          disabled={isAptoDisabled}
         />
         </Grid>
         <Grid item xs={12} md={6}>

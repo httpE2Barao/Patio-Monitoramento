@@ -10,7 +10,6 @@ import { Schema, schema } from "../schema-zod";
 import { FormEndereco } from "./FormEndereco";
 import { FormFeedback } from "./FormFeedback";
 import { FormResidentes } from "./FormResidentes";
-import { FormVeiculo } from "./FormVeiculo";
 
 const ENCRYPTION_KEY =
   process.env.NEXT_PUBLIC_ENCRYPTION_KEY || "chave-de-seguranca";
@@ -32,8 +31,9 @@ export const Form: React.FC = () => {
   // Referência para scroll automático no feedback
   const feedbackRef = useRef<HTMLDivElement | null>(null);
 
-  // Vai controlar o bloqueio do campo apto
+  // Controla o bloqueio dos campos
   const [isAptoDisabled, setIsAptoDisabled] = useState(false);
+  const [isCondominioDisabled, setIsCondominioDisabled] = useState(false);
 
   // Guardar o CPF e apto/bloco vindos do localStorage
   const [storedCPF, setStoredCPF] = useState<string>("");
@@ -136,7 +136,10 @@ export const Form: React.FC = () => {
       setValue("endereco.condominio", {
         codigoCondominio: storedCondId,
         nomeCondominio: storedCondNome,
-      })
+      });
+      setIsCondominioDisabled(true); // <--- Bloqueia edição
+    } else {
+      setIsCondominioDisabled(false);
     }
   
     // Junta apto e bloco
@@ -457,11 +460,11 @@ export const Form: React.FC = () => {
                 ))}
               </Grid>
 
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 {veiculosFields.map((item, index) => (
                   <FormVeiculo key={item.id} index={index} />
                 ))}
-              </Grid>
+              </Grid> */}
 
               <Grid item xs={12}>
                 <FormFeedback />
