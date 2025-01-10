@@ -202,136 +202,139 @@ export const Form: React.FC = () => {
     }
   };  
   
-  // ========= Cria ou edita morador conforme necessidade ========= //
-  const gerenciarMorador = async (
+  async function gerenciarMorador(
     condominioId: string,
+    nomeCondominio: string,
     apartamento: string,
     bloco: string,
-    data: Schema,
-    DecryptedPassword: string
-  ): Promise<string> => {
+    morador: {
+      nome: string;
+      telefone: string[];
+      email: string;
+      tipoDocumento: string;
+      documento: string;
+      parentesco: string;
+    },
+    feedback: string,
+    DecryptedPassword: string, // pode ser "" para quem não tem senha
+    setEditar: React.Dispatch<React.SetStateAction<boolean | null>>,
+    setFeedbackMessage: React.Dispatch<React.SetStateAction<string | null>>
+  ): Promise<string> {
     try {
       const payloadMoradorBase = {
         mor_cond_id: condominioId,
-        mor_cond_nome: data.endereco.condominio.nomeCondominio,
+        mor_cond_nome: nomeCondominio,
         mor_apto: apartamento,
         mor_bloco: bloco,
-        mor_nome: data.residentes[0].nome,
-        mor_parentesco: data.residentes[0].parentesco || "Outros",
-        mor_cpf: data.residentes[0].documento,
-        mor_celular01: data.residentes[0].telefone[0],
-        mor_celular02: data.residentes[0].telefone[1] || "",
-        mor_celular03: data.residentes[0].telefone[2] || "",
-        mor_email: data.residentes[0].email,
+        mor_nome: morador.nome,
+        mor_parentesco: morador.parentesco || "",
+        mor_cpf: morador.documento,
+        mor_celular01: morador.telefone[0] || "",
+        mor_celular02: morador.telefone[1] || "",
+        mor_celular03: morador.telefone[2] || "",
+        mor_email: morador.email,
         mor_responsavel: "Formulário de Cadastro",
-        mor_obs: data.feedback || "",
-        mor_senhaapp: DecryptedPassword,
+        mor_obs: feedback || "",
+        mor_senhaapp: DecryptedPassword, // se for "", significa sem senha
       };
-
-      // 1) Tenta criar morador
+  
+      // 1) Tenta criar
       const novoMoradorResponse = await chamarApi("novo_morador", {
         ...payloadMoradorBase,
         acao: "novo",
       });
-
-      // 2) Se já existir, edita
+  
+      // 2) Se já existir, faz edição
       if (
-        novoMoradorResponse.resposta?.includes(
-          "Erro ! O CPF Informado já está cadastrado"
-        ) ||
-        novoMoradorResponse.resposta?.includes(
-          "Erro! O CPF Informado já está cadastrado"
-        )
+        novoMoradorResponse.resposta?.includes("Erro ! O CPF Informado já está cadastrado") ||
+        novoMoradorResponse.resposta?.includes("Erro! O CPF Informado já está cadastrado")
       ) {
         setEditar(true);
-
+  
         const listarMoradoresResponse = await chamarApi("listar_moradores", {
           acao: "listar",
           mor_cond_id: condominioId,
           mor_apto: "",
           mor_bloco: "",
         });
-
+  
         const moradores = listarMoradoresResponse?.Moradores || [];
         const moradorExistente = moradores.find(
-          (morador: any) => morador.rg === data.residentes[0].documento
+          (item: any) => item.rg === morador.documento
         );
-
+  
         if (!moradorExistente) {
           throw new Error("Morador existente não encontrado para edição.");
         }
-
-        // Agora faz a edição do morador
-        const editarMoradorPayload = {
+  
+        // Faz a edição
+        const editarMoradorResponse = await chamarApi("editar_morador", {
           mor_id: moradorExistente.idregistro,
           ...payloadMoradorBase,
           acao: "editar",
-        };
-
-        console.log(
-          "gerenciarMorador: Payload para edição do morador:",
-          editarMoradorPayload
-        );
-
-        const editarMoradorResponse = await chamarApi(
-          "editar_morador",
-          editarMoradorPayload
-        );
-
+        });
+  
         if (!editarMoradorResponse.resposta?.includes("Sucesso")) {
           throw new Error(
             editarMoradorResponse.resposta || "Erro ao editar morador."
           );
         }
-
+  
         return "Morador atualizado com sucesso!";
       }
-
+  
+      // 3) Se não veio "CPF já cadastrado", mas também não veio "Sucesso", é erro
       if (!novoMoradorResponse.resposta?.includes("Sucesso")) {
-        throw new Error(
-          novoMoradorResponse.resposta || "Erro ao criar morador."
-        );
+        throw new Error(novoMoradorResponse.resposta || "Erro ao criar morador.");
       }
-
+  
+      // 4) Se deu sucesso na criação
       return "Cadastro enviado com sucesso!";
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Erro ao gerenciar morador:", error.message);
-        setFeedbackMessage(error.message);
-      } else {
-        console.error("Erro desconhecido:", error);
-        setFeedbackMessage("Erro desconhecido no processo. Tente novamente.");
-      }
-      throw error;
+    } catch (error: any) {
+      console.error("Erro ao gerenciar morador:", error.message);
+      setFeedbackMessage(error.message);
+      throw error; // re-lança para interromper fluxo se precisar
     }
-  };
+  }  
 
-  // ========= Fluxo principal: onSubmit ========= //
+  // ================== Fluxo no onSubmit ================== //
   const onSubmit = async (data: Schema) => {
     setLoading(true);
     try {
-      // Separa apto e bloco se houver
-      const [apartamento, bloco = ""] = data.endereco.apto.trim().split(" ");
+      const aptoLimpo = limparAptoBloco(data.endereco.apto);
+      const [apartamento, bloco = ""] = aptoLimpo.split(" ");
       const condominioId = data.endereco.condominio.codigoCondominio;
 
-      // Verifica ou cria o apartamento
+      // Verifica/cria apto
       await verificarOuCriarApartamento(condominioId, apartamento, bloco);
 
-      // Tenta criar/editar o morador
-      const mensagem = await gerenciarMorador(
-        condominioId,
-        apartamento,
-        bloco,
-        data,
-        DecryptedPassword
-      );
+      for (let i = 0; i < data.residentes.length; i++) {
+        const morador = data.residentes[i];
+        const feedback = data.feedback || "";
 
-      setFeedbackMessage(mensagem); // Exibe a mensagem retornada
+        // Só o primeiro recebe a senha descriptografada
+        const senhaParaEsseMorador = i === 0 ? DecryptedPassword : "SENHA";
+
+        // Chamamos a função unificada
+        const msg = await gerenciarMorador(
+          condominioId,
+          data.endereco.condominio.nomeCondominio,
+          apartamento,
+          bloco,
+          morador,
+          feedback,
+          senhaParaEsseMorador,
+          setEditar,
+          setFeedbackMessage
+        );
+
+        console.log("Resposta ao cadastrar/editar um morador:", msg);
+        setFeedbackMessage(msg); // Mostra a última mensagem
+      }
     } catch (error: unknown) {
       console.error("Erro no fluxo:", error);
     } finally {
       setLoading(false);
-      // Remove dados do localStorage (mas pode manter se quiser re-editar)
       clearSpecificLocalStorageData();
     }
   };
@@ -339,6 +342,26 @@ export const Form: React.FC = () => {
   const onError = (errors: any) => {
     console.log("Erros de validação:", errors);
   };
+
+  function limparAptoBloco(input: string): string {
+    // Converte tudo para lowercase
+    let texto = input.toLowerCase();
+  
+    // Remove qualquer caractere que não seja letra, dígito ou espaço
+    texto = texto.replace(/[^a-z0-9\s]/g, " ");
+  
+    // Remove as palavras "apartamento", "apto", "apt", "ap"
+    // (\b = borda de palavra para evitar capturar substrings indesejadas)
+    texto = texto.replace(/\b(apartamento|apto|apt|ap)\b/g, "");
+  
+    // Remove as palavras "bloco" e "bl"
+    texto = texto.replace(/\b(bloco|bl)\b/g, "");
+  
+    // Substitui múltiplos espaços por um único e faz trim
+    texto = texto.replace(/\s+/g, " ").trim();
+  
+    return texto;
+  }  
 
   // ========= Funções para resetar e fazer logout ========= //
   const handleReset = () => {

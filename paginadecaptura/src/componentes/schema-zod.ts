@@ -40,7 +40,7 @@ export const residenteBaseSchema = z.object({
         .refine((text) => patterns.email.test(text), { message: "O email é inválido" }),
     tipoDocumento: z.enum(["RG", "CPF", "CNH"], { message: 'Selecione um tipo de documento válido' }),
     documento: z.string(),
-    parentesco: z.string().optional(),
+    parentesco: z.string(),
 }).superRefine((values, ctx) => {
     const documentoLimpo = values.documento.replace(/[\s.-]/g, '');
 
@@ -83,7 +83,7 @@ export const veiculoSchema = z.object({
 });
 
 // Esquema de validação para feedback
-export const feedbackSchema = z.string().max(100, { message: 'Feedback deve ter até 100 caracteres' }).nullable().optional();
+export const feedbackSchema = z.string().max(100, { message: 'Feedback deve ter até 100 caracteres' }).nullable();
 
 // Esquema geral de validação
 export const schema = z.object({
