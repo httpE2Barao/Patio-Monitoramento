@@ -16,25 +16,18 @@ export const LoginSignup: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log("useEffect: Verificando token de autenticação...");
     const token = localStorage.getItem("authToken");
-    console.log("useEffect: Token encontrado:", token);
     if (token) {
-      console.log("useEffect: Token válido, redirecionando para /form");
       router.push("/form");
-    } else {
-      console.log("useEffect: Token não encontrado, permanecendo em /auth");
     }
   }, [router]);
 
   const handleToggleForm = () => {
     setIsSignup((prevState) => !prevState);
     setError("");
-    console.log(`handleToggleForm: Formulário alterado para ${isSignup ? "Login" : "Signup"}`);
   };
 
   const handleSubmit = async (data: any) => {
-    console.log("LoginSingup: Iniciando processo de", isSignup ? "signup" : "login");
     setError("");
     setLoading(true);
 
@@ -43,39 +36,28 @@ export const LoginSignup: React.FC = () => {
 
     try {
       if (isSignup) {
-        console.log("LoginSingup: Fluxo de Signup iniciado");
-          console.log("LoginSingup: Criando novo usuário");
-          // Salva token localmente
-          const authToken = data.mor_cond_id || "autenticado";
-          console.log("LoginSingup: Salvando authToken no localStorage:", authToken);
-          localStorage.setItem("authToken", authToken);
+        // Fluxo de Signup
+        // Salva token localmente
+        const authToken = data.mor_cond_id || "autenticado";
+        localStorage.setItem("authToken", authToken);
 
-          // === Criptografa e salva CPF e Senha no localStorage ===
-          console.log("LoginSingup: Criptografando CPF e senha");
-          const encryptedCPF = CryptoJS.AES.encrypt(cpf, ENCRYPTION_KEY).toString();
-          const encryptedPassword = CryptoJS.AES.encrypt(password, ENCRYPTION_KEY).toString();
+        // === Criptografa e salva CPF e Senha no localStorage ===
+        const encryptedCPF = CryptoJS.AES.encrypt(cpf, ENCRYPTION_KEY).toString();
+        const encryptedPassword = CryptoJS.AES.encrypt(password, ENCRYPTION_KEY).toString();
 
-          console.log("LoginSingup: Salvando CPF e senha criptografados no localStorage");
-          localStorage.setItem("encryptedCPF", encryptedCPF);
-          localStorage.setItem("encryptedPassword", encryptedPassword);
+        localStorage.setItem("encryptedCPF", encryptedCPF);
+        localStorage.setItem("encryptedPassword", encryptedPassword);
 
-          console.log("LoginSingup: Redirecionando para /form");
-          router.push("/form");
+        router.push("/form");
       } else {
-          // Fluxo de login
-          console.log("LoginSingup: Fluxo de Login iniciado");
-          const payloadLogin = {
-            action: "login",
-            payload: { cpf, senha: password },
-          };
-          console.log("LoginSingup: Enviando requisição de login ao backend");
+        // Fluxo de login
+        const payloadLogin = {
+          action: "login",
+          payload: { cpf, senha: password },
+        };
         const response = await axios.post("/api/proxy", payloadLogin);
 
-        console.log("LoginSingup: Resposta do login:", response.data);
-        
         if (response.data?.resposta === "ok") {
-          console.log("LoginSingup: Login bem-sucedido");
-          
           // Salva token localmente
           const authToken = response.data.mor_cond_id || "autenticado";
           localStorage.setItem("authToken", authToken);
@@ -100,25 +82,19 @@ export const LoginSignup: React.FC = () => {
           
           router.push("/form");             
         } else {
-          console.log("LoginSingup: Erro no login:", response.data.resposta);
           setError(response.data.resposta || "Credenciais inválidas.");
         }
       }} 
       catch (err: any) {
-      console.log("LoginSingup: Erro capturado no try/catch:", err);
       if (err.response) {
-        console.log("LoginSingup: Erro de resposta do servidor:", err.response.data);
         setError(err.response.data.error || "Erro no servidor.");
       } else if (err.request) {
-        console.log("LoginSingup: Erro na requisição:", err.request);
         setError("Sem resposta do servidor.");
       } else {
-        console.log("LoginSingup: Erro desconhecido:", err.message);
         setError("Erro desconhecido.");
       }
     } finally {
       setLoading(false);
-      console.log("LoginSingup: Processo finalizado, loading setado para false");
     }
   };
   

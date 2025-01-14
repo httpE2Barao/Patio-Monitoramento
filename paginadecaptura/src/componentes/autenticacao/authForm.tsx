@@ -121,24 +121,18 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           mor_bloco: "",
         });
   
-        console.log("Resposta completa da API:", response);
-  
         const { resposta, Moradores } = response;
   
         // Se a API retornou um erro
         if (resposta && typeof resposta === "string") {
-          console.error("Erro da API:", resposta);
           setError(resposta);
           return;
         }
   
         // Verifique se 'Moradores' está presente e é um array
         if (!Moradores || !Array.isArray(Moradores)) {
-          console.error("Estrutura inválida na resposta da API:", response);
           throw new Error("Resposta inválida da API ao listar moradores.");
         }
-  
-        console.log("Lista de moradores retornados:", Moradores);
   
         // Compare o RG retornado com o CPF inserido.
         const normalizedCPF = normalizeDoc(data.cpf);
@@ -149,7 +143,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           const normalizedRG = normalizeDoc(m.rg);
   
           if (normalizedRG === normalizedCPF) {
-            console.log(`Match encontrado com o morador ${index + 1}:`, m);
             found = true;
             setError("Morador já existe, faça login.");
             return; // Interrompe o submit
@@ -157,13 +150,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         }
   
         if (!found) {
-          console.warn("Nenhum morador encontrado com o CPF informado.");
           // Continue com o cadastro
-        } else {
-          console.log("CPF encontrado entre os RGs cadastrados.");
         }
       } catch (err: any) {
-        console.error("Erro ao listar moradores:", err);
         setError(err.error || "Não foi possível verificar seus dados no condomínio.");
         return;
       }

@@ -177,9 +177,7 @@ export const Form: React.FC = () => {
       });
   
       if (aptoEncontrado) {
-        console.log("DEBUG > aptoEncontrado =", aptoEncontrado);
-        console.log("DEBUG > Apto já existe, ID =", aptoEncontrado.idregistro);
-        // Retorne o id (ex: aptoEncontrado.idregistro)
+        // Apto já existe, ID = aptoEncontrado.idregistro
         return aptoEncontrado.idregistro; 
       } else {  
         const criarResponse = await chamarApi("criar_apartamento", {
@@ -189,10 +187,7 @@ export const Form: React.FC = () => {
           bloco: bloco,
         });
         
-        console.log("DEBUG > criarResponse =", criarResponse);
-  
         if (!criarResponse?.resposta?.includes("Sucesso")) {
-          console.log("DEBUG > criarResponse.resposta =", criarResponse?.resposta);
           throw new Error(criarResponse?.resposta || "Erro ao criar apartamento.");
         }
         // Se a API retornar { idregistro: 999, resposta: "Sucesso" }
@@ -330,7 +325,6 @@ export const Form: React.FC = () => {
           setFeedbackMessage
         );
 
-        console.log("Resposta ao cadastrar/editar um morador:", msg);
         setFeedbackMessage(msg); // Mostra a última mensagem
       }
     } catch (error: unknown) {
