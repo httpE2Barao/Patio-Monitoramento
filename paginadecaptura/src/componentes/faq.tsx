@@ -66,7 +66,7 @@ const FAQ = () => {
                     <FaqOption pergunta={"É seguro fornecer meus dados?"} resposta={"Sim, garantimos total segurança. Nosso sistema é 100% seguro e utiliza criptografia para proteger suas informações, que são usadas exclusivamente para controle de acesso ao condomínio e mantidas em sigilo absoluto."} Expandir={Expandir} />
                     <FaqOption pergunta={"Posso cadastrar mais de um veículo?"} resposta={"Sim, no formulário dimâmico você poderá informar quantos veículos possui."} Expandir={Expandir} />
                     <FaqOption pergunta={"Quando a atualização dos dados entrará em vigor?"} resposta={"Após o envio, suas novas informações serão analizadas e atualizadas no sistema em breve para garantir um acesso ainda mais eficiente."} Expandir={Expandir} />
-                    <FaqOption pergunta={"O que devo fazer se mudar de apartamento?"} resposta={"Em caso de mudança de apartamento, basta atualizar seu cadastro com o novo endereço. O formulário inclui as datas de envio para garantir que todas as informações estejam sempre atualizadas."} Expandir={Expandir} />
+                    {/* <FaqOption pergunta={"O que devo fazer se mudar de apartamento?"} resposta={"Em caso de mudança de apartamento, basta atualizar seu cadastro com o novo endereço. O formulário inclui as datas de envio para garantir que todas as informações estejam sempre atualizadas."} Expandir={Expandir} /> */}
                     <FaqOption pergunta={"Ainda tenho dúvidas, como posso falar com vocês?"} resposta={'Se precisar de mais ajuda, entre em contato clicando no botão "Contate-nos" no topo da página ou pelos nossos canais de atendimento no rodapé.'} Expandir={Expandir} />
                 </Box>
             </Container>
